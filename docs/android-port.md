@@ -1,8 +1,28 @@
 # CrossPoint no Bigme HiBreak Pro
 
-Alvo: **Bigme HiBreak Pro**, telefone e-ink com Android. MediaTek
-(`idVendor 0x0E8D`), arm64-v8a, número de série `B651DNW2GG1C006000099`.
-Resolução e densidade do painel: **ainda não medidas**, dependem de adb.
+Alvo: **Bigme HiBreak Pro**, telefone e-ink com Android. Tudo abaixo foi lido
+do aparelho, não inferido.
+
+| | |
+| --- | --- |
+| Modelo | Bigme HiBreak (`ro.product.model`), build `Bigme_HiBreak_V1.0_20260306` |
+| Android | 14, SDK 34 |
+| SoC | MediaTek MT6877, arm64-v8a |
+| Painel | **824x1648**, densidade **300 dpi** |
+| Rotação física | `ro.vendor.xrz.phy_rotation = 270` |
+| Série | `B651DNW2GG1C006000099` |
+| OEM por trás | xrztech (`ro.build.locale.area`) |
+
+Duas consequências imediatas da geometria:
+
+- **824 / 8 = 103 exato.** O renderer do CrossPoint trabalha com planos de 1bpp
+  e `DISPLAY_WIDTH_BYTES = WIDTH / 8`. Largura múltipla de 8 evita a classe de
+  bug de padding por linha de cara. Cada plano dá 103 x 1648 = 169.744 bytes.
+- **300 dpi contra os ~212 do X4.** A UI do CrossPoint foi desenhada para
+  painéis bem menos densos. Em 300 dpi tudo sai fisicamente menor, e as fontes
+  são bitmap (EpdFont), não vetoriais. Ou se geram tamanhos maiores, ou se
+  renderiza em escala. Isto é trabalho de UI, não de porte, mas é melhor saber
+  agora.
 
 Este porte é primo do porte Kindle, não do porte M5PaperS3. Os dois tiram o
 CrossPoint do ESP32 e o colocam num sistema operacional que já é dono da
@@ -70,31 +90,83 @@ Com o `String` vindo do nosso shim a detecção não dispara, ele cai no
 
 ## O painel: o que a Bigme expõe
 
-A Bigme não publica SDK. O framework interno chama-se `xrz` e foi levantado por
-engenharia reversa por terceiros (`imedwei/inksdk`), num **HiBreak Plus**, não
-no Pro. Nada abaixo foi confirmado no nosso aparelho ainda.
+A Bigme não publica SDK. O framework interno chama-se `xrz`. Um levantamento
+por engenharia reversa de terceiros (`imedwei/inksdk`) o descreveu num **HiBreak
+Plus**; **confirmamos no nosso Pro** que é o mesmo framework, e encontramos mais
+do que aquele material descrevia, porque ele olhou o caminho da caneta e não o
+do sistema.
+
+### O que está no aparelho, confirmado
 
 ```
-xrz.framework.manager.XrzEinkManager
-  setRefreshModeForSurfaceView(SurfaceView, int)
-  setRefreshModeByView(View, int)
-  forceGlobalRefresh(int)
-xrz.framework.manager.EinkRefreshMode          // tabela int -> waveform
-/system/framework/xrz.framework.server.jar     // 124KB, world-readable
-ro.vendor.xrz.default_refresh_mode = 178
+handwrittenservice  (PID 1066, root)  [com.xrz.IHandwrittenService]
+/system/framework/xrz.framework.server.jar          114.534 bytes, world-readable
 ```
 
-O que torna isso utilizável: o app de notas da própria Bigme que usa essa API
-roda em UID de app comum e não é assinado pela plataforma. Um app de terceiro
-alcança o mesmo por reflexão, sem permissão.
+O jar contém só o lado servidor (`DisplayPolicyService`,
+`DisplayPolicyController`, `AppFreezeService`, `SplitScreenService`,
+`DatabaseHelper`). As classes `xrz.framework.manager.*`, incluindo a
+`EinkRefreshMode`, são apenas **referenciadas** aqui: elas moram no
+`framework.jar` do boot classpath, que ainda não foi puxado.
 
-Mapeamento pretendido, a confirmar:
+Superfície de API lida das strings do dex, bem maior que a publicada:
 
-| CrossPoint | Kindle (FBInk) | Bigme (xrz) |
+```
+setRefreshMode / getRefreshMode              setLayerRefreshMode
+setRefreshModeForPackage(packageName, ...)   getRefreshModeForPackage
+setRefreshFrequency / setRefreshFrequencyForPackage
+setIsRefreshSetting / setIsRefreshSettingForPackage
+forceGlobalRefresh                           getEinkMode
+readWaveForm / readFactoryWaveForm           sendGlobalHandwrittenRequest
+```
+
+### A escada de modos
+
+Os valores saem das propriedades do sistema, que são as que o próprio aparelho
+usa:
+
+| Propriedade | Valor | Leitura |
 | --- | --- | --- |
-| `FULL_REFRESH` | `WFM_GC16` flashing | `MODE_GC16` |
-| `HALF_REFRESH` | `WFM_GL16` | `MODE_GU16` |
-| `FAST_REFRESH` | `WFM_DU` | `MODE_HANDWRITE` |
+| `ro.vendor.xrz.default_refresh_mode` | 178 | padrão, texto e UI |
+| `sys.video_refresh_mode` | 179 | vídeo: o mais rápido, pior qualidade |
+| `sys.comic_refresh_mode` | 180 | quadrinhos: tons de cinza |
+| `sys.maga_refresh_mode` | -2147483471 | revista |
+| `vendor.xrz.logo_refresh_mode` | -2147483471 | logo do boot |
+| `vendor.xrz.bootanimation_refresh_mode` | 180 | animação de boot |
+| `vendor.xrz.force_global_refresh_mode` | -1 | desligado, e **gravável** |
+
+`-2147483471` é `0x80000000 | 177`. Então **o inteiro carrega flag no bit
+alto**, não é enum simples, e os modos base se agrupam em 177, 178, 179, 180.
+
+**Hipótese de mapeamento**, ainda não verificada no painel:
+
+| CrossPoint | Bigme | Por quê |
+| --- | --- | --- |
+| `FULL_REFRESH` | `0x80000000 \| 177` | o que revista e logo usam: melhor qualidade |
+| `HALF_REFRESH` | 178 | o padrão de texto e UI |
+| `FAST_REFRESH` | 179 | o de vídeo: mais rápido |
+| imagens | 180 | o de quadrinhos: cinza |
+
+### A descoberta que pode dispensar API nenhuma
+
+O `DatabaseHelper` do jar carrega esta tabela:
+
+```sql
+CREATE TABLE policy_org (
+  package_name text, refresh_mode integer default '-1',
+  refresh_frequency integer, app_contrast integer, app_anti_flicker integer,
+  app_anti_alias integer, app_text_enhance integer, app_dark_level integer,
+  app_color_enhance integer, app_brightness_level integer,
+  app_auto_clean integer, app_color_mode integer, app_scroll_flip integer,
+  app_dpi integer, ... )
+```
+
+**O sistema já guarda modo de refresh por aplicativo.** É isso que o
+`com.xrz.sys.control` (rodando, em `/data/app`) expõe ao usuário. Ou seja: para
+a v1, provavelmente não precisamos de reflexão, nem de JNI, nem de API nenhuma.
+O usuário escolhe o modo do CrossPoint no painel de controle do próprio
+aparelho, e o sistema aplica. A API programática vira otimização, não
+requisito.
 
 **Decisão de projeto:** a v1 não usa nada disso. Sai pelo caminho Android
 padrão e deixa o sistema decidir o refresh, que é o que ele já faz para
@@ -107,20 +179,30 @@ coexistem, e árvore de views repintando em cadência alta custa caro (1062ms p9
 a 30Hz). Um leitor que repinta por virada de página é o perfil bom desse
 hardware, não o ruim.
 
-## Estado do aparelho
+## O adb deste aparelho é instável
 
-Ainda não conectado. O adb enumera a interface correta (classe 255, subclasse
-66, protocolo 1, dois endpoints) e o aparelho não responde no pipe de leitura:
+Vale registrar porque custou tempo. A interface USB é correta (classe 255,
+subclasse 66, protocolo 1) e o adb acha o aparelho, mas a conexão cai depois de
+poucos comandos:
 
 ```
 usb_osx.cpp:322  Add usb device B651DNW2GG1C006000099
 usb_osx.cpp:631  usb_read failed with status: e00002ed   <- kIOReturnNotResponding
-transport.cpp    connection terminated: read failed
+transport.cpp    connection terminated: read failed      <- em loop
 ```
 
-Lado do Mac inteiro. É o daemon adb do Android que não atende. Enquanto isso
-não resolver, tudo nesta seção e a geometria do painel ficam sem medição, e o
-perfil `FREEINK_DEVICE_HIBREAK` não pode ser escrito com números de verdade.
+O lado do Mac está inteiro; é o daemon do Android que larga a conexão. O
+contorno é não depender de sessões longas: um comando por invocação, com retry,
+e nada refeito. O jar de 114KB precisou de três tentativas.
+
+Para trabalho de verdade, a depuração sem fio (`adb pair` / `adb connect`)
+provavelmente vale mais do que insistir no cabo.
+
+### Ainda não puxado
+
+- `/system/framework/framework.jar`, onde moram `XrzEinkManager` e a
+  `EinkRefreshMode` com os valores nomeados. É grande, e sobre esta conexão vai
+  doer.
 
 ## O que ainda não foi decidido
 

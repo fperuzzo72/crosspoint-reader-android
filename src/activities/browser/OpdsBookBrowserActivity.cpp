@@ -1,6 +1,7 @@
 #include "OpdsBookBrowserActivity.h"
 
 #include <Arduino.h>
+#include <BoardConfig.h>
 #include <FontCacheManager.h>
 #include <FreeInkUIIcon.h>
 #include <GfxRenderer.h>
@@ -635,11 +636,26 @@ void OpdsBookBrowserActivity::checkAndConnectWifi() {
 }
 
 void OpdsBookBrowserActivity::launchWifiSelection() {
+#if FREEINK_DEVICE_HIBREAK
+  // Neste aparelho quem associa e o sistema operacional. A tela de escolha de
+  // rede do CrossPoint varre e conecta por conta propria, e aqui ela abriria
+  // vazia: o scanNetworks() do shim devolve zero de proposito, porque varrer
+  // brigaria com o gerenciador do Android pela mesma radio.
+  //
+  // Entao em vez de abrir uma lista que nunca tera item, dizemos o que fazer.
+  // Isto e a mesma politica que o porte Kindle adotou para os fluxos de
+  // associacao: esconder por capacidade em vez de falhar no botao.
+  state = BrowserState::ERROR;
+  errorMessage = tr(STR_CLOCK_SYNC_NO_WIFI_HINT);
+  requestUpdate();
+  return;
+#else
   state = BrowserState::WIFI_SELECTION;
   requestUpdate();
 
   startActivityForResult(std::make_unique<WifiSelectionActivity>(renderer, mappedInput),
                          [this](const ActivityResult& result) { onWifiSelectionComplete(!result.isCancelled); });
+#endif
 }
 
 void OpdsBookBrowserActivity::onWifiSelectionComplete(const bool connected) {

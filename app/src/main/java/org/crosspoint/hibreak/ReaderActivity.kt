@@ -76,6 +76,10 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
       return
     }
 
+    // Antes da raiz e antes da thread: o C++ pergunta o estado da rede assim
+    // que alguem abre o OPDS, e sem contexto a resposta seria "sem rede".
+    CrossPointNet.init(this)
+
     val root = resolveStorageRoot()
     CrossPointNative.nativeSetStorageRoot(root.absolutePath)
 

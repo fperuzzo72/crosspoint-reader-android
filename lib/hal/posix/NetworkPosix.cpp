@@ -5,6 +5,7 @@
 // control of the radio is not ours to do and fails honestly rather than
 // pretending. Sockets are entirely real.
 
+#include <BoardConfig.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
@@ -19,6 +20,10 @@
 #include <cstdio>
 #include <cstring>
 #include <memory>
+
+#if FREEINK_DEVICE_HIBREAK
+#include "android/NetAndroid.h"
+#endif
 
 #include "arduino-shim/NetworkUdp.h"
 #include "arduino-shim/WiFi.h"
@@ -88,17 +93,43 @@ bool resolveHost(const char* host, const uint16_t port, sockaddr_in* out) {
 WiFiClass WiFi;
 
 wl_status_t WiFiClass::status() {
+#if FREEINK_DEVICE_HIBREAK
+  // Pergunta ao framework, nao ao getifaddrs. Ver NetAndroid.h: o Android 11
+  // fechou NETLINK para aplicativo comum e o getifaddrs deixou de enxergar as
+  // interfaces, entao esta funcao respondia "sem rede" com o Wi-Fi ligado e o
+  // OPDS abria a tela de escolha de rede que aqui nao tem o que escolher.
+  //
+  // O log sai uma vez e compara as duas respostas, porque a frase acima era
+  // uma hipotese quando foi escrita e o aparelho e quem decide.
+  const bool framework = crosspoint::android::netIsOnline();
+  static bool said = false;
+  if (!said) {
+    said = true;
+    std::fprintf(stderr, "[net] online: framework=%d getifaddrs=%d\n", framework ? 1 : 0,
+                 firstInetInterface(nullptr, 0, nullptr) ? 1 : 0);
+    std::fflush(stderr);
+  }
+  return framework ? WL_CONNECTED : WL_DISCONNECTED;
+#else
   // "Connected" means the only thing this process can actually verify: an
   // interface is up and has an address. Whether the system considers itself
   // associated is not visible from here, and guessing would be worse.
   return firstInetInterface(nullptr, 0, nullptr) ? WL_CONNECTED : WL_DISCONNECTED;
+#endif
 }
 
 IPAddress WiFiClass::localIP() {
   uint32_t addr = 0;
+#if FREEINK_DEVICE_HIBREAK
+  addr = crosspoint::android::netLocalIpV4();
+  if (addr == 0) {
+    return IPAddress();
+  }
+#else
   if (!firstInetInterface(nullptr, 0, &addr)) {
     return IPAddress();
   }
+#endif
   const auto* b = reinterpret_cast<const uint8_t*>(&addr);
   return IPAddress(b[0], b[1], b[2], b[3]);
 }

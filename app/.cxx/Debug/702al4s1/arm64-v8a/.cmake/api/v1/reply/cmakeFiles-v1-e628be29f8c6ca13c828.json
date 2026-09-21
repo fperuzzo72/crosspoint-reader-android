@@ -740,6 +740,7 @@
 				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/HttpAndroid.cpp",
 				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/Jni.cpp",
 				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/JniBridge.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/NetAndroid.cpp",
 				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/hosted/HostedGray.cpp",
 				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/kindle/KindleFrameBuffer.cpp",
 				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/kindle/KindleGrayExpand.cpp",

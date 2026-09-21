@@ -13,6 +13,20 @@ cd "$(dirname "$0")"
 # 22 e 24 sairam: testados no aparelho e grandes demais para uso real. 12
 # saiu antes por ser pequeno demais. Sobra 14/16/18/20, que e a faixa que se
 # usa lendo.
+# Setas, formas geometricas, dingbats e os operadores matematicos que aparecem
+# em texto corrido. NENHUMA fonte de origem deste repositorio os tinha: medido,
+# NotoSerif e Ubuntu davam 0 de 112 setas e 1 de 96 formas geometricas. Por
+# isso saiam como quadrado com "?" nos livros.
+#
+# Duas fontes porque uma nao basta: a Symbols2 cobre formas geometricas (96/96)
+# e dingbats (145/192) mas so 13 de 112 setas e nao tem a U+2192; a Math tem
+# 99 de 112 setas e a U+2192. A pilha e ordenada por prioridade decrescente,
+# entao elas entram DEPOIS da fonte principal e so preenchem o que falta.
+SYMBOL_FONTS=(
+  ../builtinFonts/source/NotoSansMath/NotoSansMath-Regular.ttf
+  ../builtinFonts/source/NotoSansSymbols2/NotoSansSymbols2-Regular.ttf
+)
+
 READER_FONT_STYLES=("Regular" "Italic" "Bold" "BoldItalic")
 NOTOSERIF_FONT_SIZES=(14 16 18 20)
 NOTOSANS_FONT_SIZES=(14 16 18 20)
@@ -27,7 +41,7 @@ for size in ${NOTOSERIF_FONT_SIZES[@]}; do
     font_name="notoserif_${size}_$(echo $style | tr '[:upper:]' '[:lower:]')"
     font_path="../builtinFonts/source/NotoSerif/NotoSerif-${style}.ttf"
     output_path="../builtinFonts/${font_name}.h"
-    python fontconvert.py $font_name $size $font_path --2bit --compress --pnum --zopfli > $output_path
+    python fontconvert.py $font_name $size $font_path "${SYMBOL_FONTS[@]}" --2bit --compress --pnum --zopfli > $output_path
     echo "Generated $output_path"
   done
 done
@@ -37,7 +51,7 @@ for size in ${NOTOSANS_FONT_SIZES[@]}; do
     font_name="notosans_${size}_$(echo $style | tr '[:upper:]' '[:lower:]')"
     font_path="../builtinFonts/source/NotoSans/NotoSans-${style}.ttf"
     output_path="../builtinFonts/${font_name}.h"
-    python fontconvert.py $font_name $size $font_path --2bit --compress --pnum --zopfli > $output_path
+    python fontconvert.py $font_name $size $font_path "${SYMBOL_FONTS[@]}" --2bit --compress --pnum --zopfli > $output_path
     echo "Generated $output_path"
   done
 done
@@ -87,14 +101,15 @@ for size in ${UI_FONT_SIZES[@]}; do
     # (fontstack is ordered by descending priority).
     viet_path="../builtinFonts/source/Ubuntu/Ubuntu-Vietnamese-${style}.ttf"
     output_path="../builtinFonts/${font_name}.h"
-    python fontconvert.py $font_name $size $font_path $viet_path \
+    python fontconvert.py $font_name $size $font_path $viet_path "${SYMBOL_FONTS[@]}" \
       --2bit --compress --pnum --zopfli > $output_path
     echo "Generated $output_path"
   done
 done
 
 python fontconvert.py notosans_8_regular 8 \
-  ../builtinFonts/source/NotoSans/NotoSans-Regular.ttf > ../builtinFonts/notosans_8_regular.h
+  ../builtinFonts/source/NotoSans/NotoSans-Regular.ttf "${SYMBOL_FONTS[@]}" \
+  > ../builtinFonts/notosans_8_regular.h
 
 echo ""
 echo "Running compression verification..."

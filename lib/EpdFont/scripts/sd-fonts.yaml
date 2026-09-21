@@ -83,9 +83,9 @@ families:
 
   - name: Merriweather
     description: "Warm serif for long-form reading (Latin, Cyrillic)"
-    scripts: [latin, cyrillic]
-    intervals: latin-ext,cyrillic,ipa-chars
-    sizes: [12, 14, 16, 18]
+    scripts: [latin]
+    intervals: latin-ext,ipa-chars
+    sizes: [14, 16, 18, 20]
     styles:
       regular:    {url: "https://raw.githubusercontent.com/SorkinType/Merriweather/master/fonts/ttf/Merriweather-Regular.ttf"}
       bold:       {url: "https://raw.githubusercontent.com/SorkinType/Merriweather/master/fonts/ttf/Merriweather-Bold.ttf"}
@@ -173,9 +173,9 @@ families:
 
   - name: NotoSansExtended
     description: "Sans-serif (Latin, Greek, Cyrillic, Georgian, Armenian, Ethiopic)"
-    scripts: [latin, cyrillic, greek, georgian, armenian, ethiopic]
-    intervals: latin-ext,greek,cyrillic,georgian,armenian,ethiopic,ipa-chars
-    sizes: [12, 14, 16, 18]
+    scripts: [latin]
+    intervals: latin-ext,ipa-chars
+    sizes: [14, 16, 18, 20]
     styles:
       regular:    {path: "builtinFonts/source/NotoSans/NotoSans-Regular.ttf"}
       bold:       {path: "builtinFonts/source/NotoSans/NotoSans-Bold.ttf"}
@@ -269,7 +269,7 @@ families:
     description: "Accessibility font for low vision (Latin)"
     scripts: [latin]
     intervals: latin-ext,ipa-chars
-    sizes: [12, 14, 16, 18]
+    sizes: [14, 16, 18, 20]
     styles:
       regular:    {url: "https://raw.githubusercontent.com/googlefonts/atkinson-hyperlegible-next/main/fonts/ttf/AtkinsonHyperlegibleNext-Regular.ttf"}
       bold:       {url: "https://raw.githubusercontent.com/googlefonts/atkinson-hyperlegible-next/main/fonts/ttf/AtkinsonHyperlegibleNext-Bold.ttf"}

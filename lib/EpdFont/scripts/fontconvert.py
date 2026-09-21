@@ -87,10 +87,27 @@ intervals = [
     ### Math Symbols (common subset) ###
     # Superscripts and Subscripts
     (0x2070, 0x209F),
-    # General math operators
-    (0x2200, 0x22FF),
-    # Arrows
-    (0x2190, 0x21FF),
+    # General math operators.
+    #
+    # Estreitado do bloco inteiro (256 glifos) para os que aparecem em texto
+    # corrido. Enquanto nenhuma fonte de origem tinha esses glifos, pedir o
+    # bloco todo custava zero; com a NotoSansMath na pilha ele passou a ser
+    # encontrado e a custar ~110KB por arquivo, quase tudo em simbolo que
+    # nenhum romance usa.
+    (0x2202, 0x2202),  # derivada parcial
+    (0x2205, 0x2206),  # conjunto vazio, incremento
+    (0x220F, 0x2211),  # produto, somatorio
+    (0x221A, 0x221A),  # raiz
+    (0x221E, 0x221E),  # infinito
+    (0x2248, 0x2248),  # aproximadamente
+    (0x2260, 0x2265),  # diferente, menor/maior ou igual
+    # Arrows: as quatro direcoes e as diagonais, nao o bloco de 112.
+    (0x2190, 0x2199),
+    # Formas geometricas usadas como marcador de lista em EPUB.
+    (0x25A0, 0x25CF),
+    # Estrelas e marcas de verificacao.
+    (0x2605, 0x2606),
+    (0x2713, 0x2718),
     ### CJK ###
     # Core Unified Ideographs
     # (0x4E00, 0x9FFF),

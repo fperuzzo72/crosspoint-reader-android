@@ -175,9 +175,13 @@ esp_err_t esp_http_client_set_redirection(const esp_http_client_handle_t client)
   char* location = nullptr;
   if (esp_http_client_get_header(client, "Location", &location) == ESP_OK && location != nullptr &&
       location[0] != '\0') {
+    std::fprintf(stderr, "[http] redirecionando para %s\n", location);
+    std::fflush(stderr);
     client->url = location;
     return ESP_OK;
   }
+  std::fprintf(stderr, "[http] status de redirecionamento sem Location\n");
+  std::fflush(stderr);
   return ESP_FAIL;
 }
 
@@ -187,6 +191,8 @@ esp_err_t esp_http_client_open(const esp_http_client_handle_t client, const int 
   }
   crosspoint::android::JniAttach attach;
   if (!attach || !ensureBridge(attach.env())) {
+    std::fprintf(stderr, "[http] open: ponte JNI indisponivel\n");
+    std::fflush(stderr);
     return ESP_FAIL;
   }
   JNIEnv* env = attach.env();
@@ -251,13 +257,23 @@ int64_t esp_http_client_fetch_headers(const esp_http_client_handle_t client) {
     return -1;
   }
   JNIEnv* env = attach.env();
+  // Antes e depois da chamada, porque e aqui que a requisicao sai de verdade:
+  // o openConnection do lado Kotlin e preguicoso e o responseCode e que abre o
+  // socket, faz o handshake e le os cabecalhos. Sem as duas linhas, morrer
+  // dentro da chamada e voltar com erro dela produzem o mesmo log.
+  std::fprintf(stderr, "[http] finish(handle %d) chamando...\n", client->handle);
+  std::fflush(stderr);
   client->status = env->CallStaticIntMethod(g_bridge.cls, g_bridge.finish, client->handle);
   if (env->ExceptionCheck()) {
     env->ExceptionClear();
+    std::fprintf(stderr, "[http] finish lancou excecao\n");
+    std::fflush(stderr);
     return -1;
   }
   client->bodyPending = false;
   if (client->status < 0) {
+    std::fprintf(stderr, "[http] finish devolveu erro (-1); ver logcat por CrossPointHttp\n");
+    std::fflush(stderr);
     return -1;
   }
   client->contentLength = env->CallStaticLongMethod(g_bridge.cls, g_bridge.contentLength, client->handle);

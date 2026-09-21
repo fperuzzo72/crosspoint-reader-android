@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  O icone: um livro visto pela capa, 1 bit.
+
+  Desenhado como vetor e nao como conjunto de PNG por dois motivos. Escala
+  para qualquer densidade sem serrilhado, e sao dois kilobytes em vez de seis
+  bitmaps que teriam de ser regerados a cada ajuste.
+
+  A geometria respeita a zona segura do icone adaptativo: o Android recorta a
+  arte num circulo de 66dp dentro dos 108dp da tela, e qualquer coisa fora
+  disso pode ser cortada dependendo do formato que o lançador usa. O livro
+  ocupa 34x52dp centrado, cujo canto fica a 31dp do centro, com folga.
+
+  1 bit de verdade: so #000000 e #FFFFFF, sem cinza nem anti-serrilhado
+  declarado. Num painel e-ink um tom intermediario vira ruido de dithering.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- A capa. Cantos levemente arredondados: um retangulo perfeito parece
+         um erro de renderizacao em tamanho de lançador. -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M40,28 h28 a3,3 0 0 1 3,3 v46 a3,3 0 0 1 -3,3 h-28 a3,3 0 0 1 -3,-3 v-46 a3,3 0 0 1 3,-3 z" />
+
+    <!-- O vinco da lombada. É o que faz a forma ler como livro e não como
+         cartão: sem ele, o retângulo é ambíguo em 48dp. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,32 h2 v44 h-2 z" />
+</vector>

@@ -11,11 +11,16 @@
 // thread que chamou.
 
 #include <android/log.h>
+
+#include <cstdarg>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <jni.h>
 
 #include <atomic>
+#include <cstdio>
+#include <ctime>
+#include <string>
 #include <thread>
 
 namespace crosspoint_storage {
@@ -33,13 +38,54 @@ namespace {
 
 std::atomic<bool> g_running{false};
 
+// Log em arquivo, alem do logcat.
+//
+// Nao e redundancia: o adb deste aparelho cai depois de poucos comandos, entao
+// logcat e um canal que nao da para contar. Um arquivo dentro do diretorio do
+// aplicativo e legivel por qualquer gerenciador de arquivos, sem cabo, sem
+// depuracao ligada e sem nada do lado do computador.
+//
+// Tudo o que o shim POSIX escreve ja vai para stderr, entao redirecionar
+// stderr para ca pega o tronco inteiro de graca, incluindo as linhas que o
+// HalSystemHosted imprime sobre bateria e deteccao de suspensao.
+void logLine(const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  std::vfprintf(stderr, fmt, args);
+  va_end(args);
+  std::fputc('\n', stderr);
+  std::fflush(stderr);
+}
+
+void openLogFile(const std::string& root) {
+  const std::string path = root + "/crosspoint.log";
+  // "w" e nao "a": um log que cresce sem limite num aparelho que ninguem vai
+  // limpar e pior do que um log que so tem a ultima execucao, que e a que
+  // interessa quando se esta depurando.
+  if (std::freopen(path.c_str(), "w", stderr) == nullptr) {
+    __android_log_print(ANDROID_LOG_WARN, "CrossPoint", "nao consegui abrir %s", path.c_str());
+    return;
+  }
+  std::setvbuf(stderr, nullptr, _IONBF, 0);
+  const std::time_t now = std::time(nullptr);
+  logLine("=== CrossPoint hibreak-dev, %s", std::ctime(&now));
+  __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "log em %s", path.c_str());
+}
+
 void readerThread() {
-  __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "reader thread iniciando");
+  logLine("[jni] thread do leitor iniciando");
   setup();
+  logLine("[jni] setup() retornou; entrando no loop");
+  unsigned long long iterations = 0;
   while (g_running.load(std::memory_order_relaxed)) {
     loop();
+    // As primeiras voltas sao as que dizem se o leitor esta vivo ou travado.
+    // Depois disso, calar: o log e para diagnostico, nao para telemetria.
+    if (++iterations <= 3) {
+      logLine("[jni] loop() volta %llu", iterations);
+    }
   }
-  __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "reader thread encerrada");
+  logLine("[jni] thread do leitor encerrada");
 }
 
 }  // namespace
@@ -52,10 +98,12 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetSur
                                                                                      jobject surface) {
   auto& panel = crosspoint::android::AndroidPanel::instance();
   if (surface == nullptr) {
+    logLine("[jni] superficie retirada");
     panel.detachSurface();
     return;
   }
   ANativeWindow* win = ANativeWindow_fromSurface(env, surface);
+  logLine("[jni] superficie entregue: %p", static_cast<void*>(win));
   // attachSurface faz o proprio acquire; o fromSurface ja veio com uma
   // referencia que e nossa para soltar.
   panel.attachSurface(win);
@@ -103,7 +151,8 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetSto
   const char* utf = env->GetStringUTFChars(path, nullptr);
   if (utf != nullptr) {
     crosspoint_storage::setRoot(utf);
-    __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "raiz do armazenamento: %s", utf);
+    openLogFile(utf);
+    logLine("[jni] raiz do armazenamento: %s", utf);
     env->ReleaseStringUTFChars(path, utf);
   }
 }

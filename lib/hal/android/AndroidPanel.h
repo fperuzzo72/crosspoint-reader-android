@@ -92,16 +92,28 @@ class AndroidPanel {
   bool stageFrameLocked(const uint8_t* frame);
   bool present();
 
-  mutable std::mutex mtx;
-  ANativeWindow* win = nullptr;
+  // O ESTADO E ESTATICO, e isto e o conserto de um bug que deu tela preta.
+  //
+  // O HalDisplay declara `crosspoint::hosted::Panel panel;` como membro POR
+  // VALOR, enquanto o JNI alcanca o painel por instance(). Eram dois objetos:
+  // a Surface ia para o singleton e o leitor pintava no membro, entao nada
+  // chegava a tela e nada falhava em lugar nenhum.
+  //
+  // Ha exatamente um painel neste processo, entao estado estatico e a verdade
+  // e nao um truque: qualquer AndroidPanel e uma alca para o mesmo painel.
+  // A alternativa seria o membro do HalDisplay virar referencia, o que muda a
+  // assinatura compartilhada com o ramo Kindle por causa de um problema que so
+  // este alvo tem.
+  static std::mutex mtx;
+  static ANativeWindow* win;
   // Quadro composto em 8bpp cinza, do tamanho do painel. 824*1648 = 1,36MB,
   // irrelevante num telefone e o que permite stageFrame e stageGrayOverlay
   // chegarem ao painel numa apresentacao so, como no Kindle.
-  uint8_t* stage = nullptr;
-  Waveform lastWaveform = Waveform::Half;
+  static uint8_t* stage;
+  static Waveform lastWaveform;
   // A superficie apareceu depois do ultimo quadro composto: o proximo
   // attachSurface reapresenta em vez de deixar a tela com lixo.
-  bool stageHasContent = false;
+  static bool stageHasContent;
 };
 
 }  // namespace crosspoint::android

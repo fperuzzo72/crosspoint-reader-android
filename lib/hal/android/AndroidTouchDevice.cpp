@@ -2,6 +2,12 @@
 
 namespace crosspoint::android {
 
+std::mutex AndroidTouchDevice::mtx;
+GestureResult AndroidTouchDevice::pending{};
+bool AndroidTouchDevice::open = false;
+bool AndroidTouchDevice::contactDown = false;
+bool AndroidTouchDevice::suppressed = false;
+
 AndroidTouchDevice& AndroidTouchDevice::instance() {
   static AndroidTouchDevice dev;
   return dev;

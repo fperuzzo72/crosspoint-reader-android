@@ -1,7 +1,9 @@
 #include "AndroidPanel.h"
 
+#include <android/log.h>
 #include <android/native_window.h>
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -11,6 +13,15 @@ namespace {
 constexpr size_t STAGE_BYTES = static_cast<size_t>(HIBREAK_WIDTH) * HIBREAK_HEIGHT;
 }  // namespace
 
+// Definicao dos membros estaticos. Ver o comentario no header: o estado e do
+// processo, nao do objeto, porque o painel e um so e dois objetos apontando
+// para ele foi o que deu tela preta.
+std::mutex AndroidPanel::mtx;
+ANativeWindow* AndroidPanel::win = nullptr;
+uint8_t* AndroidPanel::stage = nullptr;
+Waveform AndroidPanel::lastWaveform = Waveform::Half;
+bool AndroidPanel::stageHasContent = false;
+
 AndroidPanel& AndroidPanel::instance() {
   static AndroidPanel panel;
   return panel;
@@ -19,6 +30,8 @@ AndroidPanel& AndroidPanel::instance() {
 AndroidPanel::~AndroidPanel() { end(); }
 
 bool AndroidPanel::begin() {
+  std::fprintf(stderr, "[panel] begin()\n");
+  std::fflush(stderr);
   std::lock_guard<std::mutex> lock(mtx);
   if (stage == nullptr) {
     stage = static_cast<uint8_t*>(std::malloc(STAGE_BYTES));
@@ -63,7 +76,9 @@ void AndroidPanel::attachSurface(ANativeWindow* window) {
   // A geometria e fixada no tamanho do painel para o compositor nao escalar:
   // uma pagina de texto em 1bpp reamostrada perde exatamente a nitidez que o
   // e-ink existe para dar.
-  ANativeWindow_setBuffersGeometry(win, HIBREAK_WIDTH, HIBREAK_HEIGHT, WINDOW_FORMAT_RGBX_8888);
+  const int32_t geo = ANativeWindow_setBuffersGeometry(win, HIBREAK_WIDTH, HIBREAK_HEIGHT, WINDOW_FORMAT_RGBX_8888);
+  std::fprintf(stderr, "[panel] superficie anexada, geometria %dx%d -> %d\n", HIBREAK_WIDTH, HIBREAK_HEIGHT, geo);
+  std::fflush(stderr);
   // A superficie pode ter chegado depois do quadro. Reapresenta em vez de
   // deixar o buffer novo com o que o compositor tiver posto nele.
   if (stageHasContent) {
@@ -133,6 +148,15 @@ uint8_t AndroidPanel::peekPixel(const uint16_t x, const uint16_t y) const {
 }
 
 bool AndroidPanel::present() {
+  // As primeiras apresentacoes sao as que dizem se o caminho de pixel esta
+  // fechado. Depois calam, senao uma virada de pagina enche o log.
+  static int reported = 0;
+  if (reported < 5) {
+    ++reported;
+    std::fprintf(stderr, "[panel] present #%d win=%p stage=%p temConteudo=%d\n", reported,
+                 static_cast<void*>(win), static_cast<void*>(stage), stageHasContent ? 1 : 0);
+    std::fflush(stderr);
+  }
   if (win == nullptr || stage == nullptr) {
     // Sem superficie nao e erro: a Activity pode estar pausada e o quadro
     // fica guardado para quando ela voltar.

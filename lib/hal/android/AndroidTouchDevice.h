@@ -45,13 +45,16 @@ class AndroidTouchDevice {
   static AndroidTouchDevice& instance();
 
  private:
-  mutable std::mutex mtx;
-  GestureResult pending{};
-  bool open = false;
-  bool contactDown = false;
+  // Estatico pelo mesmo motivo que o AndroidPanel: o HalGPIO declara
+  // `crosspoint::hosted::Touch touchDevice;` por valor e o JNI alcanca por
+  // instance(). Eram dois objetos, e os gestos iam para o que ninguem lia.
+  static std::mutex mtx;
+  static GestureResult pending;
+  static bool open;
+  static bool contactDown;
   // Um toque longo ja foi entregue neste contato: tudo ate a soltura e
   // descartado, senao a soltura viraria toque tambem.
-  bool suppressed = false;
+  static bool suppressed;
 };
 
 }  // namespace crosspoint::android

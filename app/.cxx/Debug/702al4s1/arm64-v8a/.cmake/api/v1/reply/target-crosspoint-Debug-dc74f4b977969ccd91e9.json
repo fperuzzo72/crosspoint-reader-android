@@ -715,7 +715,9 @@
 				117,
 				118,
 				119,
-				120
+				120,
+				121,
+				122
 			],
 			"sysroot" : 
 			{
@@ -725,82 +727,6 @@
 	],
 	"dependencies" : 
 	[
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_Buzzer::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_EnvironmentSensor::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_FrontlightManager::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_Imu::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_InputManager::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_LedManager::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_MemoryManager::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_Microphone::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_PowerManager::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_RecoveryBoot::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_Rtc::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_SDCardManager::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_UsbMassStorage::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_XteinkDetect::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_BleKeyboardHost::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_NearbyTransfer::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_SecureNet::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_sdk_FreeInkUI::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "cp_fetched::@6890427a1f51a3e7e1df"
-		},
 		{
 			"backtrace" : 3,
 			"id" : "cp_lib_EpdFont::@6890427a1f51a3e7e1df"
@@ -912,6 +838,82 @@
 		{
 			"backtrace" : 3,
 			"id" : "cp_sdk_BoardT5S3::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_Buzzer::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_EnvironmentSensor::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_FrontlightManager::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_Imu::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_InputManager::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_LedManager::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_MemoryManager::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_Microphone::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_PowerManager::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_RecoveryBoot::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_Rtc::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_SDCardManager::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_UsbMassStorage::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_XteinkDetect::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_BleKeyboardHost::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_NearbyTransfer::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_SecureNet::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_sdk_FreeInkUI::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
+			"id" : "cp_fetched::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "crosspoint::@6890427a1f51a3e7e1df",
@@ -1533,7 +1535,9 @@
 				117,
 				118,
 				119,
-				120
+				120,
+				121,
+				122
 			]
 		}
 	],
@@ -1686,7 +1690,27 @@
 				1
 			],
 			"compileGroupIndex" : 0,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/HttpAndroid.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"backtraces" : 
+			[
+				1
+			],
+			"compileGroupIndex" : 0,
 			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/Jni.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"backtraces" : 
+			[
+				1
+			],
+			"compileGroupIndex" : 0,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/JniBridge.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

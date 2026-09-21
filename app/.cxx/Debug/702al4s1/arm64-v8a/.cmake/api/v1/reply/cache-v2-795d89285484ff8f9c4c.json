@@ -1379,10 +1379,10 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "The CMake toolchain file"
+					"value" : "Path to a CMake toolchain file, read early in the CMake run, that specifies the compilers, toolchain utilities, and target-platform information used when cross-compiling."
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "UNINITIALIZED",
 			"value" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/android.toolchain.cmake"
 		},
 		{

@@ -19,6 +19,24 @@
     -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
+    <!--
+      INTERNET: OPDS, sincronizacao KOReader e download de fontes. Sem ela
+      toda conexao falha com SecurityException e o erro aparece como "servidor
+      nao respondeu", que manda procurar no lugar errado.
+
+      ACCESS_NETWORK_STATE: saber se ha rede antes de tentar, para a mensagem
+      ser "sem conexao" e nao um timeout de quinze segundos.
+
+      Deliberadamente AUSENTE: ACCESS_FINE_LOCATION. Ler o nome da rede
+      conectada exige permissao de localizacao no Android 10+, porque o SSID
+      identifica onde voce esta. O CrossPoint mostra o nome da rede na barra;
+      aqui ele mostra o IP e o estado de conectado, que vem de getifaddrs sem
+      permissao nenhuma. Pedir localizacao por um rotulo seria a primeira vez
+      neste porte que uma permissao ampla e pedida por algo cosmetico.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:label="@string/app_name"
         android:allowBackup="false"

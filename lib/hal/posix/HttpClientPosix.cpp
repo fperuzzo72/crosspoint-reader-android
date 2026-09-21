@@ -1,5 +1,11 @@
 // HTTP/1.1 over sockets, shaped like ESP-IDF's esp_http_client.
 // See arduino-shim/esp_http_client.h for what TLS does and does not do here.
+//
+// No HiBreak este arquivo sai inteiro: o lib/hal/android/HttpAndroid.cpp leva
+// a requisicao para o Kotlin, onde TLS ja existe.
+#include <BoardConfig.h>
+
+#if !FREEINK_DEVICE_HIBREAK
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -30,13 +36,19 @@ std::string lower(std::string s) {
 
 const char* methodName(const esp_http_client_method_t m) {
   switch (m) {
-    case HTTP_METHOD_POST: return "POST";
-    case HTTP_METHOD_PUT: return "PUT";
-    case HTTP_METHOD_PATCH: return "PATCH";
-    case HTTP_METHOD_DELETE: return "DELETE";
-    case HTTP_METHOD_HEAD: return "HEAD";
+    case HTTP_METHOD_POST:
+      return "POST";
+    case HTTP_METHOD_PUT:
+      return "PUT";
+    case HTTP_METHOD_PATCH:
+      return "PATCH";
+    case HTTP_METHOD_DELETE:
+      return "DELETE";
+    case HTTP_METHOD_HEAD:
+      return "HEAD";
     case HTTP_METHOD_GET:
-    default: return "GET";
+    default:
+      return "GET";
   }
 }
 
@@ -77,8 +89,8 @@ bool esp_http_client::parseUrl(const std::string& url) {
 
   size_t hostStart = schemeEnd + 3;
   size_t pathStart = url.find('/', hostStart);
-  std::string hostPort = pathStart == std::string::npos ? url.substr(hostStart)
-                                                        : url.substr(hostStart, pathStart - hostStart);
+  std::string hostPort =
+      pathStart == std::string::npos ? url.substr(hostStart) : url.substr(hostStart, pathStart - hostStart);
   path = pathStart == std::string::npos ? "/" : url.substr(pathStart);
 
   port = scheme == "https" ? 443 : 80;
@@ -459,3 +471,5 @@ esp_err_t esp_http_client_get_header(const esp_http_client_handle_t client, cons
   *value = client->headerScratch.data();
   return ESP_OK;
 }
+
+#endif  // !FREEINK_DEVICE_HIBREAK

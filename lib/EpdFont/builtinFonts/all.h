@@ -55,3 +55,5 @@
 #include <builtinFonts/ubuntu_12_regular.h>
 #include <builtinFonts/ubuntu_14_bold.h>
 #include <builtinFonts/ubuntu_14_regular.h>
+#include <builtinFonts/ubuntu_16_bold.h>
+#include <builtinFonts/ubuntu_16_regular.h>

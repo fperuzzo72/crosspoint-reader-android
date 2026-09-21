@@ -176,6 +176,10 @@ EpdFont ui14RegularFont(&ubuntu_14_regular);
 EpdFont ui14BoldFont(&ubuntu_14_bold);
 EpdFontFamily ui14FontFamily(&ui14RegularFont, &ui14BoldFont);
 
+EpdFont ui16RegularFont(&ubuntu_16_regular);
+EpdFont ui16BoldFont(&ubuntu_16_bold);
+EpdFontFamily ui16FontFamily(&ui16RegularFont, &ui16BoldFont);
+
 // Definitions for SilentRestart.h. RTC_NOINIT survives ESP.restart() but not power loss.
 RTC_NOINIT_ATTR uint32_t silentRebootMagic;
 RTC_NOINIT_ATTR uint32_t silentRebootTarget;
@@ -453,17 +457,26 @@ void setupDisplayAndFonts(bool seamless = false) {
   renderer.insertFont(NOTOSANS_20_FONT_ID, notosans20FontFamily);
   renderer.insertFont(NOTOSANS_22_FONT_ID, notosans22FontFamily);
   renderer.insertFont(NOTOSANS_24_FONT_ID, notosans24FontFamily);
-  renderer.insertFont(UI_10_FONT_ID, ui10FontFamily);
 #if FREEINK_DEVICE_HIBREAK
-  // 300 dpi: a interface desenhada para 12 sai fisicamente pequena demais. Os
-  // temas pedem UI_12_FONT_ID em dezenas de lugares, entao o que muda e o que
-  // esse ID ENTREGA, nao cada chamada. O ID e uma chave, nao uma medida.
-  renderer.insertFont(UI_12_FONT_ID, ui14FontFamily);
-  renderer.insertFont(UI_14_FONT_ID, ui14FontFamily);
+  renderer.insertFont(UI_10_FONT_ID, ui12FontFamily);
+#else
+  renderer.insertFont(UI_10_FONT_ID, ui10FontFamily);
+#endif
+#if FREEINK_DEVICE_HIBREAK
+  // 300 dpi: a interface desenhada para 10 e 12 sai fisicamente pequena demais.
+  // Os temas pedem estes IDs em dezenas de lugares, entao o que muda e o que
+  // cada ID ENTREGA, nao cada chamada. O ID e uma chave, nao uma medida, e por
+  // isso o nome da constante passa a nao descrever o corpo.
+  //
+  // Os dois sobem juntos um degrau da escada: UI_10 entrega 12 (barra de
+  // status, rotulos de botao) e UI_12 entrega 16 (corpo da interface).
+  // Testado no aparelho: 14 ainda ficava pequeno.
+  renderer.insertFont(UI_12_FONT_ID, ui16FontFamily);
 #else
   renderer.insertFont(UI_12_FONT_ID, ui12FontFamily);
-  renderer.insertFont(UI_14_FONT_ID, ui14FontFamily);
 #endif
+  renderer.insertFont(UI_14_FONT_ID, ui14FontFamily);
+  renderer.insertFont(UI_16_FONT_ID, ui16FontFamily);
   renderer.insertFont(SMALL_FONT_ID, smallFontFamily);
 
   // Discover and load SD card fonts

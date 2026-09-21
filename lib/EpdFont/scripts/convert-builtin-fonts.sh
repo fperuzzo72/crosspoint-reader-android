@@ -14,6 +14,11 @@ READER_FONT_STYLES=("Regular" "Italic" "Bold" "BoldItalic")
 NOTOSERIF_FONT_SIZES=(14 16 18 20 22 24)
 NOTOSANS_FONT_SIZES=(14 16 18 20 22 24)
 
+# UI_ONLY=1 pula as fontes de leitura. Elas sao deterministicas (o ID e a soma
+# dos SHA-256 dos cabecalhos, e regerar produz arquivo identico), entao pular
+# nao muda nada alem do tempo.
+if [ -z "${UI_ONLY:-}" ]; then
+
 for size in ${NOTOSERIF_FONT_SIZES[@]}; do
   for style in ${READER_FONT_STYLES[@]}; do
     font_name="notoserif_${size}_$(echo $style | tr '[:upper:]' '[:lower:]')"
@@ -34,7 +39,9 @@ for size in ${NOTOSANS_FONT_SIZES[@]}; do
   done
 done
 
-UI_FONT_SIZES=(10 12 14)
+fi  # UI_ONLY
+
+UI_FONT_SIZES=(10 12 14 16)
 UI_FONT_STYLES=("Regular" "Bold")
 
 # Arabic glyphs for UI text (menus, file browser titles). The built-in fonts

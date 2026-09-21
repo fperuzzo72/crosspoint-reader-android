@@ -16,6 +16,7 @@
 #define UI_10_FONT_ID (1322569422)
 #define UI_12_FONT_ID (1831230762)
 #define UI_14_FONT_ID (-583199504)
+#define UI_16_FONT_ID (409281181)
 #define SMALL_FONT_ID (1465627787)
 
 // Font ID 0 is reserved as the "not found" sentinel.
@@ -35,4 +36,5 @@ static_assert(NOTOSANS_24_FONT_ID != 0, "Font ID collision with sentinel");
 static_assert(UI_10_FONT_ID != 0, "Font ID collision with sentinel");
 static_assert(UI_12_FONT_ID != 0, "Font ID collision with sentinel");
 static_assert(UI_14_FONT_ID != 0, "Font ID collision with sentinel");
+static_assert(UI_16_FONT_ID != 0, "Font ID collision with sentinel");
 static_assert(SMALL_FONT_ID != 0, "Font ID collision with sentinel");

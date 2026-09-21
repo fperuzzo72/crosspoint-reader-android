@@ -18,6 +18,26 @@ struct Rect {
   explicit Rect(int x = 0, int y = 0, int width = 0, int height = 0) : x(x), y(y), width(width), height(height) {}
 };
 
+// A faixa reservada para a barra de status, em pixels.
+//
+// NAO e derivada da fonte: o UITheme::getStatusBarHeight() soma esta constante
+// com a altura da barra de progresso e pronto. Entao o corpo usado na barra
+// tem de caber aqui, ou o texto invade a area da pagina acima dele.
+//
+// Medido nos cabecalhos gerados (advanceY da Ubuntu): 10 pede 24, 12 pede 29,
+// 14 pede 34, 16 pede 38. Com 19 reservados, a fonte de 10 ja estourava por
+// 5px em todos os alvos; ninguem notava porque 5px de descida sobre a margem
+// da pagina nao encosta em glifo nenhum.
+//
+// No HiBreak a barra usa 12, entao a reserva passa a ser o advanceY dele. Sai
+// mais alta que o original e o texto para de invadir, o que e melhor do que
+// era antes e nao so diferente.
+#if FREEINK_DEVICE_HIBREAK
+inline constexpr int STATUS_BAR_VERTICAL_MARGIN = 29;
+#else
+inline constexpr int STATUS_BAR_VERTICAL_MARGIN = 19;
+#endif
+
 struct ThemeMetrics {
   int batteryWidth;
   int batteryHeight;
@@ -182,7 +202,7 @@ constexpr ThemeMetrics values = {.batteryWidth = 15,
                                  .progressBarHeight = 16,
                                  .progressBarMarginTop = 1,
                                  .statusBarHorizontalMargin = 5,
-                                 .statusBarVerticalMargin = 19,
+                                 .statusBarVerticalMargin = STATUS_BAR_VERTICAL_MARGIN,
                                  .keyboardKeyHeight = 48,
                                  .keyboardKeySpacing = 0,
                                  .keyboardCenteredText = false,

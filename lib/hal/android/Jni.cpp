@@ -58,9 +58,18 @@ void logLine(const char* fmt, ...) {
 
 void openLogFile(const std::string& root) {
   const std::string path = root + "/crosspoint.log";
+  const std::string prev = root + "/crosspoint.log.anterior";
+
+  // A execucao ANTERIOR e guardada antes de truncar, e isto nao e zelo: o
+  // caso em que o log importa e quando o processo morre, e a unica forma de
+  // ler o arquivo e reabrindo o aplicativo, que era exatamente o que apagava
+  // a evidencia. Duas execucoes bastam, entao nao ha rotacao de verdade: a
+  // atual e a de antes dela.
+  std::remove(prev.c_str());
+  std::rename(path.c_str(), prev.c_str());
+
   // "w" e nao "a": um log que cresce sem limite num aparelho que ninguem vai
-  // limpar e pior do que um log que so tem a ultima execucao, que e a que
-  // interessa quando se esta depurando.
+  // limpar e pior do que um log que so tem a ultima execucao.
   if (std::freopen(path.c_str(), "w", stderr) == nullptr) {
     __android_log_print(ANDROID_LOG_WARN, "CrossPoint", "nao consegui abrir %s", path.c_str());
     return;

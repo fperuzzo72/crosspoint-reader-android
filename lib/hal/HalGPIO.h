@@ -2,18 +2,19 @@
 
 #include <Arduino.h>
 
-#if FREEINK_DEVICE_KINDLE
-// No InputManager here: it drives an ADC button ladder and a touch controller
-// over I2C, neither of which exists on this device. Touch arrives from evdev.
-//
-// BoardConfig.h is included explicitly because InputManager.h used to bring it
-// in transitively. Dropping it made FREEINK_CAP_TOUCH evaluate to 0 wherever
-// this header was reached first, which silently removed the touch half of
-// MappedInputManager's declarations and only showed up as "no declaration
-// matches" at its definitions.
+// BoardConfig.h vem ANTES do #if, e isso nao e ordem de gosto.
+// FREEINK_MCU_HOSTED e DERIVADO la dentro; testa-lo antes de incluir o header
+// le zero, o ramo errado e escolhido, e o erro so aparece dezenas de linhas
+// depois como "undeclared identifier". Com FREEINK_DEVICE_KINDLE isso nao
+// acontecia porque aquele vem da linha de comando. Este arquivo ja tinha
+// levado uma versao do mesmo tombo com FREEINK_CAP_TOUCH.
 #include <BoardConfig.h>
 
-#include "kindle/KindleTouch.h"
+#if FREEINK_MCU_HOSTED
+// Sem InputManager aqui: ele dirige uma escada de botoes por ADC e um
+// controlador de toque por I2C, e nenhum dos dois existe num alvo hospedado.
+// O toque chega do sistema operacional.
+#include "hosted/HostedPanel.h"
 #else
 #include <InputManager.h>
 #endif
@@ -54,12 +55,12 @@
 #define QMI8658_WHO_AM_I_VALUE 0x05  // WHO_AM_I expected value
 
 class HalGPIO {
-#if FREEINK_DEVICE_KINDLE
-  crosspoint::kindle::KindleTouchDevice touchDevice;
+#if FREEINK_MCU_HOSTED
+  crosspoint::hosted::Touch touchDevice;
   // HalGPIO's touch API is edge-based: update() gathers, the was* accessors
   // consume. KindleTouchDevice reports one gesture per poll, so the gesture
   // for this frame is held here between the two.
-  crosspoint::kindle::GestureResult frameGesture;
+  crosspoint::hosted::GestureResult frameGesture;
   bool touchOpen = false;
 #elif CROSSPOINT_EMULATED == 0
   InputManager inputMgr;

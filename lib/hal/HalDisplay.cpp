@@ -1,11 +1,12 @@
 // The FreeInkDisplay-backed HalDisplay, used by every ESP32 target.
 //
-// The Kindle has its own in HalDisplayKindle.cpp: it drives the kernel EPDC
-// instead of a raw panel, and compiling this file there would drag the whole
-// PanelDriver and EpdBus tree into a build that can never use it.
+// Os alvos hospedados (Kindle, HiBreak) usam o HalDisplayHosted.cpp: o painel
+// pertence ao sistema operacional e nao a um barramento nosso, e compilar este
+// arquivo la arrastaria toda a arvore de PanelDriver e EpdBus para um build
+// que nunca pode usa-la.
 #include <BoardConfig.h>
 
-#if !FREEINK_DEVICE_KINDLE
+#if !FREEINK_MCU_HOSTED
 
 #include <HalDisplay.h>
 #include <HalGPIO.h>
@@ -171,4 +172,4 @@ uint16_t HalDisplay::getDisplayWidthBytes() const { return einkDisplay.getDispla
 
 uint32_t HalDisplay::getBufferSize() const { return einkDisplay.getBufferSize(); }
 
-#endif  // !FREEINK_DEVICE_KINDLE
+#endif  // !FREEINK_MCU_HOSTED

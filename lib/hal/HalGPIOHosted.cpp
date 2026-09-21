@@ -1,4 +1,4 @@
-// HalGPIO for the Kindle.
+// HalGPIO para os alvos hospedados: Kindle e HiBreak.
 //
 // Two thirds of this interface describes hardware the KT3 does not have, and
 // saying so plainly is more useful than half-implementing it:
@@ -25,7 +25,7 @@
 
 #include "HalDisplay.h"  // panel geometry, for the touch classifier's normalisation
 
-#if FREEINK_DEVICE_KINDLE
+#if FREEINK_MCU_HOSTED
 
 #include <cstdio>
 
@@ -49,7 +49,7 @@ void HalGPIO::begin() {
     // Worth a line: with no touch and no buttons, the reader is unreachable,
     // and silence here would look like a frozen UI rather than a missing input
     // device.
-    std::fprintf(stderr, "[kindle] touch device did not open; the UI will not be reachable\n");
+    std::fprintf(stderr, "[hosted] touch device did not open; the UI will not be reachable\n");
   }
 }
 
@@ -60,8 +60,8 @@ void HalGPIO::update() {
   // One gesture per frame. If two complete inside a single frame the second is
   // kept, because it is the more recent thing the user did; queueing them would
   // let taps arrive after the screen they targeted had already changed.
-  const crosspoint::kindle::GestureResult g = touchDevice.update(TOUCH_POLL_MS);
-  frameGesture = g ? g : crosspoint::kindle::GestureResult{};
+  const crosspoint::hosted::GestureResult g = touchDevice.update(TOUCH_POLL_MS);
+  frameGesture = g ? g : crosspoint::hosted::GestureResult{};
 
   // USB edge detection lives here because wasUsbStateChanged() is const: the
   // sampling has to happen on the one call that is allowed to mutate.
@@ -92,7 +92,7 @@ bool HalGPIO::wasHomeKeyLongPressed() const { return false; }
 bool HalGPIO::hasTouch() const { return touchOpen; }
 
 bool HalGPIO::wasTouchTap(float& nx, float& ny) const {
-  if (frameGesture.kind != crosspoint::kindle::Gesture::Tap) {
+  if (frameGesture.kind != crosspoint::hosted::Gesture::Tap) {
     return false;
   }
   nx = frameGesture.nx;
@@ -114,8 +114,8 @@ bool HalGPIO::wasTouchDown(float& nx, float& ny) const {
 bool HalGPIO::wasTouchReleased() const {
   // Tap and swipe both fire on release; a long press fires while the finger is
   // still down and deliberately swallows its own release, so it is excluded.
-  return frameGesture.kind == crosspoint::kindle::Gesture::Tap ||
-         frameGesture.kind == crosspoint::kindle::Gesture::Swipe;
+  return frameGesture.kind == crosspoint::hosted::Gesture::Tap ||
+         frameGesture.kind == crosspoint::hosted::Gesture::Swipe;
 }
 
 bool HalGPIO::isTouchTapCandidate(float& nx, float& ny, unsigned long& heldMs) const {
@@ -140,7 +140,7 @@ bool HalGPIO::isTouchHeldAt(float& nx, float& ny) const {
 }
 
 bool HalGPIO::wasTouchLongPress(float& nx, float& ny) const {
-  if (frameGesture.kind != crosspoint::kindle::Gesture::LongPress) {
+  if (frameGesture.kind != crosspoint::hosted::Gesture::LongPress) {
     return false;
   }
   nx = frameGesture.nx;
@@ -149,7 +149,7 @@ bool HalGPIO::wasTouchLongPress(float& nx, float& ny) const {
 }
 
 bool HalGPIO::wasSwipe(float& nxStart, float& nyStart, float& nxEnd, float& nyEnd) const {
-  if (frameGesture.kind != crosspoint::kindle::Gesture::Swipe) {
+  if (frameGesture.kind != crosspoint::hosted::Gesture::Swipe) {
     return false;
   }
   nxStart = frameGesture.nx;
@@ -203,4 +203,4 @@ HalGPIO::WakeupReason HalGPIO::getWakeupReason() const {
 // this global with it.
 HalGPIO gpio;
 
-#endif  // FREEINK_DEVICE_KINDLE
+#endif  // FREEINK_MCU_HOSTED

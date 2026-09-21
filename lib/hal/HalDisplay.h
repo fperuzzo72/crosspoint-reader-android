@@ -1,13 +1,14 @@
 #pragma once
 #include <Arduino.h>
 #include <BoardConfig.h>
-#if FREEINK_DEVICE_KINDLE
-// The Kindle bypasses FreeInkDisplay entirely rather than adding a driver to
-// it: that stack exists to drive a raw panel over SPI/i80, and here the kernel
-// EPDC owns the panel. Including EInkDisplay.h would drag the whole PanelDriver
-// and EpdBus tree into a build that can never use it, which is where 251 of the
-// undefined symbols in the first link attempt came from.
-#include "kindle/KindleFrameBuffer.h"
+#if FREEINK_MCU_HOSTED
+// Os alvos hospedados desviam do FreeInkDisplay inteiro em vez de ganharem
+// mais um driver: aquela pilha existe para dirigir um painel cru por SPI/i80,
+// e aqui o painel pertence ao sistema operacional. Incluir EInkDisplay.h
+// arrastaria toda a arvore de PanelDriver e EpdBus para um build que nunca
+// pode usa-la, que foi de onde vieram 251 dos simbolos indefinidos da primeira
+// tentativa de link no Kindle.
+#include "hosted/HostedPanel.h"
 // The grayscale descriptor types still come from the SDK: they are the HAL's
 // vocabulary, not the panel driver's, and this header carries no Arduino or
 // bus dependency of its own.
@@ -50,9 +51,9 @@ class HalDisplay {
   void begin(bool seamless = false);
 
   // Display dimensions
-#if FREEINK_DEVICE_KINDLE
-  static constexpr uint16_t DISPLAY_WIDTH = crosspoint::kindle::KT3_WIDTH;
-  static constexpr uint16_t DISPLAY_HEIGHT = crosspoint::kindle::KT3_HEIGHT;
+#if FREEINK_MCU_HOSTED
+  static constexpr uint16_t DISPLAY_WIDTH = crosspoint::hosted::PANEL_WIDTH;
+  static constexpr uint16_t DISPLAY_HEIGHT = crosspoint::hosted::PANEL_HEIGHT;
 #else
   static constexpr uint16_t DISPLAY_WIDTH = EInkDisplay::DISPLAY_WIDTH;
   static constexpr uint16_t DISPLAY_HEIGHT = EInkDisplay::DISPLAY_HEIGHT;
@@ -138,14 +139,15 @@ class HalDisplay {
   // the whole text body (a visible flash).
   bool combinesGrayscaleBase() const;
 
-#if FREEINK_DEVICE_KINDLE
+#if FREEINK_MCU_HOSTED
   // Re-establish the panel connection after the device has been suspended, and
   // repaint. Returns false when the panel could not be reopened at all, which
   // is the one failure this can actually detect.
   bool reinitAfterResume();
 
-  // True when something outside this process has painted over the panel, which
-  // on this device means the Kindle's own UI blanking the screen.
+  // True when something outside this process has painted over the panel. On
+  // the Kindle that means its own UI blanking the shared framebuffer; on
+  // Android nobody shares our Surface, so it is always false there.
   bool panelContentWasReplaced() const;
 #endif
 
@@ -156,8 +158,8 @@ class HalDisplay {
   uint32_t getBufferSize() const;
 
  private:
-#if FREEINK_DEVICE_KINDLE
-  crosspoint::kindle::KindleFrameBuffer panel;
+#if FREEINK_MCU_HOSTED
+  crosspoint::hosted::Panel panel;
   // CrossPoint composes into its own 1bpp buffer on every target; on the ESP32
   // that buffer lives inside EInkDisplay. Here it is ours, because the panel
   // half only ever receives a finished frame.

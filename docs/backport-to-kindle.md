@@ -69,3 +69,44 @@ Coisas que o Kindle resolveu e que vamos precisar rever aqui, não copiar:
 - **`ESP.restart()`** re-executa o processo no Kindle. No Android reiniciar um
   processo não é a mesma coisa que reiniciar a Activity, e a semântica certa
   ainda não foi decidida.
+
+
+## O refactor hospedado, que e o maior backport pendente
+
+Tres arquivos do repositorio Kindle mudaram de nome e de guarda aqui, e a
+mudanca vale igual la:
+
+| Kindle hoje | Aqui | Guarda |
+| --- | --- | --- |
+| `HalDisplayKindle.cpp` | `HalDisplayHosted.cpp` | `FREEINK_MCU_HOSTED` |
+| `HalGPIOKindle.cpp` | `HalGPIOHosted.cpp` | idem |
+| `HalSystemKindle.cpp` | `HalSystemHosted.cpp` | idem |
+
+Nenhum deles ficou mais complicado: a guarda deixou de nomear um aparelho e
+passou a nomear a familia que o BoardConfig ja derivava, e o tipo do painel
+saiu do `crosspoint::kindle` para um alias em `lib/hal/hosted/HostedPanel.h`.
+
+**Uma armadilha que o backport vai encontrar:** `FREEINK_MCU_HOSTED` e
+DERIVADO dentro do `BoardConfig.h`. Testa-lo antes de incluir aquele header le
+zero e escolhe o ramo errado, e o erro so aparece dezenas de linhas depois como
+`undeclared identifier`. Com `FREEINK_DEVICE_KINDLE` isso nao acontecia porque
+aquele vem da linha de comando. O `HalGPIO.h` tinha exatamente esse problema e
+o proprio comentario dele ja registrava uma versao anterior do mesmo tombo, com
+`FREEINK_CAP_TOUCH`.
+
+**Pendencia que impede o ramo Kindle de compilar aqui:** `KindleTouch.h` ainda
+declara `Gesture`, `GestureResult` e `TouchTuning` dentro de
+`crosspoint::kindle`, e `lib/hal/hosted/HostedTouch.h` declara os mesmos tres
+em `crosspoint::hosted`. Isso esta assim de proposito, em vez de aliases que
+esconderiam a duplicata: os dois alvos tem que falar UMA lingua de gesto, nao
+duas identicas. O backport move os do Kindle para o `HostedTouch.h`.
+
+O mesmo vale para `KindleGrayExpand.cpp`, cujas duas funcoes puras viraram
+`lib/hal/hosted/HostedGray.cpp` sem nenhuma alteracao de logica.
+
+## Achados que nao sao de nenhum dos dois
+
+| Marca | O que |
+| --- | --- |
+| **Upstream** | `HalSystem.cpp` e `HalGPIO.cpp` guardavam com `!FREEINK_DEVICE_KINDLE` o que na verdade queriam dizer com `!FREEINK_MCU_HOSTED`: os dois incluem coisa de ESP32 (`InputManager`, `xtensa_context.h`) que aparelho hospedado nenhum tem. Funcionava por so existir um alvo hospedado. |
+| **Upstream** | `FirmwareBoardTag.cpp` tem `#error` para aparelho desconhecido, entao cada alvo novo precisa de uma entrada. Correto, e vale registrar que e assim de proposito. |

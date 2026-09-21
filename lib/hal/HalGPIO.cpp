@@ -5,7 +5,7 @@
 // kernel's business.
 #include <BoardConfig.h>
 
-#if !FREEINK_DEVICE_KINDLE
+#if !FREEINK_MCU_HOSTED
 
 #include <BatteryMonitor.h>
 #include <HalGPIO.h>
@@ -309,4 +309,4 @@ HalGPIO::WakeupReason HalGPIO::getWakeupReason() const {
   return WakeupReason::Other;
 }
 
-#endif  // !FREEINK_DEVICE_KINDLE
+#endif  // !FREEINK_MCU_HOSTED

@@ -35,7 +35,7 @@ INC="$INC -Isrc/components -Isrc/activities -Isrc/util -Isrc/network"
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/libunibreak"
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/tjpgd"
 VER=${CROSSPOINT_VERSION:-android-dev}
-DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_KINDLE}=1 -DANDROID=1"
+DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_HIBREAK}=1 -DANDROID=1"
 mkdir -p build/android
 cat > build/android/defines.h <<DEFS
 #pragma once
@@ -149,7 +149,9 @@ echo "--- tentando linkar ---"
     -static-libstdc++ \
     -Wl,--gc-sections \
     -Wl,--start-group $archives -Wl,--end-group \
-    -llog -lz 2>"$OUT/link.err"
+    -llog -lz -landroid 2>"$OUT/link.err"
+# -landroid: ANativeWindow_lock/unlockAndPost/release, que sao a metade de
+# baixo do AndroidPanel.
 # -lz: o PNGdec usa zlib, e o Android tem libz no sistema. No firmware ESP32
 # a inflacao vem do miniz vendorizado; aqui nao ha motivo para carregar uma
 # copia quando o bionic ja traz uma.

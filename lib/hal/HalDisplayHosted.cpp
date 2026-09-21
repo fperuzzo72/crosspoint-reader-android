@@ -1,9 +1,13 @@
-// HalDisplay for the Kindle.
+// HalDisplay para os alvos hospedados: Kindle e HiBreak.
 //
-// Replaces HalDisplay.cpp, which forwards everything to FreeInkDisplay. Here
-// the panel half is KindleFrameBuffer (mmap of /dev/fb0 plus FBInk's refresh
-// ioctls) and the framebuffer CrossPoint composes into is ours to own, because
-// the panel half only ever receives a finished frame.
+// Substitui o HalDisplay.cpp, que repassa tudo para o FreeInkDisplay. Aqui a
+// metade do painel e crosspoint::hosted::Panel, escolhida em tempo de
+// compilacao em hosted/HostedPanel.h, e o framebuffer em que o CrossPoint
+// compoe e nosso, porque a metade do painel so recebe quadro pronto.
+//
+// Os dois aparelhos nao tem nada em comum no hardware, mas precisam
+// exatamente da mesma sequencia: compor, encenar a base, pintar os planos de
+// cinza por cima, apresentar uma vez. Por isso um arquivo e nao dois.
 //
 // Excluding this file's counterpart from the build is what removes the whole
 // PanelDriver and EpdBus tree, which is where 251 of the undefined symbols in
@@ -19,22 +23,22 @@
 
 #include "HalDisplay.h"
 
-#if FREEINK_DEVICE_KINDLE
+#if FREEINK_MCU_HOSTED
 
 #include <cstdlib>
 #include <cstring>
 
 namespace {
 
-crosspoint::kindle::Waveform toWaveform(const HalDisplay::RefreshMode mode) {
+crosspoint::hosted::Waveform toWaveform(const HalDisplay::RefreshMode mode) {
   switch (mode) {
     case HalDisplay::FULL_REFRESH:
-      return crosspoint::kindle::Waveform::Full;
+      return crosspoint::hosted::Waveform::Full;
     case HalDisplay::HALF_REFRESH:
-      return crosspoint::kindle::Waveform::Half;
+      return crosspoint::hosted::Waveform::Half;
     case HalDisplay::FAST_REFRESH:
     default:
-      return crosspoint::kindle::Waveform::Fast;
+      return crosspoint::hosted::Waveform::Fast;
   }
 }
 
@@ -342,4 +346,4 @@ void HalDisplay::preconditionGrayscale(uint16_t, uint16_t, uint16_t, uint16_t) {
 // switch reported `display` undefined from every call site.
 HalDisplay display;
 
-#endif  // FREEINK_DEVICE_KINDLE
+#endif  // FREEINK_MCU_HOSTED

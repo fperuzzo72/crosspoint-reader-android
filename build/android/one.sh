@@ -15,6 +15,6 @@ INC="$INC -Ilib/uzlib/src -Ilib/miniz/src -Isrc -Ilib -Isrc/components -Isrc/act
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/libunibreak"
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/tjpgd"
 VER=${CROSSPOINT_VERSION:-android-dev}
-DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_KINDLE}=1 -DANDROID=1"
+DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_HIBREAK}=1 -DANDROID=1"
 DEF="$DEF -DCROSSPOINT_VERSION=\"$VER\" -DARDUINOJSON_ENABLE_ARDUINO_STRING=1"
 exec "$CC" -std=c++20 -fsyntax-only $INC $DEF "$@" "$F"

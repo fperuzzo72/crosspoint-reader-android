@@ -270,3 +270,76 @@ provavelmente vale mais do que insistir no cabo.
   máquina; uma Activity é pausada, morta e recriada.
 - O que compilar fora por capability: servidor web, modo AP, OTA, flasher,
   Calibre. Tudo redundante num telefone.
+
+
+## O backend, e o refactor que ele forcou
+
+Escrever um `HalDisplayAndroid.cpp` ao lado do `HalDisplayKindle.cpp` teria
+duplicado 345 linhas. Os dois aparelhos nao tem nada em comum no hardware, mas
+o HalDisplay precisa da mesma sequencia dos dois (compoe, encena a base, pinta
+os planos de cinza por cima, apresenta uma vez), e o arquivo do Kindle ja
+estava escrito contra essa forma.
+
+Entao a guarda deixou de ser `FREEINK_DEVICE_KINDLE` e passou a ser
+`FREEINK_MCU_HOSTED`, que o BoardConfig ja derivava:
+
+| Antes | Agora | Linhas |
+| --- | --- | --- |
+| `HalDisplayKindle.cpp` | `HalDisplayHosted.cpp` | 345 |
+| `HalGPIOKindle.cpp` | `HalGPIOHosted.cpp` | 206 |
+| `HalSystemKindle.cpp` | `HalSystemHosted.cpp` | 231 |
+
+`lib/hal/hosted/HostedPanel.h` escolhe o painel e o toque em tempo de
+compilacao. Sem classe base virtual de proposito: um binario por aparelho, e
+uma vtable so pagaria indirecao por uma decisao que o preprocessador ja tomou.
+
+O que e novo e especifico:
+
+```
+lib/hal/hosted/HostedGray.{h,cpp}     expansao 1bpp->8bpp e overlay de cinza
+lib/hal/hosted/HostedTouch.h          Gesture, GestureResult, TouchTuning
+lib/hal/hosted/HostedPanel.h          o seletor
+lib/hal/android/AndroidPanel.{h,cpp}  ANativeWindow, 824x1648, RGBX_8888
+lib/hal/android/AndroidTouchDevice.*  caixa de correio, nao classificador
+lib/hal/android/Jni.cpp               as quatro travessias da fronteira
+```
+
+### Duas decisoes que valem registro
+
+**O toque nao e classificado em C++.** No Kindle o backend le evdev cru e
+decide sozinho o que e toque, toque longo e swipe, porque ninguem mais vai
+fazer isso. No Android essa peca ja existe e e melhor do que a que
+escreveriamos: o `GestureDetector` conhece o slop do aparelho e os limiares do
+sistema. Entao a classificacao fica no Kotlin e o que atravessa o JNI e o
+gesto pronto. O `AndroidTouchDevice` e so o encaixe de threads.
+
+**Sem superficie nao e erro.** Uma Activity e pausada e destruida sob os pes do
+processo, e a thread do CrossPoint continua viva e pintando. O quadro composto
+sobrevive em `stage` e e reapresentado quando a superficie volta. Esta e a
+diferenca de fundo entre este alvo e os outros dois, onde o painel esta sempre
+la.
+
+### O link
+
+```
+0 referencias indefinidas
+```
+
+E aqui vale a mesma desconfianca que o resto deste documento: **linkar nao e
+funcionar.** O primeiro rename do `HalSystemKindle.cpp` para `Hosted` linkou
+perfeitamente enquanto levava junto `access("/mnt/us/crosspoint/crosspoint")` e
+uma leitura de bateria por `lipc-get-prop com.lab126.powerd`. Num HiBreak as
+duas falham em silencio e o medidor de bateria le 0. Foi separado por aparelho
+depois, mas o link nao teria reclamado nunca.
+
+## Proximo
+
+O lado Kotlin: Activity, SurfaceView, GestureDetector, e o Gradle com o CMake
+do NDK. A ponte ja esta definida e e pequena:
+
+```
+nativeSetSurface(Surface?)                      Surface -> ANativeWindow
+nativeGesture(kind, nx, ny, nxEnd, nyEnd, ms)   gesto ja classificado
+nativeContact(down)                             dedo encostado
+nativeStart()                                   sobe a thread do leitor
+```

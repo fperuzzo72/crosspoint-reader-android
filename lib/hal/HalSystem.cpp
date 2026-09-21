@@ -7,7 +7,7 @@
 // already collect better evidence than this could.
 #include <BoardConfig.h>
 
-#if !FREEINK_DEVICE_KINDLE
+#if !FREEINK_MCU_HOSTED
 
 #include "HalSystem.h"
 
@@ -218,4 +218,4 @@ bool isRebootFromPanic() {
 
 }  // namespace HalSystem
 
-#endif  // !FREEINK_DEVICE_KINDLE
+#endif  // !FREEINK_MCU_HOSTED

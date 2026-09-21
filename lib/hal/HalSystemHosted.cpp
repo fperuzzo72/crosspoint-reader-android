@@ -1,4 +1,4 @@
-// HalSystem for the Kindle.
+// HalSystem para os alvos hospedados: Kindle e HiBreak.
 //
 // The whole of this interface is about surviving a crash: the ESP32 version
 // captures a stack walk into RTC_NOINIT memory, which survives a reset, then
@@ -16,7 +16,7 @@
 
 #include "HalSystem.h"
 
-#if FREEINK_DEVICE_KINDLE
+#if FREEINK_MCU_HOSTED
 
 #include <BoardConfig.h>
 
@@ -26,6 +26,14 @@
 #include <cstdlib>
 #include <csignal>
 #include <ctime>
+
+// O prefixo de log nomeia o aparelho. Dizer [kindle] num Bigme e pequeno,
+// mas e o tipo de mentira que faz alguem procurar no lugar errado.
+#if FREEINK_DEVICE_HIBREAK
+#define HOSTED_TAG "hibreak"
+#else
+#define HOSTED_TAG "kindle"
+#endif
 
 namespace HalSystem {
 
@@ -98,9 +106,19 @@ bool clocksUsable = true;
 }  // namespace
 
 bool storageIsAttached() {
-  // The binary this process is running from. It cannot be absent while the
-  // filesystem is mounted, and it cannot be present while it is not.
+#if FREEINK_DEVICE_HIBREAK
+  // Nao ha cartao para desmontar. O armazenamento do aplicativo faz parte do
+  // ciclo de vida dele: se este processo esta rodando, ele esta la.
+  //
+  // Isto vira uma pergunta de verdade quando a pasta de ebooks sair do
+  // diretorio privado e passar pelo scoped storage, porque ai a resposta
+  // depende de uma permissao que o usuario pode revogar a qualquer momento.
+  return true;
+#else
+  // O binario de onde este processo esta rodando. Nao pode faltar enquanto o
+  // sistema de arquivos esta montado, e nao pode estar la enquanto nao esta.
   return access("/mnt/us/crosspoint/crosspoint", F_OK) == 0;
+#endif
 }
 
 namespace {
@@ -155,19 +173,33 @@ int batteryPercent() {
     const char* what;
     bool isCommand;
   };
+#if FREEINK_DEVICE_HIBREAK
+  // Caminhos do Android. Nao medidos no HiBreak ainda: sao os nomes que a
+  // maioria dos aparelhos usa, e o log diz qual respondeu para o chute parar.
+  //
+  // O caminho robusto e outro: o BatteryManager do framework, empurrado pelo
+  // Kotlin. Sysfs e legivel por app comum em muitos aparelhos e em outros nao,
+  // e qual dos dois e este ainda nao foi verificado.
+  static const Source sources[] = {
+      {"/sys/class/power_supply/battery/capacity", false},
+      {"/sys/class/power_supply/bms/capacity", false},
+      {"/sys/class/power_supply/Battery/capacity", false},
+  };
+#else
   static const Source sources[] = {
       {"lipc-get-prop com.lab126.powerd battLevel 2>/dev/null", true},
       {"/sys/class/power_supply/bd71827_bat/capacity", false},
       {"/sys/class/power_supply/max77696-battery/capacity", false},
       {"/sys/devices/system/yoshi_battery/yoshi_battery0/battery_capacity", false},
   };
+#endif
 
   for (const auto& source : sources) {
     const int value = source.isCommand ? readIntFromCommand(source.what) : readIntFromFile(source.what);
     if (value >= 0 && value <= 100) {
       if (!saidSource) {
         saidSource = true;
-        std::fprintf(stderr, "[kindle] battery read from %s: %d%%\n", source.what, value);
+        std::fprintf(stderr, "[" HOSTED_TAG "] battery read from %s: %d%%\n", source.what, value);
       }
       cached = value;
       return cached;
@@ -176,7 +208,7 @@ int batteryPercent() {
 
   if (!saidSource) {
     saidSource = true;
-    std::fprintf(stderr, "[kindle] no battery source answered; the gauge will read 0\n");
+    std::fprintf(stderr, "[" HOSTED_TAG "] no battery source answered; the gauge will read 0\n");
   }
   return cached;
 }
@@ -195,7 +227,7 @@ bool resumedFromSuspend(uint32_t* const millisAsleep) {
     // Say so, loudly and once. The first version of this went quiet here, and a
     // detector that disables itself in silence is indistinguishable from one
     // that is working and finding nothing. That cost a round of testing.
-    std::fprintf(stderr, "[kindle] CLOCK_BOOTTIME unavailable; suspend detection is off for this run\n");
+    std::fprintf(stderr, "[" HOSTED_TAG "] CLOCK_BOOTTIME unavailable; suspend detection is off for this run\n");
     clocksUsable = false;
     return false;
   }
@@ -208,7 +240,7 @@ bool resumedFromSuspend(uint32_t* const millisAsleep) {
     clocksInitialised = true;
     // Printed so a log can prove the detector is armed. "No suspend was
     // reported" and "nothing was ever watching" look identical otherwise.
-    std::fprintf(stderr, "[kindle] suspend detection armed (monotonic %lds, boottime %lds)\n",
+    std::fprintf(stderr, "[" HOSTED_TAG "] suspend detection armed (monotonic %lds, boottime %lds)\n",
                  static_cast<long>(monotonicMs / 1000), static_cast<long>(boottimeMs / 1000));
     return false;
   }
@@ -228,4 +260,4 @@ bool resumedFromSuspend(uint32_t* const millisAsleep) {
 
 }  // namespace HalSystem
 
-#endif  // FREEINK_DEVICE_KINDLE
+#endif  // FREEINK_MCU_HOSTED

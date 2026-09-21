@@ -31,6 +31,27 @@ path do `census.sh`, do `trylink.sh` e do `cmake/kindle/`. É um diff mecânico 
 deixa a costura visível, que é o que o próprio doc do porte Kindle argumenta ser
 o achado estrutural do projeto.
 
+## Quando guardar por aparelho, e quando nao
+
+Decidido: este porte existe para UM aparelho. Nao ha ambicao de generalidade,
+porque o hardware diverge demais entre um telefone e-ink, um Kindle e um
+ESP32 para uma abstracao valer o que custa.
+
+Isso NAO quer dizer que tudo vai atras de `#if FREEINK_DEVICE_HIBREAK`. O
+criterio e outro, e e sobre o que quebraria dentro desta arvore:
+
+- **Com guarda** quando o valor certo para este aparelho estaria errado para o
+  Kindle, que compila do mesmo codigo aqui. Os corpos de fonte, os limites da
+  margem, a raiz do armazenamento, a escada de refresh.
+- **Sem guarda** quando o que mudou e uma correcao que vale em qualquer lugar.
+  A barra de status alinhar com a coluna de texto e o caso: o usuario mexe numa
+  configuracao chamada "margem da tela" esperando que valha para a pagina
+  inteira, e a barra nao respeitava. Guardar isso seria fingir que o acerto e
+  uma preferencia local.
+
+Na duvida, sem guarda e anotado aqui. Uma guarda a mais esconde um conserto; um
+conserto a mais aparece no diff e alguem discute.
+
 ## Correções classificadas
 
 Cada conserto leva uma destas três marcas:

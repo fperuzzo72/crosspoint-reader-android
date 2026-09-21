@@ -1,5 +1,7 @@
 #include "ActivityManager.h"
 
+#include <StorageLayout.h>
+
 #include <BoardConfig.h>
 #include <FontCacheManager.h>
 #include <FsHelpers.h>
@@ -245,6 +247,14 @@ void ActivityManager::goToUsbDrive() {
 void ActivityManager::goToSettings() { replaceActivity(std::make_unique<SettingsActivity>(renderer, mappedInput)); }
 
 void ActivityManager::goToFileBrowser(std::string path) {
+  // Caminho vazio ou a raiz querem dizer "a biblioteca", nao "o topo do
+  // armazenamento". Nos aparelhos de cartao SD os dois sao a mesma coisa; no
+  // HiBreak nao, porque o cache e as fontes moram ao lado dos livros.
+  // As chamadas que passam um caminho de arquivo de verdade (voltar para a
+  // pasta do livro que se estava lendo) passam por aqui intactas.
+  if (path.empty() || path == "/") {
+    path = crosspoint::storage::LIBRARY_ROOT;
+  }
   replaceActivity(std::make_unique<FileBrowserActivity>(renderer, mappedInput, std::move(path)));
 }
 

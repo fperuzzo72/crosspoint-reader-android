@@ -99,6 +99,15 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
     if (Environment.isExternalStorageManager()) {
       val dir = File(Environment.getExternalStorageDirectory(), "CrossPoint")
       if (dir.mkdirs() || dir.isDirectory) {
+        // O layout e criado aqui e nao pelo leitor porque uma pasta que ja
+        // existe e um convite: voce abre o gerenciador de arquivos, ve
+        // "books", e sabe onde soltar o EPUB. Uma pasta que so aparece depois
+        // que o leitor decide cria-la nao ensina nada.
+        //
+        // .crosspoint nao esta aqui: o PersistableStore cria quando precisa, e
+        // uma pasta de cache vazia so confunde.
+        File(dir, "books").mkdirs()
+        File(dir, "fonts").mkdirs()
         return dir
       }
     }

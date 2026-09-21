@@ -19,7 +19,7 @@
 #if CROSSPOINT_OMIT_LARGE_READER_FONTS
 inline constexpr uint8_t BUILTIN_READER_POINT_SIZES[] = {12, 14};
 #else
-inline constexpr uint8_t BUILTIN_READER_POINT_SIZES[] = {12, 14, 16, 18};
+inline constexpr uint8_t BUILTIN_READER_POINT_SIZES[] = {14, 16, 18, 20, 22, 24};
 #endif
 
 // Point sizes selectable for the active reader font, ascending: the SD family's

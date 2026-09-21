@@ -31,7 +31,15 @@ struct UiFontSize {
 constexpr UiFontSize kUiFontSizes[] = {
     {SMALL_FONT_ID, 8},
     {UI_10_FONT_ID, 10},
+#if FREEINK_DEVICE_HIBREAK
+    // Casa com o que o main.cpp registra sob este ID neste aparelho. Se o
+    // mapa dissesse 12 enquanto a fonte entrega 14, o fallback CJK sairia
+    // menor que o latim ao lado dele.
+    {UI_12_FONT_ID, 14},
+#else
     {UI_12_FONT_ID, 12},
+#endif
+    {UI_14_FONT_ID, 14},
 };
 
 }  // namespace

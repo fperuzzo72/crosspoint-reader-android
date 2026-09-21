@@ -370,13 +370,20 @@ int CrossPointSettings::getReaderFontId() const {
   const uint8_t pt =
       snapToNearestPointSize(BUILTIN_READER_POINT_SIZES, std::size(BUILTIN_READER_POINT_SIZES), fontPointSize);
   const bool sans = (fontFamily == NOTOSANS);
+  // Este switch e o espelho de BUILTIN_READER_POINT_SIZES e tem de andar com
+  // ele. Um tamanho que exista la e falte aqui cai no default e desenha no
+  // corpo errado sem reclamar, que e a pior forma disto quebrar.
   switch (pt) {
-    case 12:
-      return sans ? NOTOSANS_12_FONT_ID : NOTOSERIF_12_FONT_ID;
     case 16:
       return sans ? NOTOSANS_16_FONT_ID : NOTOSERIF_16_FONT_ID;
     case 18:
       return sans ? NOTOSANS_18_FONT_ID : NOTOSERIF_18_FONT_ID;
+    case 20:
+      return sans ? NOTOSANS_20_FONT_ID : NOTOSERIF_20_FONT_ID;
+    case 22:
+      return sans ? NOTOSANS_22_FONT_ID : NOTOSERIF_22_FONT_ID;
+    case 24:
+      return sans ? NOTOSANS_24_FONT_ID : NOTOSERIF_24_FONT_ID;
     case 14:
     default:
       return sans ? NOTOSANS_14_FONT_ID : NOTOSERIF_14_FONT_ID;

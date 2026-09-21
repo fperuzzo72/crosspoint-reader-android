@@ -4,9 +4,15 @@ set -e
 
 cd "$(dirname "$0")"
 
+# 12 saiu: a 300 dpi do HiBreak ele fica pequeno demais para ler, medido no
+# aparelho e nao inferido. 20, 22 e 24 entraram pelo mesmo teste.
+#
+# Num ESP32 esta lista seria uma decisao de orcamento: os glifos sao a maior
+# parte do binario e ha 380KB de RAM. Neste alvo esse teto nao existe, entao a
+# lista e sobre leitura e nao sobre memoria.
 READER_FONT_STYLES=("Regular" "Italic" "Bold" "BoldItalic")
-NOTOSERIF_FONT_SIZES=(12 14 16 18)
-NOTOSANS_FONT_SIZES=(12 14 16 18)
+NOTOSERIF_FONT_SIZES=(14 16 18 20 22 24)
+NOTOSANS_FONT_SIZES=(14 16 18 20 22 24)
 
 for size in ${NOTOSERIF_FONT_SIZES[@]}; do
   for style in ${READER_FONT_STYLES[@]}; do
@@ -28,7 +34,7 @@ for size in ${NOTOSANS_FONT_SIZES[@]}; do
   done
 done
 
-UI_FONT_SIZES=(10 12)
+UI_FONT_SIZES=(10 12 14)
 UI_FONT_STYLES=("Regular" "Bold")
 
 # Arabic glyphs for UI text (menus, file browser titles). The built-in fonts

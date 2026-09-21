@@ -31,15 +31,28 @@ path do `census.sh`, do `trylink.sh` e do `cmake/kindle/`. É um diff mecânico 
 deixa a costura visível, que é o que o próprio doc do porte Kindle argumenta ser
 o achado estrutural do projeto.
 
-## Correções pendentes de classificação
+## Correções classificadas
 
-Nada ainda. Conforme o censo for descendo, cada conserto entra aqui com uma
-destas três marcas:
+Cada conserto leva uma destas três marcas:
 
 - **POSIX** — vale nos dois, backport devido.
 - **Android** — bionic, NDK, ciclo de vida ou sandbox. Fica aqui.
 - **Upstream** — é bug do CrossPoint ou do freeink-sdk e devia subir para o
   repositório de origem, não só para o Kindle.
+
+Da subida de 61% para 100% no censo:
+
+| Marca | Conserto | Onde |
+| --- | --- | --- |
+| **POSIX** | `esp_restart()`, a forma livre do ESP-IDF ao lado do `ESP.restart()` que já existia. O `RecoveryBoot` e o `MemoryManager` do SDK chamam esta. | `arduino-shim/esp_system.h`, `ArduinoPlatform.cpp` |
+| **POSIX** | `StaticTask_t`, opaco, só para `sizeof()` compilar. `xTaskCreateStatic` segue ausente de propósito, então quem tentar criar tarefa estática quebra no link e não em silêncio. | `arduino-shim/freertos/task.h` |
+| **POSIX** | `adc_attenuation_t` e `analogSetAttenuation()` inertes, ao lado do `analogRead()` que já era inerte. | `arduino-shim/Arduino.h` |
+| **POSIX** | `ARDUINOJSON_ENABLE_ARDUINO_STRING=1`. Sem isso o ArduinoJson não detecta ambiente Arduino, cai no `std::string` e todo `as<String>()` falha. O Kindle tem o mesmo `String` de shim e o mesmo problema. | flag de build |
+| **Upstream** | `HomeActivity.h` declarava `struct RecentBook;` adiante e tinha `std::vector<RecentBook>` como membro. Mal formado: instanciar membros de `vector` exige tipo completo. O libstdc++ do ESP32 aceita, o libc++ recusa. Trocado por `#include "RecentBooksStore.h"`. | `src/activities/home/HomeActivity.h` |
+| **POSIX** | `scripts/fetch-thirdparty.sh`: as dependências que o `platformio.ini` declara, presas por versão, buscadas fora do PlatformIO. O doc do porte Kindle já apontava isso como valendo mais que mais shim. | `scripts/` |
+
+O `CROSSPOINT_VERSION` não entra na lista: é define de build que o
+`scripts/git_branch.py` injeta, e fora do PlatformIO só precisa existir.
 
 ## Contramão
 

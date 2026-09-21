@@ -35,3 +35,14 @@ uint32_t ulTaskNotifyTake(BaseType_t clearOnExit, TickType_t timeoutTicks);
 BaseType_t xTaskNotify(TaskHandle_t task, uint32_t value, eNotifyAction action);
 BaseType_t xTaskNotifyGive(TaskHandle_t task);
 TaskHandle_t xTaskGetCurrentTaskHandle();
+
+// Alocacao estatica de tarefa. No FreeRTOS isto e o TCB que o chamador
+// entrega a xTaskCreateStatic(); aqui uma tarefa e uma pthread e o kernel
+// aloca o que precisa. Este tipo existe para o codigo que so faz
+// sizeof(StaticTask_t) compilar. NAO e promessa de que criacao estatica
+// funciona: xTaskCreateStatic continua deliberadamente ausente, entao quem
+// realmente tentar criar uma tarefa estatica quebra no link, com o nome do
+// sitio de chamada, e nao silenciosamente em tempo de execucao.
+struct StaticTask_t {
+  void* dummy[24];
+};

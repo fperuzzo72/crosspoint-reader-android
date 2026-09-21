@@ -73,3 +73,9 @@ void EspClass::restart() const {
   // Only reached if exec failed; the caller was promised this never returns.
   _exit(1);
 }
+
+// A forma livre do ESP-IDF. O RecoveryBoot e o MemoryManager do SDK chamam
+// esta, nao o ESP.restart() do core Arduino. Mesmo ato, mesmo caminho.
+[[noreturn]] void esp_restart() {
+  ESP.restart();
+}

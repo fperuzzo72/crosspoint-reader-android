@@ -9,7 +9,10 @@
 #include "components/themes/BaseTheme.h"
 #include "util/ButtonNavigator.h"
 
-struct RecentBook;
+// RecentBook precisa estar COMPLETO aqui: std::vector<RecentBook> e membro
+// desta classe, e instanciar os membros do vector com tipo incompleto e mal
+// formado. O libstdc++ do ESP32 aceita; o libc++ do NDK recusa, com razao.
+#include "RecentBooksStore.h"
 struct Rect;
 
 class HomeActivity final : public Activity {

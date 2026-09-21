@@ -15,24 +15,34 @@ Android, com o framework do fabricante decidindo o waveform.
 Censo com o clang do NDK (`aarch64-linux-android28-clang++`, arm64-v8a),
 `-fsyntax-only` sobre cada `.cpp` de `src/`, `lib/` e `freeink-sdk/libs`:
 
-| Quando | Compila | Causa dominante |
+| Depois de | Compila | Causa dominante restante |
 | --- | --- | --- |
-| primeira rodada, camada POSIX do Kindle herdada | **61% (144/235)** | `ArduinoJson.h` (73 arquivos) |
+| primeira rodada, camada POSIX do Kindle herdada | 61% (144/235) | `ArduinoJson.h` (73 arquivos) |
+| buscar as dependencias declaradas | 94% (221/235) | `CROSSPOINT_VERSION` (6) |
+| shims, o conserto do `RecentBook` e a flag do ArduinoJson | **100% (221/221)** | nenhuma |
 
-Para comparação, a primeira rodada do porte Kindle deu 25%. A diferença é toda
-a camada POSIX que veio pronta.
+Duas ressalvas, porque um censo diz menos do que parece. Ele responde "este
+arquivo compilaria", nao "isto linka" e muito menos "isto roda". E o
+denominador caiu de 235 para 221 porque `FreeInkDisplay/src` saiu da conta:
+sao os `PanelDriver` e o `EpdBus`, que falam com um painel cru por SPI ou i80,
+e aqui nao ha painel cru. O porte Kindle excluiu pelo mesmo motivo, e foi o
+maior passo unico do `trylink` dele.
 
-Das 91 falhas, 83 são header de terceiro que não está vendorizado, e nenhuma
-delas é problema de portabilidade. As 8 restantes são reais e pequenas:
+O proximo numero que importa e o de referencias indefinidas, nao o de arquivos
+que compilam.
 
-```
-2  use of undeclared identifier 'esp_restart'
-2  use of undeclared identifier 'CROSSPOINT_VERSION'
-1  use of undeclared identifier 'portYIELD_FROM_ISR'
-1  use of undeclared identifier 'ADC_11db'
-1  expected ')'
-1  arithmetic on a pointer to an incomplete type 'RecentBook'
-```
+Para comparação, a primeira rodada do porte Kindle deu 25% e ele levou seis
+etapas para chegar a 82%. A diferença é toda a camada POSIX que veio pronta.
+
+Das 91 falhas da primeira rodada, 83 eram header de terceiro não vendorizado e
+nenhuma era problema de portabilidade. As oito restantes viraram seis consertos,
+listados e classificados em [backport-to-kindle.md](backport-to-kindle.md).
+
+O único achado de código real foi o `RecentBook`: `HomeActivity.h` declarava
+`struct RecentBook;` adiante e depois tinha um `std::vector<RecentBook>` como
+membro. Instanciar os membros de um `vector` com tipo incompleto é mal formado.
+O libstdc++ do ESP32 aceita, o libc++ do NDK recusa, e o libc++ está certo. Isso
+é bug do CrossPoint, não do Android.
 
 ## Os headers que faltam
 
@@ -47,7 +57,16 @@ portável, nenhum foi buscado:
 | `qrcode.h` | ricmoo/QRCode | 0.0.1 | 1 |
 | `pngle.h`, `stb_truetype.h` | vendorizadas em outro lugar | | 2 |
 
-`ArduinoJson` sozinho leva o censo de 61% para perto de 92%.
+`ArduinoJson` sozinho levou o censo de 61% para 94%. Todos estão presos por
+versão em [`scripts/fetch-thirdparty.sh`](../scripts/fetch-thirdparty.sh), que é
+o que o doc do porte Kindle dizia valer mais do que qualquer shim a mais: virar
+a tabela de busca manual num passo de dependência de verdade.
+
+Uma armadilha do ArduinoJson que custou o último arquivo: ele só registra o
+conversor para `String` quando detecta ambiente Arduino, olhando por `ARDUINO`.
+Com o `String` vindo do nosso shim a detecção não dispara, ele cai no
+`std::string` e todo `as<String>()` falha. A flag é
+`ARDUINOJSON_ENABLE_ARDUINO_STRING=1`.
 
 ## O painel: o que a Bigme expõe
 

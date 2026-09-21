@@ -36,20 +36,26 @@ echo "API:  $API   ABI: arm64-v8a"
 echo
 
 # --- include path ----------------------------------------------------------
-INC="-Ilib/hal/posix/arduino-shim -Ilib/hal/posix -Ilib/hal/android -Ilib/hal"
+INC="-Ithird_party -Ilib/hal/posix/arduino-shim -Ilib/hal/posix -Ilib/hal/android -Ilib/hal"
 for d in $(find freeink-sdk/libs -type d -name include); do INC="$INC -I$d"; done
 for d in lib/*/; do INC="$INC -I${d%/}"; done
 INC="$INC -Ilib/uzlib/src -Ilib/miniz/src -Isrc -Ilib -Isrc/components -Isrc/activities -Isrc/util -Isrc/network"
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/libunibreak"
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/tjpgd"
+VER=${CROSSPOINT_VERSION:-android-dev}
 DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_KINDLE}=1 -DANDROID=1"
+# O ArduinoJson so registra o conversor de String quando sabe que esta num
+# ambiente Arduino. Aqui o String vem do nosso shim, entao a deteccao
+# automatica dele (que olha por ARDUINO) nao dispara e ele cai no
+# std::string. A flag liga o conversor e faz ele incluir <WString.h>.
+DEF="$DEF -DCROSSPOINT_VERSION=\"$VER\" -DARDUINOJSON_ENABLE_ARDUINO_STRING=1"
 
 mkdir -p "$OUT"
 : > "$OUT/census-errors.txt"
 : > "$OUT/fails.txt"
 ok=0; fail=0
 for f in $(find src lib freeink-sdk/libs -name '*.cpp' 2>/dev/null \
-           | grep -vE 'expat|miniz|uzlib|/test/|/tools/|lib/hal/kindle/'); do
+           | grep -vE 'expat|miniz|uzlib|/test/|/tools/|lib/hal/kindle/|FreeInkDisplay/src/'); do
   if "$CC" -std=c++20 -fsyntax-only $INC $DEF "$f" > "$OUT/one.err" 2>&1; then
     ok=$((ok+1))
   else

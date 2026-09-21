@@ -165,3 +165,8 @@ inline void analogReadResolution(uint8_t) {}
 // Timezone configuration goes through the system here; see esp_sntp.h.
 inline void configTzTime(const char*, const char*, const char* = nullptr, const char* = nullptr) {}
 inline void configTime(long, int, const char*, const char* = nullptr, const char* = nullptr) {}
+
+// Atenuacao do ADC do ESP32. Nao ha ADC aqui; o valor existe para o codigo de
+// bateria compilar e analogSetAttenuation e inerte, como analogRead.
+enum adc_attenuation_t { ADC_0db = 0, ADC_2_5db = 1, ADC_6db = 2, ADC_11db = 3 };
+inline void analogSetAttenuation(adc_attenuation_t) {}

@@ -18,6 +18,10 @@
 #include <atomic>
 #include <thread>
 
+namespace crosspoint_storage {
+void setRoot(const char* path);
+}
+
 #include "AndroidPanel.h"
 #include "AndroidTouchDevice.h"
 
@@ -80,6 +84,28 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeGestur
 // saber que ha um contato em andamento antes de ele virar alguma coisa.
 JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeContact(JNIEnv*, jclass, jboolean down) {
   crosspoint::android::AndroidTouchDevice::instance().setContactDown(down == JNI_TRUE);
+}
+
+// A raiz do armazenamento. Tem de ser chamada ANTES do nativeStart(): o
+// setup() do CrossPoint ja monta o navegador de arquivos e le a biblioteca,
+// e uma raiz errada nessa hora e uma biblioteca vazia.
+//
+// Quem decide o caminho e o Kotlin, porque so o framework sabe qual e o
+// diretorio deste aplicativo. Na v1 e o getExternalFilesDir(), que e
+// gravavel sem permissao nenhuma e visivel num gerenciador de arquivos. A
+// pasta de ebooks escolhida pelo usuario, sob scoped storage, e outro
+// problema e vem depois.
+JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetStorageRoot(JNIEnv* env, jclass,
+                                                                                        jstring path) {
+  if (path == nullptr) {
+    return;
+  }
+  const char* utf = env->GetStringUTFChars(path, nullptr);
+  if (utf != nullptr) {
+    crosspoint_storage::setRoot(utf);
+    __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "raiz do armazenamento: %s", utf);
+    env->ReleaseStringUTFChars(path, utf);
+  }
 }
 
 // Sobe a thread do CrossPoint. Idempotente: a Activity pode ser recriada sem

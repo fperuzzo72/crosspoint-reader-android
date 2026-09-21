@@ -52,6 +52,18 @@ object CrossPointNative {
   @JvmStatic external fun nativeContact(down: Boolean)
 
   /**
+   * A raiz do armazenamento, em caminho absoluto.
+   *
+   * Tem de ser chamada ANTES de [nativeStart]: o `setup()` do CrossPoint ja
+   * monta o navegador de arquivos e le a biblioteca, e uma raiz errada nessa
+   * hora e uma biblioteca vazia.
+   *
+   * Quem decide e este lado, porque so o framework sabe qual e o diretorio
+   * deste aplicativo.
+   */
+  @JvmStatic external fun nativeSetStorageRoot(path: String)
+
+  /**
    * Sobe a thread do leitor. Idempotente de proposito: a Activity pode ser
    * recriada (rotacao, mudanca de configuracao) sem o processo morrer, e
    * reiniciar o CrossPoint perderia a posicao de leitura.

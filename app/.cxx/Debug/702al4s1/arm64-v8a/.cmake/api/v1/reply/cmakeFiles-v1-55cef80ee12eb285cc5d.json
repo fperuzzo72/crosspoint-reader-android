@@ -1,0 +1,1894 @@
+{
+	"globsDependent" : 
+	[
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/*/*/include",
+			"listDirectories" : true,
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/Icons/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/ImageToneMapper/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/display/FreeInkDisplay/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/AudioManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BatteryMonitor/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardConfig/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Buzzer/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/EnvironmentSensor/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/FrontlightManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Imu/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/InputManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/LedManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/MemoryManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Microphone/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/PowerManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/RecoveryBoot/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Rtc/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/UsbMassStorage/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/XteinkDetect/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/NearbyTransfer/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/SecureNet/include",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/ui/FreeInkUI/include"
+			]
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/display/FreeInkDisplay/src/bus/EpdBusNull.cpp",
+			"listDirectories" : true,
+			"paths" : []
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/Icons/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/Icons/src/*.cpp",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/ImageToneMapper/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/ImageToneMapper/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/ImageToneMapper/src/ImageToneMapper.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/*.c",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/vendor/miniz_impl.c"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/Credential.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/ProtectedBook.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/Rights.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/WolfsslCrypto.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/src/Zip.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/*.c",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/expat_xmlparse.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/expat_xmlrole.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/expat_xmltok.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/miniz_impl.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/pngle_impl.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/tjpgd_impl.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/vendor/unibreak_impl.c"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/BookCatalog.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/FreeInkBook.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/cache/PageCache.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/css/Css.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/epub/ImageProbe.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/epub/PackageParsers.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/epub/XmlSax.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/epub/ZipCatalog.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/layout/ChapterLayout.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/render/ImageRenderer.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/render/PageRenderer.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/render/TtfFont.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/text/EntityFilter.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/src/text/Hyphenator.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/AudioManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/AudioManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/AudioManager/src/AudioManager.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BatteryMonitor/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BatteryMonitor/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BatteryMonitor/src/BatteryMonitor.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardConfig/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardConfig/src/*.cpp",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/src/BoardPaperS3.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/src/M5PaperS3LgfxConfig.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/src/BoardT5S3.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/src/LilyGoT5S3LgfxConfig.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Buzzer/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Buzzer/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Buzzer/src/Buzzer.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/EnvironmentSensor/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/EnvironmentSensor/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/EnvironmentSensor/src/EnvironmentSensor.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/FrontlightManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/FrontlightManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/FrontlightManager/src/FrontlightManager.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Imu/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Imu/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Imu/src/Imu.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/InputManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/InputManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/InputManager/src/InputManager.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/LedManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/LedManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/LedManager/src/LedManager.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/MemoryManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/MemoryManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/MemoryManager/src/MemoryManager.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Microphone/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Microphone/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Microphone/src/Microphone.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/PowerManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/PowerManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/PowerManager/src/PowerManager.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/RecoveryBoot/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/RecoveryBoot/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/RecoveryBoot/src/RecoveryBoot.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Rtc/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Rtc/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Rtc/src/Rtc.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/src/SDCardManager.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/src/SdmmcBlockDevice.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/UsbMassStorage/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/UsbMassStorage/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/UsbMassStorage/src/UsbMassStorage.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/XteinkDetect/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/XteinkDetect/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/XteinkDetect/src/XteinkDetect.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/src/BleKeyboardHost.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/src/HidKeymap.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/NearbyTransfer/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/NearbyTransfer/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/NearbyTransfer/src/NearbyTransfer.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/SecureNet/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/SecureNet/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/SecureNet/src/SecureClient.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/ui/FreeInkUI/src/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/ui/FreeInkUI/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/ui/FreeInkUI/src/FreeInkUI.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/EpdFont.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/EpdFontFamily.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/FontDecompressor.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/SdCardFont.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/SdCardFontManager.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont/SdCardFontRegistry.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/BookMetadataCache.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/Page.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/ParsedText.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/Section.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/blocks/ImageBlock.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/blocks/TextBlock.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/converters/ImageDecoderFactory.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/converters/ImageDimsProbe.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/converters/ImageToFramebufferDecoder.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/converters/JpegToFramebufferConverter.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/converters/PngToFramebufferConverter.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/css/CssParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/htmlEntities.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/hyphenation/HyphenationCommon.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/hyphenation/Hyphenator.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/hyphenation/LanguageRegistry.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/hyphenation/LiangHyphenation.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/parsers/ChapterHtmlSlimParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/parsers/ContainerParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/parsers/ContentOpfParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/parsers/TocNavParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub/Epub/parsers/TocNcxParser.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/FsHelpers/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/FsHelpers/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/FsHelpers/FsHelpers.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer/Bitmap.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer/BitmapHelpers.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer/FontCacheManager.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer/GfxRenderer.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/I18n/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/I18n/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/I18n/I18n.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/I18n/I18nStrings.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/InflateReader/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/InflateReader/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/InflateReader/InflateReader.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JpegToBmpConverter/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JpegToBmpConverter/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/JpegToBmpConverter/JpegToBmpConverter.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JsonParser/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JsonParser/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/JsonParser/ReleaseJsonParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/JsonParser/StreamingJsonParser.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/ChapterXPathResolver.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/KOReaderCredentialStore.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/KOReaderDocumentId.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/KOReaderSyncClient.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/ProgressComparison.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync/ProgressMapper.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Logging/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Logging/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Logging/Logging.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Memory/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Memory/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Memory/BuildScratch.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi/*.c",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi/minibidi.c"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi/BidiUtils.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/OpdsParser/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/OpdsParser/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/OpdsParser/OpdsParser.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/OpdsParser/OpdsStream.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/PngToBmpConverter/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/PngToBmpConverter/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/PngToBmpConverter/PngToBmpConverter.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Serialization/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Serialization/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Serialization/ObfuscationUtils.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Serialization/PersistableStore.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Txt/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Txt/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Txt/Txt.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Utf8/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Utf8/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Utf8/Utf8.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/XmlParserUtils/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/XmlParserUtils/*.cpp",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Xtc/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Xtc/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Xtc/Xtc.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/Xtc/Xtc/XtcParser.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/ZipFile/*.c",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/ZipFile/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/ZipFile/ZipFile.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalClock.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalDisplay.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalDisplayHosted.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalFrontlight.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalGPIO.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalGPIOHosted.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalMemory.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalPowerManager.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalStorage.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalSystem.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalSystemHosted.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/HalTiltSensor.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/AndroidPanel.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/AndroidTouchDevice.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/android/Jni.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/hosted/HostedGray.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/kindle/KindleFrameBuffer.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/kindle/KindleGrayExpand.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/kindle/KindleTouchClassifier.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/kindle/KindleTouchDevice.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/ArduinoPlatform.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/ArduinoShim.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/ArduinoString.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/CryptoPosix.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/HttpClientPosix.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/NetworkPosix.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/SdFatPosix.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/SerialProxyPosix.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/WebServerPosix.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/WebSocketsPosix.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/*.c",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/src/miniz_impl.c",
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/third_party/miniz.c"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/src/InflateStream.cpp"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib/*.c",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib/src/tinflate.c"
+			],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib/*.cpp",
+			"paths" : [],
+			"recurse" : true
+		},
+		{
+			"expression" : "/Users/fperuzzo/github/crosspoint-reader-android/src/*.cpp",
+			"paths" : 
+			[
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/CrossPointSettings.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/CrossPointState.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/FontInstaller.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/MappedInputManager.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/OpdsServerStore.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/ReaderFontSizes.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/RecentBooksStore.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/SdCardFontSystem.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/WifiCredentialStore.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/Activity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/ActivityManager.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/UiListActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/UiTabListActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/boot_sleep/BootActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/boot_sleep/SleepActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/browser/OpdsBookBrowserActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/home/CrashActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/home/FileBrowserActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/home/HomeActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/home/RecentBooksActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/network/CalibreConnectActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/network/CrossPointWebServerActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/network/NetworkModeSelectionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/network/UsbDriveActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/network/WifiSelectionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/DictionaryDefinitionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/DictionaryWordSelectActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EndOfBookOptions.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EpubReaderActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EpubReaderBookmarksActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EpubReaderChapterSelectionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EpubReaderFootnotesActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EpubReaderMenuActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/EpubReaderPercentSelectionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/KOReaderSyncActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/QrDisplayActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/ReaderActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/ReaderToolbarUi.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/TxtReaderActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/XtcReaderActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/reader/XtcReaderChapterSelectionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/ButtonRemapActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/ClearCacheActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/ClockOffsetActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/ClockSyncActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/FontDownloadActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/KOReaderAuthActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/KOReaderSettingsActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/KeyboardLayoutsActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/LanguageSelectActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/OpdsServerListActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/OpdsSettingsActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/OtaUpdateActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/SdFirmwareUpdateActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/SettingsActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/StatusBarSettingsActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/TextSettingsActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/settings/TextSettingsPreview.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/BmpViewerActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/ConfirmationActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/FrontlightPanelActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/FullScreenMessageActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/IntervalSelectionActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/KeyboardEntryActivity.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/activities/util/KeyboardLayoutSet.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/components/UITheme.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/components/UiAppHost.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/components/themes/BaseTheme.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/components/themes/lyra/Lyra3CoversTheme.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/components/themes/lyra/LyraTheme.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/components/themes/roundedraff/RoundedRaffTheme.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/main.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/CrossPointWebServer.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/FirmwareBoardTag.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/FirmwareFlasher.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/HttpDownloader.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/OtaBootSwitch.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/OtaUpdater.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/network/WebDAVHandler.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/platform/UsbSerialJtagHandoff.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/BookCacheUtils.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/BookmarkFile.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/BookmarkUtil.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/ButtonNavigator.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/DictHtmlPages.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/DictZip.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/Dictionary.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/DictionaryRegistry.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/HtmlToPlainText.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/NextBookFinder.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/OpdsFilename.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/QrUtils.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/ScreenshotUtil.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/StringUtils.cpp",
+				"/Users/fperuzzo/github/crosspoint-reader-android/src/util/UrlUtils.cpp"
+			],
+			"recurse" : true
+		}
+	],
+	"inputs" : 
+	[
+		{
+			"path" : "CMakeLists.txt"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineSystem.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/android.toolchain.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/android-legacy.toolchain.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/abis.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/platforms.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Determine.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/hooks/pre/Android-Determine.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeSystem.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/CMakeFiles/4.4.2/CMakeSystem.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/android.toolchain.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Initialize.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/hooks/pre/Android-Initialize.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linux-Initialize.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Determine-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCompilerIdDetection.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Diab-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/PellesC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Renesas-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-FindBinUtils.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCXXCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/CMakeFiles/4.4.2/CMakeCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Determine-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCompilerIdDetection.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Bruce-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Compaq-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Diab-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/GNU-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/HP-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/LCC-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/PellesC-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Renesas-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/SDCC-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/SunPro-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/XL-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/XLClang-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/zOS-C-DetermineCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-FindBinUtils.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/CMakeFiles/4.4.2/CMakeCCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeSystemSpecificInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeGenericSystem.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeInitializeConfigs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/hooks/pre/Android.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linux.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/UnixPaths.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCXXInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Clang-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Clang.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/hooks/pre/Android-Clang.cmake"
+		},
+		{
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/build/cmake/flags.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/FeatureTesting.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-CXX-CXXImportStd.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCXXCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/CMakeFiles/4.4.2/CMakeCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Linker/LLD-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Linker/LLD.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Linker/GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Android-LLD-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Linux-LLD-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Linux-LLD.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Linux-GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeInspectCXXLinker.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCXXCompiler.cmake.in"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Compiler/Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Clang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Android-Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeTestCCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeTestCompilerCommon.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCCompilerABI.c"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/FeatureTesting.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCCompiler.cmake.in"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/CMakeFiles/4.4.2/CMakeCCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeCLinkerInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Linker/LLD-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Linker/LLD.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Linker/GNU.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Android-LLD-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Linux-LLD-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Platform/Linker/Linux-LLD.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/Internal/CMakeInspectCLinker.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/opt/homebrew/share/cmake/Modules/CMakeCCompiler.cmake.in"
+		}
+	],
+	"kind" : "cmakeFiles",
+	"paths" : 
+	{
+		"build" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a",
+		"source" : "/Users/fperuzzo/github/crosspoint-reader-android/cmake/android"
+	},
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 1
+	}
+}

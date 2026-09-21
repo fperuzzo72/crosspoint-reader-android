@@ -1,0 +1,794 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "libcp_lib_MiniBidi.a"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"cp_add_archive",
+			"target_link_libraries",
+			"add_compile_options"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 154,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 122,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 123,
+				"parent" : 1
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 38,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 48,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 11
+	},
+	"compileDependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "cp_common::@6890427a1f51a3e7e1df"
+		}
+	],
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -std=c++20 -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-ffunction-sections"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-fdata-sections"
+				},
+				{
+					"backtrace" : 5,
+					"fragment" : "-fvisibility=hidden"
+				},
+				{
+					"backtrace" : 5,
+					"fragment" : "-fvisibility-inlines-hidden"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 3,
+					"define" : "ANDROID=1"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "ARDUINOJSON_ENABLE_ARDUINO_STRING=1"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "CROSSPOINT_VERSION=\"hibreak-dev\""
+				},
+				{
+					"backtrace" : 3,
+					"define" : "FREEINK_DEVICE_HIBREAK=1"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "XML_CONTEXT_BYTES=1024"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "XML_GE=0"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/arduino-shim"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/third_party"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib/src"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/src"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/third_party/expat"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/components"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/activities"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/util"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/network"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/third_party/libunibreak"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/third_party/tjpgd"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/FsHelpers"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/I18n"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/InflateReader"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JpegToBmpConverter"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JsonParser"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Logging"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Memory"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/OpdsParser"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/PngToBmpConverter"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Serialization"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Txt"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Utf8"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/XmlParserUtils"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Xtc"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/ZipFile"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/expat"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/Icons/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/ImageToneMapper/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/display/FreeInkDisplay/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/AudioManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BatteryMonitor/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardConfig/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Buzzer/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/EnvironmentSensor/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/FrontlightManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Imu/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/InputManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/LedManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/MemoryManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Microphone/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/PowerManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/RecoveryBoot/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Rtc/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/UsbMassStorage/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/XteinkDetect/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/NearbyTransfer/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/SecureNet/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/ui/FreeInkUI/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					2
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			],
+			"sysroot" : 
+			{
+				"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+			}
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fno-limit-debug-info  -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-ffunction-sections"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-fdata-sections"
+				},
+				{
+					"backtrace" : 5,
+					"fragment" : "-fvisibility=hidden"
+				},
+				{
+					"backtrace" : 5,
+					"fragment" : "-fvisibility-inlines-hidden"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 3,
+					"define" : "ANDROID=1"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "ARDUINOJSON_ENABLE_ARDUINO_STRING=1"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "CROSSPOINT_VERSION=\"hibreak-dev\""
+				},
+				{
+					"backtrace" : 3,
+					"define" : "FREEINK_DEVICE_HIBREAK=1"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "XML_CONTEXT_BYTES=1024"
+				},
+				{
+					"backtrace" : 3,
+					"define" : "XML_GE=0"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/arduino-shim"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/third_party"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/hal"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib/src"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz/src"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/third_party/expat"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/components"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/activities"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/util"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/src/network"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/third_party/libunibreak"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/third_party/tjpgd"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/EpdFont"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Epub"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/FsHelpers"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/GfxRenderer"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/I18n"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/InflateReader"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JpegToBmpConverter"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/JsonParser"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/KOReaderSync"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Logging"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Memory"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/OpdsParser"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/PngToBmpConverter"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Serialization"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Txt"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Utf8"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/XmlParserUtils"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/Xtc"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/ZipFile"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/expat"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/miniz"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/uzlib"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/Icons/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/assets/ImageToneMapper/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/ContentProtection/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/book/FreeInkBook/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/display/FreeInkDisplay/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/AudioManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BatteryMonitor/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardConfig/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardPaperS3/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/BoardT5S3/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Buzzer/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/EnvironmentSensor/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/FrontlightManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Imu/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/InputManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/LedManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/MemoryManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Microphone/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/PowerManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/RecoveryBoot/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/Rtc/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/SDCardManager/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/UsbMassStorage/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/hardware/XteinkDetect/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/BleKeyboardHost/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/NearbyTransfer/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/network/SecureNet/include"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/Users/fperuzzo/github/crosspoint-reader-android/freeink-sdk/libs/ui/FreeInkUI/include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				1
+			],
+			"sysroot" : 
+			{
+				"path" : "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+			}
+		}
+	],
+	"id" : "cp_lib_MiniBidi::@6890427a1f51a3e7e1df",
+	"interfaceLinkLibraries" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "cp_common::@6890427a1f51a3e7e1df"
+		}
+	],
+	"linkLibraries" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "cp_common::@6890427a1f51a3e7e1df"
+		}
+	],
+	"name" : "cp_lib_MiniBidi",
+	"nameOnDisk" : "libcp_lib_MiniBidi.a",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"backtraces" : 
+			[
+				2
+			],
+			"compileGroupIndex" : 0,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi/BidiUtils.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"backtraces" : 
+			[
+				2
+			],
+			"compileGroupIndex" : 1,
+			"path" : "/Users/fperuzzo/github/crosspoint-reader-android/lib/MiniBidi/minibidi.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

@@ -1,0 +1,501 @@
+{
+	"configurations" : 
+	[
+		{
+			"abstractTargets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_common::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_common-Debug-0dc36a85210bd7d593f4.json",
+					"name" : "cp_common",
+					"projectIndex" : 0
+				}
+			],
+			"directories" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0
+					],
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-b23a0b23c080df4d29ba.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10.0"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						32,
+						33,
+						34,
+						35,
+						36,
+						37,
+						38,
+						39,
+						40,
+						41,
+						42,
+						43,
+						44,
+						45,
+						46,
+						47
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"abstractTargetIndexes" : 
+					[
+						0
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "crosspoint_hibreak",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						32,
+						33,
+						34,
+						35,
+						36,
+						37,
+						38,
+						39,
+						40,
+						41,
+						42,
+						43,
+						44,
+						45,
+						46,
+						47
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_fetched::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_fetched-Debug-9e8a357f4ebfa965e6c4.json",
+					"name" : "cp_fetched",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_EpdFont::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_EpdFont-Debug-c3f7d0fb0281282cab03.json",
+					"name" : "cp_lib_EpdFont",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Epub::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Epub-Debug-2c009af3a4b4c3a0895c.json",
+					"name" : "cp_lib_Epub",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_FsHelpers::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_FsHelpers-Debug-410d40c765e368b3bcf7.json",
+					"name" : "cp_lib_FsHelpers",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_GfxRenderer::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_GfxRenderer-Debug-884fb1fb84563f9f95ef.json",
+					"name" : "cp_lib_GfxRenderer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_I18n::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_I18n-Debug-efd4eaa35553c4242a12.json",
+					"name" : "cp_lib_I18n",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_InflateReader::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_InflateReader-Debug-e50b548a4d6c8683d961.json",
+					"name" : "cp_lib_InflateReader",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_JpegToBmpConverter::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_JpegToBmpConverter-Debug-6bb6b64ce960a160fd62.json",
+					"name" : "cp_lib_JpegToBmpConverter",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_JsonParser::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_JsonParser-Debug-35e84667e81bb117f6ac.json",
+					"name" : "cp_lib_JsonParser",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_KOReaderSync::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_KOReaderSync-Debug-dc84400822a354419520.json",
+					"name" : "cp_lib_KOReaderSync",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Logging::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Logging-Debug-926230c84cc042bba9e5.json",
+					"name" : "cp_lib_Logging",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Memory::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Memory-Debug-915cba08443feb9d0826.json",
+					"name" : "cp_lib_Memory",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_MiniBidi::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_MiniBidi-Debug-7e7945d071e54f4db6e4.json",
+					"name" : "cp_lib_MiniBidi",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_OpdsParser::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_OpdsParser-Debug-99fddb37c0240a7c6763.json",
+					"name" : "cp_lib_OpdsParser",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_PngToBmpConverter::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_PngToBmpConverter-Debug-6c87581110b7482214aa.json",
+					"name" : "cp_lib_PngToBmpConverter",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Serialization::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Serialization-Debug-840697d81169800c2dd4.json",
+					"name" : "cp_lib_Serialization",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Txt::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Txt-Debug-314ed435bfbc0f2f0a18.json",
+					"name" : "cp_lib_Txt",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Utf8::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Utf8-Debug-df59c4a0438905a8459c.json",
+					"name" : "cp_lib_Utf8",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_Xtc::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_Xtc-Debug-b6725185faa79d5f9cbd.json",
+					"name" : "cp_lib_Xtc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_ZipFile::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_ZipFile-Debug-21b0c75e584aeafca59c.json",
+					"name" : "cp_lib_ZipFile",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_miniz::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_miniz-Debug-ca23e1fedcdba611c0e5.json",
+					"name" : "cp_lib_miniz",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_lib_uzlib::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_lib_uzlib-Debug-2fa04d2a8d9d5b31c6de.json",
+					"name" : "cp_lib_uzlib",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_AudioManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_AudioManager-Debug-075bf11816385990206b.json",
+					"name" : "cp_sdk_AudioManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_BatteryMonitor::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_BatteryMonitor-Debug-66582b8aec13b1100c7f.json",
+					"name" : "cp_sdk_BatteryMonitor",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_BleKeyboardHost::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_BleKeyboardHost-Debug-252c2d2c573ad0e7563f.json",
+					"name" : "cp_sdk_BleKeyboardHost",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_BoardPaperS3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_BoardPaperS3-Debug-1e730a64ea51f2b200ab.json",
+					"name" : "cp_sdk_BoardPaperS3",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_BoardT5S3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_BoardT5S3-Debug-13512733a05eae9fa1c9.json",
+					"name" : "cp_sdk_BoardT5S3",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_Buzzer::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_Buzzer-Debug-fc0f5fe6dafc0e9553ca.json",
+					"name" : "cp_sdk_Buzzer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_ContentProtection::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_ContentProtection-Debug-6c2c9217d4b39f73a133.json",
+					"name" : "cp_sdk_ContentProtection",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_EnvironmentSensor::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_EnvironmentSensor-Debug-5dd099773e22465436c9.json",
+					"name" : "cp_sdk_EnvironmentSensor",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_FreeInkBook::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_FreeInkBook-Debug-28fded3158aad4caf18e.json",
+					"name" : "cp_sdk_FreeInkBook",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_FreeInkUI::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_FreeInkUI-Debug-f3e882fa5f08e5c8aa3d.json",
+					"name" : "cp_sdk_FreeInkUI",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_FrontlightManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_FrontlightManager-Debug-01e431c8fcbacab5f871.json",
+					"name" : "cp_sdk_FrontlightManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_ImageToneMapper::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_ImageToneMapper-Debug-30ade6251d83792d747d.json",
+					"name" : "cp_sdk_ImageToneMapper",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_Imu::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_Imu-Debug-7f792baec91e56339e28.json",
+					"name" : "cp_sdk_Imu",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_InputManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_InputManager-Debug-3bf8e01d98e2960e1720.json",
+					"name" : "cp_sdk_InputManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_LedManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_LedManager-Debug-64a9ee5a8df0b30d29f4.json",
+					"name" : "cp_sdk_LedManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_MemoryManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_MemoryManager-Debug-93cdf6eb436248ba2dea.json",
+					"name" : "cp_sdk_MemoryManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_Microphone::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_Microphone-Debug-d03e7eaeba1f319ad74c.json",
+					"name" : "cp_sdk_Microphone",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_NearbyTransfer::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_NearbyTransfer-Debug-8fd03fe72fd4a9b5179e.json",
+					"name" : "cp_sdk_NearbyTransfer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_PowerManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_PowerManager-Debug-0ce216b8723fe6cac138.json",
+					"name" : "cp_sdk_PowerManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_RecoveryBoot::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_RecoveryBoot-Debug-dd45121a9aadc83298f8.json",
+					"name" : "cp_sdk_RecoveryBoot",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_Rtc::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_Rtc-Debug-f972fcce17fbe682b77f.json",
+					"name" : "cp_sdk_Rtc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_SDCardManager::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_SDCardManager-Debug-1cf34bcf263005424482.json",
+					"name" : "cp_sdk_SDCardManager",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_SecureNet::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_SecureNet-Debug-e013a32bb2598e9c2102.json",
+					"name" : "cp_sdk_SecureNet",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_UsbMassStorage::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_UsbMassStorage-Debug-c756e810e94bb055054f.json",
+					"name" : "cp_sdk_UsbMassStorage",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "cp_sdk_XteinkDetect::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-cp_sdk_XteinkDetect-Debug-253d0def3d806165674e.json",
+					"name" : "cp_sdk_XteinkDetect",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "crosspoint::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-crosspoint-Debug-9dea62ce3ca44fd6f395.json",
+					"name" : "crosspoint",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a",
+		"source" : "/Users/fperuzzo/github/crosspoint-reader-android/cmake/android"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 11
+	}
+}

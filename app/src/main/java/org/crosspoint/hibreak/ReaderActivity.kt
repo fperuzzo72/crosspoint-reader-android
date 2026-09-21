@@ -58,6 +58,18 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
     // contexto e apaga livro.
     gestures.setIsLongpressEnabled(true)
 
+    // A ordem importa: a raiz antes de subir a thread, senao o setup() do
+    // CrossPoint le a biblioteca de um caminho que nao existe.
+    //
+    // getExternalFilesDir() e a escolha da v1: gravavel sem permissao
+    // nenhuma, some junto com o aplicativo na desinstalacao, e visivel num
+    // gerenciador de arquivos em Android/data/org.crosspoint.hibreak/files.
+    // Uma pasta de ebooks escolhida pelo usuario, sob scoped storage, e o
+    // maior item de design que falta neste porte, e nao e este.
+    val root = getExternalFilesDir(null) ?: filesDir
+    root.mkdirs()
+    CrossPointNative.nativeSetStorageRoot(root.absolutePath)
+
     CrossPointNative.nativeStart()
   }
 

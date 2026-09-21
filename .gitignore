@@ -7,3 +7,5 @@ local.properties
 .gradle/
 third_party/
 build/android/link/
+app/build/
+.gradle/

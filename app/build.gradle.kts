@@ -6,7 +6,7 @@ plugins {
 android {
   namespace = "org.crosspoint.hibreak"
   compileSdk = 35
-  ndkVersion = "28.0.12433566"
+  ndkVersion = "30.0.16248370"
 
   defaultConfig {
     applicationId = "org.crosspoint.hibreak"

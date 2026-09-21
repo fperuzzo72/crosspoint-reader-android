@@ -8,12 +8,27 @@
 #include <cerrno>
 #include <cstring>
 
+#include <BoardConfig.h>
+
 #include "arduino-shim/SdFat.h"
 
 namespace crosspoint_storage {
 namespace {
 
+// A raiz padrao e do Kindle porque foi o primeiro alvo hospedado. No Android
+// nao ha caminho fixo que sirva: o diretorio do aplicativo depende do nome do
+// pacote e do usuario, e so o framework sabe qual e. O Kotlin descobre e
+// chama setRoot() pelo JNI antes de subir a thread do leitor.
+//
+// Este valor existe para o caso de essa chamada faltar. Aponta para um lugar
+// que nao existe no Android de proposito: um default que silenciosamente
+// funcionasse esconderia a chamada faltando ate alguem perguntar por que os
+// livros somem entre uma instalacao e outra.
+#if FREEINK_DEVICE_HIBREAK
+char g_root[256] = "/nao-inicializado";
+#else
 char g_root[256] = "/mnt/us";
+#endif
 // Thread-local so two threads resolving at once cannot overwrite each other's
 // answer; the storage lock does not cover this shim.
 thread_local char g_resolved[1024];

@@ -1,0 +1,322 @@
+{
+  "buildFiles": [
+    "/Users/fperuzzo/github/crosspoint-reader-android/cmake/android/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/opt/homebrew/bin/ninja",
+      "-C",
+      "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/opt/homebrew/bin/ninja",
+    "-C",
+    "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "cp_fetched::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_fetched",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_fetched.a"
+    },
+    "cp_lib_EpdFont::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_EpdFont",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_EpdFont.a"
+    },
+    "cp_lib_Epub::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Epub",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Epub.a"
+    },
+    "cp_lib_FsHelpers::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_FsHelpers",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_FsHelpers.a"
+    },
+    "cp_lib_GfxRenderer::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_GfxRenderer",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_GfxRenderer.a"
+    },
+    "cp_lib_I18n::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_I18n",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_I18n.a"
+    },
+    "cp_lib_InflateReader::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_InflateReader",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_InflateReader.a"
+    },
+    "cp_lib_JpegToBmpConverter::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_JpegToBmpConverter",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_JpegToBmpConverter.a"
+    },
+    "cp_lib_JsonParser::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_JsonParser",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_JsonParser.a"
+    },
+    "cp_lib_KOReaderSync::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_KOReaderSync",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_KOReaderSync.a"
+    },
+    "cp_lib_Logging::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Logging",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Logging.a"
+    },
+    "cp_lib_Memory::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Memory",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Memory.a"
+    },
+    "cp_lib_MiniBidi::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_MiniBidi",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_MiniBidi.a"
+    },
+    "cp_lib_OpdsParser::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_OpdsParser",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_OpdsParser.a"
+    },
+    "cp_lib_PngToBmpConverter::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_PngToBmpConverter",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_PngToBmpConverter.a"
+    },
+    "cp_lib_Serialization::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Serialization",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Serialization.a"
+    },
+    "cp_lib_Txt::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Txt",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Txt.a"
+    },
+    "cp_lib_Utf8::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Utf8",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Utf8.a"
+    },
+    "cp_lib_Xtc::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_Xtc",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_Xtc.a"
+    },
+    "cp_lib_ZipFile::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_ZipFile",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_ZipFile.a"
+    },
+    "cp_lib_miniz::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_miniz",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_miniz.a"
+    },
+    "cp_lib_uzlib::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_lib_uzlib",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_lib_uzlib.a"
+    },
+    "cp_sdk_AudioManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_AudioManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_AudioManager.a"
+    },
+    "cp_sdk_BatteryMonitor::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_BatteryMonitor",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_BatteryMonitor.a"
+    },
+    "cp_sdk_BleKeyboardHost::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_BleKeyboardHost",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_BleKeyboardHost.a"
+    },
+    "cp_sdk_BoardPaperS3::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_BoardPaperS3",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_BoardPaperS3.a"
+    },
+    "cp_sdk_BoardT5S3::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_BoardT5S3",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_BoardT5S3.a"
+    },
+    "cp_sdk_Buzzer::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_Buzzer",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_Buzzer.a"
+    },
+    "cp_sdk_ContentProtection::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_ContentProtection",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_ContentProtection.a"
+    },
+    "cp_sdk_EnvironmentSensor::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_EnvironmentSensor",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_EnvironmentSensor.a"
+    },
+    "cp_sdk_FreeInkBook::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_FreeInkBook",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_FreeInkBook.a"
+    },
+    "cp_sdk_FreeInkUI::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_FreeInkUI",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_FreeInkUI.a"
+    },
+    "cp_sdk_FrontlightManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_FrontlightManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_FrontlightManager.a"
+    },
+    "cp_sdk_ImageToneMapper::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_ImageToneMapper",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_ImageToneMapper.a"
+    },
+    "cp_sdk_Imu::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_Imu",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_Imu.a"
+    },
+    "cp_sdk_InputManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_InputManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_InputManager.a"
+    },
+    "cp_sdk_LedManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_LedManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_LedManager.a"
+    },
+    "cp_sdk_MemoryManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_MemoryManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_MemoryManager.a"
+    },
+    "cp_sdk_Microphone::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_Microphone",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_Microphone.a"
+    },
+    "cp_sdk_NearbyTransfer::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_NearbyTransfer",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_NearbyTransfer.a"
+    },
+    "cp_sdk_PowerManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_PowerManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_PowerManager.a"
+    },
+    "cp_sdk_RecoveryBoot::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_RecoveryBoot",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_RecoveryBoot.a"
+    },
+    "cp_sdk_Rtc::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_Rtc",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_Rtc.a"
+    },
+    "cp_sdk_SDCardManager::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_SDCardManager",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_SDCardManager.a"
+    },
+    "cp_sdk_SecureNet::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_SecureNet",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_SecureNet.a"
+    },
+    "cp_sdk_UsbMassStorage::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_UsbMassStorage",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_UsbMassStorage.a"
+    },
+    "cp_sdk_XteinkDetect::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "cp_sdk_XteinkDetect",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/libcp_sdk_XteinkDetect.a"
+    },
+    "crosspoint::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "crosspoint",
+      "output": "/Users/fperuzzo/github/crosspoint-reader-android/app/build/intermediates/cxx/Debug/702al4s1/obj/arm64-v8a/libcrosspoint.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/opt/homebrew/share/android-commandlinetools/ndk/30.0.16248370/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

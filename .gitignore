@@ -5,3 +5,5 @@ build/android/fails.txt
 .DS_Store
 local.properties
 .gradle/
+third_party/
+build/android/link/

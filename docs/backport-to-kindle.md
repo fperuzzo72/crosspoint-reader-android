@@ -49,7 +49,7 @@ Da subida de 61% para 100% no censo:
 | **POSIX** | `adc_attenuation_t` e `analogSetAttenuation()` inertes, ao lado do `analogRead()` que já era inerte. | `arduino-shim/Arduino.h` |
 | **POSIX** | `ARDUINOJSON_ENABLE_ARDUINO_STRING=1`. Sem isso o ArduinoJson não detecta ambiente Arduino, cai no `std::string` e todo `as<String>()` falha. O Kindle tem o mesmo `String` de shim e o mesmo problema. | flag de build |
 | **Upstream** | `HomeActivity.h` declarava `struct RecentBook;` adiante e tinha `std::vector<RecentBook>` como membro. Mal formado: instanciar membros de `vector` exige tipo completo. O libstdc++ do ESP32 aceita, o libc++ recusa. Trocado por `#include "RecentBooksStore.h"`. | `src/activities/home/HomeActivity.h` |
-| **POSIX** | `scripts/fetch-thirdparty.sh`: as dependências que o `platformio.ini` declara, presas por versão, buscadas fora do PlatformIO. O doc do porte Kindle já apontava isso como valendo mais que mais shim. | `scripts/` |
+| ~~POSIX~~ | ~~`scripts/fetch-thirdparty.sh`~~ **Não é backport.** O Kindle já tem `tools/kindle/fetch-deps.sh`, que faz o mesmo e é anterior. O que veio de lá para cá foi a convenção, não o contrário: buscar para um diretório gitignored, porque isto é passo de busca e não vendorização no repositório. Corrigido aqui depois de eu ter afirmado o inverso. | — |
 
 O `CROSSPOINT_VERSION` não entra na lista: é define de build que o
 `scripts/git_branch.py` injeta, e fora do PlatformIO só precisa existir.

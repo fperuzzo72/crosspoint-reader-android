@@ -29,7 +29,7 @@ if [ ! -f "$DST/PNGdec.h" ]; then
   echo "PNGdec 1.1.6"
   fetch "https://github.com/bitbank2/PNGdec/archive/refs/tags/1.1.6.tar.gz" "$TMP/pngdec.tgz"
   tar -xzf "$TMP/pngdec.tgz" -C "$TMP"
-  cp "$TMP"/PNGdec-1.1.6/src/*.h "$TMP"/PNGdec-1.1.6/src/*.inc "$DST"/ 2>/dev/null || true
+  cp "$TMP"/PNGdec-1.1.6/src/*.h "$TMP"/PNGdec-1.1.6/src/*.inc "$TMP"/PNGdec-1.1.6/src/*.inl "$DST"/ 2>/dev/null || true
   cp "$TMP"/PNGdec-1.1.6/src/*.cpp "$DST"/ 2>/dev/null || true
 fi
 
@@ -39,7 +39,7 @@ if [ ! -f "$DST/JPEGDEC.h" ]; then
   echo "JPEGDEC @ $JPEGREV"
   fetch "https://github.com/bitbank2/JPEGDEC/archive/$JPEGREV.tar.gz" "$TMP/jpegdec.tgz"
   tar -xzf "$TMP/jpegdec.tgz" -C "$TMP"
-  cp "$TMP"/JPEGDEC-$JPEGREV/src/*.h "$TMP"/JPEGDEC-$JPEGREV/src/*.inc "$DST"/ 2>/dev/null || true
+  cp "$TMP"/JPEGDEC-$JPEGREV/src/*.h "$TMP"/JPEGDEC-$JPEGREV/src/*.inc "$TMP"/JPEGDEC-$JPEGREV/src/*.inl "$DST"/ 2>/dev/null || true
   cp "$TMP"/JPEGDEC-$JPEGREV/src/*.cpp "$DST"/ 2>/dev/null || true
 fi
 

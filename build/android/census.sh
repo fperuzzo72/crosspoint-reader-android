@@ -48,7 +48,13 @@ DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_KINDLE}=1 -DANDROID=1"
 # ambiente Arduino. Aqui o String vem do nosso shim, entao a deteccao
 # automatica dele (que olha por ARDUINO) nao dispara e ele cai no
 # std::string. A flag liga o conversor e faz ele incluir <WString.h>.
-DEF="$DEF -DCROSSPOINT_VERSION=\"$VER\" -DARDUINOJSON_ENABLE_ARDUINO_STRING=1"
+mkdir -p build/android
+cat > build/android/defines.h <<DEFS
+#pragma once
+#define CROSSPOINT_VERSION "$VER"
+#define ARDUINOJSON_ENABLE_ARDUINO_STRING 1
+DEFS
+DEF="$DEF -include build/android/defines.h"
 
 mkdir -p "$OUT"
 : > "$OUT/census-errors.txt"

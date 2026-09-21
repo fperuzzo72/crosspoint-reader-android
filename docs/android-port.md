@@ -9,7 +9,10 @@ do aparelho, não inferido.
 | Android | 14, SDK 34 |
 | SoC | MediaTek MT6877, arm64-v8a |
 | Painel | **824x1648**, densidade **300 dpi** |
-| Rotação física | `ro.vendor.xrz.phy_rotation = 270` |
+| Rotação física | `phy_rotation = 270`, e o Android confirma: `installOrientation ROTATION_270` |
+| Recorte | notch de 49px no topo, `Rect(375, 0 - 450, 49)` |
+| Escala | `density=1.875`, ou seja 439 x 879 dp lógicos |
+| Prazo de apresentação | `presDeadline 31000000` (31ms), não os 16ms de um LCD |
 | Série | `B651DNW2GG1C006000099` |
 | OEM por trás | xrztech (`ro.build.locale.area`) |
 
@@ -18,6 +21,17 @@ Duas consequências imediatas da geometria:
 - **824 / 8 = 103 exato.** O renderer do CrossPoint trabalha com planos de 1bpp
   e `DISPLAY_WIDTH_BYTES = WIDTH / 8`. Largura múltipla de 8 evita a classe de
   bug de padding por linha de cara. Cada plano dá 103 x 1648 = 169.744 bytes.
+- **A dpi física reportada é lixo:** `density 300 (188.554 x 667.61) dpi`. Um
+  painel e-ink tem pixel quadrado; 188 na horizontal contra 667 na vertical é
+  firmware reportando tamanho físico errado. O que vale é a densidade lógica
+  300 com escala 1.875. Não usar a dpi física para nada.
+- **O notch come os 49px do topo.** O CrossPoint desenha barra de status
+  exatamente ali. Vai precisar respeitar o inset, ou o relógio fica embaixo da
+  câmera.
+- **`installOrientation ROTATION_270`.** O eixo nativo do painel está a um
+  quarto de volta do lógico. Pelo caminho Android padrão o sistema resolve; se
+  algum dia formos para o buffer ION do `handwrittenservice`, isso volta cru,
+  que foi precisamente o que o porte Kindle encontrou.
 - **300 dpi contra os ~212 do X4.** A UI do CrossPoint foi desenhada para
   painéis bem menos densos. Em 300 dpi tudo sai fisicamente menor, e as fontes
   são bitmap (EpdFont), não vetoriais. Ou se geram tamanhos maiores, ou se
@@ -50,6 +64,50 @@ maior passo unico do `trylink` dele.
 
 O proximo numero que importa e o de referencias indefinidas, nao o de arquivos
 que compilam.
+
+## O link
+
+`tools/android/trylink.sh`, adaptado do `trylink.sh` do porte Kindle, com as
+licoes duras dele intactas: invalidacao de objeto por qualquer header, exclusao
+dos `.c` que um wrapper ja inclui, e arquivamento por biblioteca em vez de
+objetos soltos (tres copias de miniz nesta arvore tornam isso obrigatorio).
+
+| Depois de | Indefinidas |
+| --- | --- |
+| primeira tentativa | 20 |
+| `third_party/*.cpp` no link e os `.inl` na busca | 18 |
+| `-lz` (o Android traz zlib; o PNGdec a usa) | **14** |
+
+Para comparacao, o porte Kindle comecou em 255 e desceu em cinco degraus ate 92
+antes de chegar a zero.
+
+**As 14 que restam sao uma coisa so:**
+
+```
+crosspoint::kindle::KindleFrameBuffer     11 metodos
+  begin, display, displayStart, waitComplete, stageFrame,
+  stageGrayOverlay, refresh, reopen, panelContentWasReplaced,
+  deepSleep, ~KindleFrameBuffer
+crosspoint::kindle::KindleTouchDevice      3 metodos
+  begin, update, ~KindleTouchDevice
+```
+
+Nada espalhado, nada de rede, nada de sistema de arquivos, nada de FreeRTOS.
+A `lib/hal/HalDisplay.cpp` e a `HalGPIO.cpp` desta arvore ainda sao as do
+Kindle e chamam o backend de la. Essa lista nao e uma lista de problemas: e a
+**especificacao do `lib/hal/android/`**. Implementar esses 14 metodos e o porte
+linkar sao a mesma frase.
+
+Duas armadilhas de build que custaram tempo e ficam registradas:
+
+- **`-D` com aspas nao sobrevive a ser escrito dentro do `cc-one.sh`**: o shell
+  interno come as aspas e `CROSSPOINT_VERSION` vira identificador em vez de
+  string. Os defines agora saem num header gerado com `-include`, que e como o
+  porte Kindle ja fazia.
+- **Um arquivo que nao compila esconde referencias em vez de criar.** Quando o
+  `CROSSPOINT_VERSION` quebrou quatro arquivos, o total continuou 20 e o
+  conjunto mudou inteiro. O numero so significa alguma coisa quando se sabe
+  quais objetos faltam, entao conferir isso faz parte de ler a medida.
 
 Para comparação, a primeira rodada do porte Kindle deu 25% e ele levou seis
 etapas para chegar a 82%. A diferença é toda a camada POSIX que veio pronta.

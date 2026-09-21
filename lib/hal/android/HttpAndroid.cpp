@@ -203,6 +203,9 @@ esp_err_t esp_http_client_open(const esp_http_client_handle_t client, const int 
     env->ExceptionClear();
     return ESP_FAIL;
   }
+  std::fprintf(stderr, "[http] open %s %s -> handle %d\n", methodName(client->method), client->url.c_str(),
+               static_cast<int>(h));
+  std::fflush(stderr);
   if (h < 0) {
     return ESP_FAIL;
   }
@@ -262,6 +265,9 @@ int64_t esp_http_client_fetch_headers(const esp_http_client_handle_t client) {
     env->ExceptionClear();
     client->contentLength = -1;
   }
+  std::fprintf(stderr, "[http] status %d, content-length %lld\n", client->status,
+               static_cast<long long>(client->contentLength));
+  std::fflush(stderr);
   return client->contentLength;
 }
 
@@ -297,6 +303,15 @@ int esp_http_client_read(const esp_http_client_handle_t client, char* buffer, co
     client->consumed += n;
   }
   env->DeleteLocalRef(arr);
+  // Uma linha a cada 64 leituras, mais a primeira e o fim. O suficiente para
+  // o log dizer ate onde a transferencia chegou antes de morrer, sem encher o
+  // arquivo com uma linha por pedaco.
+  static int reads = 0;
+  if (++reads <= 1 || n <= 0 || reads % 64 == 0) {
+    std::fprintf(stderr, "[http] read #%d n=%d total=%lld\n", reads, static_cast<int>(n),
+                 static_cast<long long>(client->consumed));
+    std::fflush(stderr);
+  }
   return n;
 }
 
@@ -327,6 +342,9 @@ esp_err_t esp_http_client_close(const esp_http_client_handle_t client) {
       attach.env()->ExceptionClear();
     }
   }
+  std::fprintf(stderr, "[http] close handle %d, %lld bytes\n", client->handle,
+               static_cast<long long>(client->consumed));
+  std::fflush(stderr);
   client->handle = -1;
   return ESP_OK;
 }

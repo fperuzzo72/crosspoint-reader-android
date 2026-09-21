@@ -11,6 +11,8 @@
 #include <OpdsStream.h>
 #include <WiFi.h>
 
+#include <cstdio>
+
 #include "CrossPointSettings.h"
 #include "MappedInputManager.h"
 #include "SilentRestart.h"
@@ -514,6 +516,8 @@ void OpdsBookBrowserActivity::downloadBook(const OpdsEntry& book) {
     return;
   }
 
+  std::fprintf(stderr, "[opds] iniciando download -> %s\n", filename.c_str());
+  std::fflush(stderr);
   int lastRenderedPercent = -1;
   unsigned long lastProgressUpdateMs = 0;
   const auto result = HttpDownloader::downloadToFile(

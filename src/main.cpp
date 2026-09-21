@@ -92,20 +92,6 @@ EpdFont notoserif20BoldItalicFont(&notoserif_20_bolditalic);
 EpdFontFamily notoserif20FontFamily(&notoserif20RegularFont, &notoserif20BoldFont, &notoserif20ItalicFont,
                                     &notoserif20BoldItalicFont);
 
-EpdFont notoserif22RegularFont(&notoserif_22_regular);
-EpdFont notoserif22BoldFont(&notoserif_22_bold);
-EpdFont notoserif22ItalicFont(&notoserif_22_italic);
-EpdFont notoserif22BoldItalicFont(&notoserif_22_bolditalic);
-EpdFontFamily notoserif22FontFamily(&notoserif22RegularFont, &notoserif22BoldFont, &notoserif22ItalicFont,
-                                    &notoserif22BoldItalicFont);
-
-EpdFont notoserif24RegularFont(&notoserif_24_regular);
-EpdFont notoserif24BoldFont(&notoserif_24_bold);
-EpdFont notoserif24ItalicFont(&notoserif_24_italic);
-EpdFont notoserif24BoldItalicFont(&notoserif_24_bolditalic);
-EpdFontFamily notoserif24FontFamily(&notoserif24RegularFont, &notoserif24BoldFont, &notoserif24ItalicFont,
-                                    &notoserif24BoldItalicFont);
-
 EpdFont notosans14RegularFont(&notosans_14_regular);
 EpdFont notosans14BoldFont(&notosans_14_bold);
 EpdFont notosans14ItalicFont(&notosans_14_italic);
@@ -133,20 +119,6 @@ EpdFont notosans20ItalicFont(&notosans_20_italic);
 EpdFont notosans20BoldItalicFont(&notosans_20_bolditalic);
 EpdFontFamily notosans20FontFamily(&notosans20RegularFont, &notosans20BoldFont, &notosans20ItalicFont,
                                    &notosans20BoldItalicFont);
-
-EpdFont notosans22RegularFont(&notosans_22_regular);
-EpdFont notosans22BoldFont(&notosans_22_bold);
-EpdFont notosans22ItalicFont(&notosans_22_italic);
-EpdFont notosans22BoldItalicFont(&notosans_22_bolditalic);
-EpdFontFamily notosans22FontFamily(&notosans22RegularFont, &notosans22BoldFont, &notosans22ItalicFont,
-                                   &notosans22BoldItalicFont);
-
-EpdFont notosans24RegularFont(&notosans_24_regular);
-EpdFont notosans24BoldFont(&notosans_24_bold);
-EpdFont notosans24ItalicFont(&notosans_24_italic);
-EpdFont notosans24BoldItalicFont(&notosans_24_bolditalic);
-EpdFontFamily notosans24FontFamily(&notosans24RegularFont, &notosans24BoldFont, &notosans24ItalicFont,
-                                   &notosans24BoldItalicFont);
 
 #ifndef OMIT_FONTS
 #if !CROSSPOINT_OMIT_LARGE_READER_FONTS
@@ -449,16 +421,16 @@ void setupDisplayAndFonts(bool seamless = false) {
   renderer.insertFont(NOTOSERIF_16_FONT_ID, notoserif16FontFamily);
   renderer.insertFont(NOTOSERIF_18_FONT_ID, notoserif18FontFamily);
   renderer.insertFont(NOTOSERIF_20_FONT_ID, notoserif20FontFamily);
-  renderer.insertFont(NOTOSERIF_22_FONT_ID, notoserif22FontFamily);
-  renderer.insertFont(NOTOSERIF_24_FONT_ID, notoserif24FontFamily);
   renderer.insertFont(NOTOSANS_14_FONT_ID, notosans14FontFamily);
   renderer.insertFont(NOTOSANS_16_FONT_ID, notosans16FontFamily);
   renderer.insertFont(NOTOSANS_18_FONT_ID, notosans18FontFamily);
   renderer.insertFont(NOTOSANS_20_FONT_ID, notosans20FontFamily);
-  renderer.insertFont(NOTOSANS_22_FONT_ID, notosans22FontFamily);
-  renderer.insertFont(NOTOSANS_24_FONT_ID, notosans24FontFamily);
 #if FREEINK_DEVICE_HIBREAK
-  renderer.insertFont(UI_10_FONT_ID, ui12FontFamily);
+  // UI_10 e o corpo das linhas de configuracao (20 usos no tema). Sobe para
+  // 14. Dentro da barra de status ele so desenha o "~" do marcador de
+  // estimativa, centrado contra a altura de linha do SMALL: com 14 contra 12
+  // esse centramento fica 2px alto, que e o preco de uma tecla em uma linha.
+  renderer.insertFont(UI_10_FONT_ID, ui14FontFamily);
 #else
   renderer.insertFont(UI_10_FONT_ID, ui10FontFamily);
 #endif
@@ -477,7 +449,15 @@ void setupDisplayAndFonts(bool seamless = false) {
 #endif
   renderer.insertFont(UI_14_FONT_ID, ui14FontFamily);
   renderer.insertFont(UI_16_FONT_ID, ui16FontFamily);
+#if FREEINK_DEVICE_HIBREAK
+  // A barra de status desenha com SMALL_FONT_ID doze vezes contra tres do
+  // UI_10, entao subir os outros dois nao a tocou. SMALL e a notosans_8, a
+  // menor da arvore. Aqui ela entrega 12, que e o advanceY para o qual a
+  // faixa da barra foi dimensionada (29px).
+  renderer.insertFont(SMALL_FONT_ID, ui12FontFamily);
+#else
   renderer.insertFont(SMALL_FONT_ID, smallFontFamily);
+#endif
 
   // Discover and load SD card fonts
   sdFontSystem.begin(renderer);

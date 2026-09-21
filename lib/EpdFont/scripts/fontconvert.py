@@ -77,11 +77,13 @@ intervals = [
     # Needed for proper rendering of many extended Latin languages
     (0x0300, 0x036F),
     ### Greek & Coptic ###
-    # Used in science, maths, philosophy, some academic texts
+    # Fora: este porte e pessoal e le em portugues e ingles. Custava ~31KB por
+    # arquivo, medido no corpo 16, e as TTFs tem os glifos (Ubuntu 71,
+    # Noto 121), entao religar e descomentar uma linha.
     # (0x0370, 0x03FF),
     ### Cyrillic ###
-    # Russian, Ukrainian, Bulgarian, etc.
-    (0x0400, 0x04FF),
+    # Fora, mesmo motivo do grego. Russo, ucraniano, bulgaro.
+    # (0x0400, 0x04FF),
     ### Math Symbols (common subset) ###
     # Superscripts and Subscripts
     (0x2070, 0x209F),

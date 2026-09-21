@@ -1,5 +1,6 @@
 #pragma once
 #include <ArduinoJson.h>
+#include <BoardConfig.h>
 #include <Epub/ReaderRenderSpec.h>
 #include <PersistableStore.h>
 
@@ -257,14 +258,39 @@ class CrossPointSettings : public PersistableStore<CrossPointSettings> {
   uint8_t hyphenationEnabled = 0;
 
   // Reader screen margin settings
+#if FREEINK_DEVICE_HIBREAK
+  // A margem inferior NAO soma com a barra de status, compete com ela:
+  //   orientedMarginBottom += std::max(screenMargin, statusBarHeight)
+  // Com a barra em 46px (29 da faixa + 16 da barra de progresso + 1) e o
+  // maximo em 40, a configuracao nunca tinha efeito embaixo: a barra sempre
+  // ganhava e o texto encostava nela sem folga.
+  //
+  // A 300 dpi os 40px do original sao ~3,4mm, apertado mesmo se funcionasse.
+  // O maximo sobe para 130 (~11mm) e o passo para 10, senao seriam 25 toques
+  // para atravessar a faixa. O padrao vai a 60, acima dos 46 da barra, para a
+  // margem existir de fato assim que o aplicativo abre.
+  static constexpr uint8_t SCREEN_MARGIN_MIN = 10;
+  static constexpr uint8_t SCREEN_MARGIN_MAX = 130;
+  static constexpr uint8_t SCREEN_MARGIN_STEP = 10;
+  static constexpr uint8_t SCREEN_MARGIN_DEFAULT = 60;
+#else
   static constexpr uint8_t SCREEN_MARGIN_MIN = 5;
   static constexpr uint8_t SCREEN_MARGIN_MAX = 40;
   static constexpr uint8_t SCREEN_MARGIN_STEP = 5;
-  uint8_t screenMargin = SCREEN_MARGIN_MIN;
-  // OPDS download destination folder ("" = SD root). Global; edited from the
-  // OPDS server list. Persisted via a category-less SettingInfo::String in
-  // SettingsList.h, so it stays out of the on-device Settings screen.
+  static constexpr uint8_t SCREEN_MARGIN_DEFAULT = SCREEN_MARGIN_MIN;
+#endif
+  uint8_t screenMargin = SCREEN_MARGIN_DEFAULT;
+// OPDS download destination folder ("" = SD root). Global; edited from the
+// OPDS server list. Persisted via a category-less SettingInfo::String in
+// SettingsList.h, so it stays out of the on-device Settings screen.
+#if FREEINK_DEVICE_HIBREAK
+  // "" significa a raiz do armazenamento, que neste aparelho e
+  // /sdcard/CrossPoint, ao LADO de books/ e nao dentro. Um livro baixado por
+  // OPDS cairia num lugar onde o navegador nao olha.
+  char opdsDownloadFolder[64] = "/books";
+#else
   char opdsDownloadFolder[64] = "";
+#endif
   // On-disk filename format for OPDS downloads (0=Author-Title default, 1=Title-Author,
   // 2=Title). See OpdsFilenameFormat. Persisted via a category-less SettingInfo::Enum,
   // edited from the OPDS server list; hidden from the on-device Settings screen.

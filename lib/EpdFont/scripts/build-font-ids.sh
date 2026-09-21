@@ -16,7 +16,7 @@
 set -e
 cd "$(dirname "$0")/../builtinFonts"
 
-READER_SIZES=(14 16 18 20 22 24)
+READER_SIZES=(14 16 18 20)
 UI_SIZES=(10 12 14 16)
 
 # Soma os hashes dos arquivos dados e imprime o ID.

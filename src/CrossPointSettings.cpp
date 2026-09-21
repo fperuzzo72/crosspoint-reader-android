@@ -380,10 +380,6 @@ int CrossPointSettings::getReaderFontId() const {
       return sans ? NOTOSANS_18_FONT_ID : NOTOSERIF_18_FONT_ID;
     case 20:
       return sans ? NOTOSANS_20_FONT_ID : NOTOSERIF_20_FONT_ID;
-    case 22:
-      return sans ? NOTOSANS_22_FONT_ID : NOTOSERIF_22_FONT_ID;
-    case 24:
-      return sans ? NOTOSANS_24_FONT_ID : NOTOSERIF_24_FONT_ID;
     case 14:
     default:
       return sans ? NOTOSANS_14_FONT_ID : NOTOSERIF_14_FONT_ID;

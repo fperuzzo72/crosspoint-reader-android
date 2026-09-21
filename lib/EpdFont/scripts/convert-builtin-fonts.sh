@@ -10,9 +10,12 @@ cd "$(dirname "$0")"
 # Num ESP32 esta lista seria uma decisao de orcamento: os glifos sao a maior
 # parte do binario e ha 380KB de RAM. Neste alvo esse teto nao existe, entao a
 # lista e sobre leitura e nao sobre memoria.
+# 22 e 24 sairam: testados no aparelho e grandes demais para uso real. 12
+# saiu antes por ser pequeno demais. Sobra 14/16/18/20, que e a faixa que se
+# usa lendo.
 READER_FONT_STYLES=("Regular" "Italic" "Bold" "BoldItalic")
-NOTOSERIF_FONT_SIZES=(14 16 18 20 22 24)
-NOTOSANS_FONT_SIZES=(14 16 18 20 22 24)
+NOTOSERIF_FONT_SIZES=(14 16 18 20)
+NOTOSANS_FONT_SIZES=(14 16 18 20)
 
 # UI_ONLY=1 pula as fontes de leitura. Elas sao deterministicas (o ID e a soma
 # dos SHA-256 dos cabecalhos, e regerar produz arquivo identico), entao pular
@@ -78,25 +81,20 @@ for size in ${UI_FONT_SIZES[@]}; do
   for style in ${UI_FONT_STYLES[@]}; do
     font_name="ubuntu_${size}_$(echo $style | tr '[:upper:]' '[:lower:]')"
     font_path="../builtinFonts/source/Ubuntu/Ubuntu-${style}.ttf"
-    hebrew_path="../builtinFonts/source/NotoSansHebrew/NotoSansHebrew-${style}.ttf"
-    arabic_path="../builtinFonts/source/NotoSansArabic/NotoSansArabic-${style}.ttf"
     # Ubuntu lacks the Latin Extended Additional block (U+1EA0-U+1EF9) used for
     # Vietnamese tone marks. Append a Vietnamese-only Ubuntu cut so those glyphs
     # are filled from it while every glyph Ubuntu already has stays unchanged
     # (fontstack is ordered by descending priority).
     viet_path="../builtinFonts/source/Ubuntu/Ubuntu-Vietnamese-${style}.ttf"
     output_path="../builtinFonts/${font_name}.h"
-    python fontconvert.py $font_name $size $font_path $hebrew_path $arabic_path $viet_path \
-      --additional-intervals 0x05D0,0x05EA "${ARABIC_INTERVALS[@]}" > $output_path
+    python fontconvert.py $font_name $size $font_path $viet_path \
+      --2bit --compress --pnum --zopfli > $output_path
     echo "Generated $output_path"
   done
 done
 
 python fontconvert.py notosans_8_regular 8 \
-  ../builtinFonts/source/NotoSans/NotoSans-Regular.ttf \
-  ../builtinFonts/source/NotoSansHebrew/NotoSansHebrew-Regular.ttf \
-  ../builtinFonts/source/NotoSansArabic/NotoSansArabic-Regular.ttf \
-  --additional-intervals 0x05D0,0x05EA "${ARABIC_INTERVALS[@]}" > ../builtinFonts/notosans_8_regular.h
+  ../builtinFonts/source/NotoSans/NotoSans-Regular.ttf > ../builtinFonts/notosans_8_regular.h
 
 echo ""
 echo "Running compression verification..."

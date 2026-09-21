@@ -30,6 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 object CrossPointHttp {
 
+    // Throwable e nao Exception em todo catch daqui, e a diferenca nao e
+    // pedantismo: OutOfMemoryError e StackOverflowError sao Error, nao
+    // Exception. Um Error escapando por uma funcao chamada do JNI atravessa a
+    // fronteira para um C++ que nao tem como trata-lo, e a runtime aborta o
+    // processo. Melhor devolver -1 e deixar o chamador reportar falha.
     private const val TAG = "CrossPointHttp"
 
     private class Conn(val http: HttpURLConnection) {
@@ -76,7 +81,7 @@ object CrossPointHttp {
             if (hasBody) conn.out = http.outputStream
             synchronized(conns) { conns[handle] = conn }
             handle
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.w(TAG, "open falhou: $url", e)
             -1
         }
@@ -89,7 +94,7 @@ object CrossPointHttp {
         return try {
             conn.out?.write(data, 0, len) ?: return -1
             len
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.w(TAG, "write falhou", e); -1
         }
     }
@@ -111,11 +116,11 @@ object CrossPointHttp {
             conn.status = conn.http.responseCode
             conn.input = try {
                 conn.http.inputStream
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 conn.http.errorStream
             }
             conn.status
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.w(TAG, "finish falhou", e); -1
         }
     }
@@ -128,7 +133,7 @@ object CrossPointHttp {
         return try {
             val n = input.read(buf, 0, buf.size)
             if (n < 0) 0 else n
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.w(TAG, "read falhou", e); -1
         }
     }

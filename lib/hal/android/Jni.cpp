@@ -14,10 +14,13 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <jni.h>
+#include <unistd.h>
 
 #include <atomic>
+#include <csignal>
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 #include <string>
 #include <thread>
@@ -80,7 +83,41 @@ void openLogFile(const std::string& root) {
   __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "log em %s", path.c_str());
 }
 
+// Captura o motivo da morte antes que ela aconteca em silencio.
+//
+// Um processo Android pode sumir por dois caminhos muito diferentes e o log
+// nao distinguia: SIGSEGV e erro de memoria no codigo nativo, SIGABRT e a
+// runtime detectando uma violacao (erro de uso do JNI, abort do C++, falta de
+// memoria na ART). Saber qual dos dois vale mais do que qualquer deducao
+// minha sobre o codigo, e ja errei duas vezes tentando deduzir.
+//
+// O handler faz o minimo possivel porque esta num contexto de sinal: escreve
+// com write() direto no descritor, sem fprintf nem malloc, e depois restaura
+// a acao padrao e se mata de novo para o sistema ainda gerar a lapide.
+void crashHandler(int sig, siginfo_t* info, void*) {
+  char buf[256];
+  const int n = snprintf(buf, sizeof(buf), "\n*** morreu com sinal %d (%s), endereco %p ***\n", sig, strsignal(sig),
+                         info != nullptr ? info->si_addr : nullptr);
+  if (n > 0) {
+    write(fileno(stderr), buf, static_cast<size_t>(n));
+    fsync(fileno(stderr));
+  }
+  signal(sig, SIG_DFL);
+  raise(sig);
+}
+
+void installCrashHandler() {
+  struct sigaction sa{};
+  sa.sa_sigaction = crashHandler;
+  sa.sa_flags = SA_SIGINFO | SA_RESETHAND;
+  sigemptyset(&sa.sa_mask);
+  for (const int sig : {SIGSEGV, SIGABRT, SIGBUS, SIGILL, SIGFPE}) {
+    sigaction(sig, &sa, nullptr);
+  }
+}
+
 void readerThread() {
+  installCrashHandler();
   logLine("[jni] thread do leitor iniciando");
   setup();
   logLine("[jni] setup() retornou; entrando no loop");

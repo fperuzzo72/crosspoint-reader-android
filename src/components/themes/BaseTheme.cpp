@@ -729,6 +729,21 @@ void BaseTheme::drawStatusBar(GfxRenderer& renderer, const float bookProgress, c
   int orientedMarginTop, orientedMarginRight, orientedMarginBottom, orientedMarginLeft;
   renderer.getOrientedViewableTRBL(&orientedMarginTop, &orientedMarginRight, &orientedMarginBottom,
                                    &orientedMarginLeft);
+  // A barra alinha com a COLUNA DE TEXTO, nao com a borda util do painel.
+  //
+  // O leitor soma screenMargin ao recuo do bezel antes de compor a pagina
+  // (EpubReaderActivity, onde orientedMarginLeft/Right recebem exatamente
+  // isto). A barra nao somava, entao ficava screenMargin pixels mais perto da
+  // borda que o texto acima dela. Com a margem pequena a diferenca passava
+  // despercebida; num painel de cantos arredondados, e com a margem em 60px,
+  // as pontas da barra caem fora da area visivel.
+  //
+  // Somar aqui e nao em cada um dos seis sitios abaixo: eles todos derivam
+  // destas duas variaveis, inclusive a largura do titulo e a barra de
+  // progresso quando ela nao esta em modo "preencher margem" (esse modo e
+  // escolha explicita do usuario por ir de ponta a ponta, e continua indo).
+  orientedMarginLeft += SETTINGS.screenMargin;
+  orientedMarginRight += SETTINGS.screenMargin;
   const auto sb = SETTINGS.statusBarSpec();
   const bool showStatusBarTextLane = sb.textLaneVisible(halClock.isAvailable());
 

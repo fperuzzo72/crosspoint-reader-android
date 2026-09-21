@@ -878,3 +878,7 @@
 20509	23435	1790031201402470542	CMakeFiles/crosspoint.dir/Users/fperuzzo/github/crosspoint-reader-android/src/main.cpp.o	bc656d3b79a5cdaa
 20552	23602	1790031201444770552	CMakeFiles/crosspoint.dir/Users/fperuzzo/github/crosspoint-reader-android/src/network/CrossPointWebServer.cpp.o	735ae2122a744305
 23602	23981	1790031204494909955	/Users/fperuzzo/github/crosspoint-reader-android/app/build/intermediates/cxx/Debug/702al4s1/obj/arm64-v8a/libcrosspoint.so	be6e99e0efada5e5
+10	35	1790031320295805812	/Users/fperuzzo/github/crosspoint-reader-android/app/.cxx/Debug/702al4s1/arm64-v8a/CMakeFiles/cmake.verify_globs	226027c8adf70eff
+43	559	1790031320328480913	CMakeFiles/crosspoint.dir/Users/fperuzzo/github/crosspoint-reader-android/lib/hal/posix/HttpClientPosix.cpp.o	9c0d382c65ab5bd7
+43	989	1790031320328754412	CMakeFiles/crosspoint.dir/Users/fperuzzo/github/crosspoint-reader-android/src/components/themes/BaseTheme.cpp.o	dc19a88f7c8e719f
+989	1581	1790031321275404751	/Users/fperuzzo/github/crosspoint-reader-android/app/build/intermediates/cxx/Debug/702al4s1/obj/arm64-v8a/libcrosspoint.so	be6e99e0efada5e5

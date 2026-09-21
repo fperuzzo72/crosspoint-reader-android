@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
+      MANAGE_EXTERNAL_STORAGE, e nao as permissoes de midia.
+
+      O CrossPoint e um leitor baseado em ARQUIVO: ele navega pastas, guarda
+      cache por livro, escreve progresso e marcadores ao lado do EPUB. As
+      permissoes granulares do Android moderno (READ_MEDIA_*) cobrem imagem,
+      audio e video, e um .epub nao e nenhum dos tres. O Storage Access
+      Framework cobriria, mas entrega URIs e nao caminhos, e a arvore inteira
+      do CrossPoint fala POSIX por cima do shim: seria reescrever o navegador
+      de arquivos, o cache e o armazenamento de progresso para um modelo que o
+      leitor nao tem.
+
+      Esta e a mesma escolha que os leitores de EPUB sérios do Android fazem,
+      e pelo mesmo motivo. O usuario concede em Ajustes > Acesso especial, com
+      um dialogo do proprio sistema, e pode revogar quando quiser.
+    -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
     <application
         android:label="@string/app_name"
         android:allowBackup="false"

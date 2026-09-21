@@ -2,7 +2,13 @@ package org.crosspoint.hibreak
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
+import android.widget.Toast
+import java.io.File
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -58,19 +64,70 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
     // contexto e apaga livro.
     gestures.setIsLongpressEnabled(true)
 
-    // A ordem importa: a raiz antes de subir a thread, senao o setup() do
-    // CrossPoint le a biblioteca de um caminho que nao existe.
-    //
-    // getExternalFilesDir() e a escolha da v1: gravavel sem permissao
-    // nenhuma, some junto com o aplicativo na desinstalacao, e visivel num
-    // gerenciador de arquivos em Android/data/org.crosspoint.hibreak/files.
-    // Uma pasta de ebooks escolhida pelo usuario, sob scoped storage, e o
-    // maior item de design que falta neste porte, e nao e este.
-    val root = getExternalFilesDir(null) ?: filesDir
-    root.mkdirs()
+    // Sem a permissao nao se comeca, e isto nao e rigor: a raiz e lida UMA
+    // vez, dentro do setup() do CrossPoint, e o nativeStart e idempotente.
+    // Subir com a pasta escondida e conceder a permissao depois deixaria o
+    // leitor presa nela ate o processo morrer, o que e pior do que nao subir,
+    // porque parece funcionar.
+    if (!Environment.isExternalStorageManager()) {
+      Toast.makeText(this, R.string.needs_all_files, Toast.LENGTH_LONG).show()
+      requestAllFilesAccess()
+      finish()
+      return
+    }
+
+    val root = resolveStorageRoot()
     CrossPointNative.nativeSetStorageRoot(root.absolutePath)
 
     CrossPointNative.nativeStart()
+  }
+
+  /**
+   * Onde os livros ficam.
+   *
+   * Com acesso a todos os arquivos concedido: `/sdcard/CrossPoint`. E uma
+   * pasta comum, que voce enxerga em qualquer gerenciador de arquivos, copia
+   * EPUB para dentro por USB ou LocalSend, e que sobrevive a desinstalar o
+   * aplicativo.
+   *
+   * Sem a permissao: `getExternalFilesDir()`, que funciona mas fica em
+   * `Android/data/`, um caminho que o Android 11+ esconde de gerenciadores de
+   * arquivos. O leitor roda, a biblioteca fica vazia, e nao ha como pôr nada
+   * la sem cabo. Por isso a permissao e pedida, e nao apenas aceita se vier.
+   */
+  private fun resolveStorageRoot(): File {
+    if (Environment.isExternalStorageManager()) {
+      val dir = File(Environment.getExternalStorageDirectory(), "CrossPoint")
+      if (dir.mkdirs() || dir.isDirectory) {
+        return dir
+      }
+    }
+    val fallback = getExternalFilesDir(null) ?: filesDir
+    fallback.mkdirs()
+    return fallback
+  }
+
+  /**
+   * Abre a tela do sistema onde a permissao e concedida.
+   *
+   * Nao ha dialogo em linha para esta: o Android exige que o usuario va aos
+   * Ajustes e ligue explicitamente, que e o preco de uma permissao ampla. Se
+   * ele nao ligar, o leitor continua funcionando com a pasta escondida.
+   */
+  private fun requestAllFilesAccess() {
+    if (Environment.isExternalStorageManager()) {
+      return
+    }
+    runCatching {
+      startActivity(
+        Intent(
+          Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+          Uri.parse("package:$packageName"),
+        )
+      )
+    }.onFailure {
+      runCatching { startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)) }
+    }
   }
 
   // --- superficie ------------------------------------------------------------

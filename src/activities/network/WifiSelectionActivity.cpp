@@ -88,6 +88,28 @@ void WifiSelectionActivity::onPromptEvent(const fui::ActionEvent& event, void* u
 void WifiSelectionActivity::onEnter() {
   Activity::onEnter();
 
+#if FREEINK_DEVICE_HIBREAK
+  // Esta tela nao se aplica aqui, e o conserto mora nela e nao nos nove
+  // chamadores: OPDS, sincronizacao KOReader, download de fontes, relogio,
+  // OTA, servidor web, Calibre e as configuracoes. Remendar um por um deixaria
+  // o proximo que alguem escrever quebrado de novo.
+  //
+  // Quem associa e o sistema operacional. O scanNetworks() do shim devolve
+  // zero de proposito, porque varrer brigaria com o gerenciador do Android
+  // pela mesma radio, entao a lista abriria vazia e sem nada a fazer.
+  //
+  // Ja conectado: encerra com sucesso na hora e o chamador segue como se a
+  // tela tivesse aparecido e o usuario tivesse escolhido. Sem rede: encerra
+  // cancelado, e cada chamador ja sabe mostrar o proprio erro.
+  {
+    const bool online = WiFi.status() == WL_CONNECTED && WiFi.localIP() != IPAddress(0, 0, 0, 0);
+    selectedSSID.clear();  // o nome da rede exigiria permissao de localizacao
+    connectedIP = online ? WiFi.localIP().toString().c_str() : "";
+    onComplete(online);
+    return;
+  }
+#endif
+
   // Load saved WiFi credentials - SD card operations need lock as we use SPI
   // for both
   {

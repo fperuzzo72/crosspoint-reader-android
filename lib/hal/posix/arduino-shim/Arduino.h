@@ -17,12 +17,11 @@
 // The ESP32 Arduino core builds on FreeRTOS and exposes it through this
 // header; code written against that core calls vTaskDelay without including
 // anything. Dropping it would break files that never named FreeRTOS at all.
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 #include "HardwareSerial.h"
 #include "Print.h"
 #include "Stream.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 // The core pulls these in for its users; code written against it assumes they
 // are already there.

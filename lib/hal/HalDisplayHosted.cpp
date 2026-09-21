@@ -254,8 +254,8 @@ HalDisplay::GrayscaleCapabilities HalDisplay::grayscaleCapabilities(const Graysc
   caps.encoding = GrayscaleEncoding::OverlayMasks;
   // Combined: the base is deferred and joins the grays in one waveform.
   caps.base = GrayscaleBase::Combined;
-  caps.stripUploads = false;   // no controller RAM to stream into
-  caps.asyncBase = false;      // the base never gets its own waveform at all
+  caps.stripUploads = false;     // no controller RAM to stream into
+  caps.asyncBase = false;        // the base never gets its own waveform at all
   caps.stagingWhileBusy = true;  // staging is a memcpy into a mapping
   return caps;
 }
@@ -277,8 +277,7 @@ void HalDisplay::displayGrayscaleBase(const RefreshMode fallback, const bool tur
   grayBaseStaged = true;
 }
 
-bool HalDisplay::displayGrayscaleBase(const GrayscaleMode mode, const RefreshMode fallback,
-                                      const bool turnOffScreen) {
+bool HalDisplay::displayGrayscaleBase(const GrayscaleMode mode, const RefreshMode fallback, const bool turnOffScreen) {
   if (mode != GrayscaleMode::Overlay) {
     displayBuffer(fallback, turnOffScreen);
     return false;  // no grayscale pass follows

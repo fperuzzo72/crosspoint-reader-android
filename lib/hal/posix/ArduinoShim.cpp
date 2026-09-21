@@ -13,8 +13,8 @@
 
 #include "arduino-shim/HardwareSerial.h"
 #include "arduino-shim/Print.h"
-#include "arduino-shim/Stream.h"
 #include "arduino-shim/SPI.h"
+#include "arduino-shim/Stream.h"
 #include "arduino-shim/Update.h"
 #include "arduino-shim/Wire.h"
 #include "arduino-shim/esp_heap_caps.h"
@@ -211,7 +211,7 @@ BaseType_t xSemaphoreGive(const SemaphoreHandle_t sem) {
 namespace {
 
 size_t systemFreeBytes() {
-  struct sysinfo info {};
+  struct sysinfo info{};
   if (sysinfo(&info) != 0) {
     return 0;
   }
@@ -446,7 +446,7 @@ BaseType_t xSemaphoreTakeFromISR(const SemaphoreHandle_t sem, BaseType_t* higher
 // ------------------------------------------------------- more heap caps ---
 
 size_t heap_caps_get_total_size(uint32_t) {
-  struct sysinfo info {};
+  struct sysinfo info{};
   if (sysinfo(&info) != 0) {
     return 0;
   }
@@ -589,4 +589,3 @@ TaskHandle_t xSemaphoreGetMutexHolder(const SemaphoreHandle_t) {
 // ----------------------------------------------------------------- OTA ---
 
 UpdateClass Update;
-

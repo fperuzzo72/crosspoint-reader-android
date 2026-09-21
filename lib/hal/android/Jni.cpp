@@ -11,13 +11,12 @@
 // thread que chamou.
 
 #include <android/log.h>
-
-#include <cstdarg>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <jni.h>
 
 #include <atomic>
+#include <cstdarg>
 #include <cstdio>
 #include <ctime>
 #include <string>
@@ -116,8 +115,8 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetSur
 // crosspoint::hosted::Gesture: 0 nenhum, 1 toque, 2 toque longo, 3 swipe.
 // Coordenadas normalizadas em 0..1; o C++ nunca ve pixel.
 JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeGesture(JNIEnv*, jclass, jint kind, jfloat nx,
-                                                                                 jfloat ny, jfloat nxEnd, jfloat nyEnd,
-                                                                                 jint heldMs) {
+                                                                                  jfloat ny, jfloat nxEnd, jfloat nyEnd,
+                                                                                  jint heldMs) {
   crosspoint::hosted::GestureResult g;
   g.kind = static_cast<crosspoint::hosted::Gesture>(kind);
   g.nx = nx;
@@ -144,7 +143,7 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeContac
 // pasta de ebooks escolhida pelo usuario, sob scoped storage, e outro
 // problema e vem depois.
 JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetStorageRoot(JNIEnv* env, jclass,
-                                                                                        jstring path) {
+                                                                                         jstring path) {
   if (path == nullptr) {
     return;
   }

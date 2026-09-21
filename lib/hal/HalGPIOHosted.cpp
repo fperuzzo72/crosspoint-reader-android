@@ -21,9 +21,8 @@
 // swipes, in normalised coordinates, measured against the panel's own evdev
 // stream.
 
-#include "HalGPIO.h"
-
 #include "HalDisplay.h"  // panel geometry, for the touch classifier's normalisation
+#include "HalGPIO.h"
 
 #if FREEINK_MCU_HOSTED
 

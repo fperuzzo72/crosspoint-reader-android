@@ -22,9 +22,10 @@
 //  - stdout e stderr sem buffer, senao um crash perde exatamente as linhas que
 //    explicam o crash.
 
+#include <unistd.h>
+
 #include <csignal>
 #include <cstdio>
-#include <unistd.h>
 
 // Definidos em src/main.cpp, compartilhado com todos os outros alvos.
 void setup();

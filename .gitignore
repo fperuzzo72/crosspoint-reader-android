@@ -10,3 +10,6 @@ build/android/link/
 app/build/
 .gradle/
 .font-venv/
+build/android/cmake/
+build/android/defines.h
+build/android/link/

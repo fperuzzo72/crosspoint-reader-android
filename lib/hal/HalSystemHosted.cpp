@@ -19,12 +19,11 @@
 #if FREEINK_MCU_HOSTED
 
 #include <BoardConfig.h>
-
 #include <unistd.h>
 
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
-#include <csignal>
 #include <ctime>
 
 // O prefixo de log nomeia o aparelho. Dizer [kindle] num Bigme e pequeno,

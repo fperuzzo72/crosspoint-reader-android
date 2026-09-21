@@ -1,11 +1,11 @@
 #pragma once
+#include <I18n.h>
+
 #include <functional>
 #include <vector>
 
 #include "./FileBrowserActivity.h"
 #include "activities/Activity.h"
-#include <I18n.h>
-
 #include "components/themes/BaseTheme.h"
 #include "util/ButtonNavigator.h"
 

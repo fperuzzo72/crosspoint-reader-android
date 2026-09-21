@@ -1,13 +1,12 @@
 #include "ActivityManager.h"
 
-#include <StorageLayout.h>
-
 #include <BoardConfig.h>
 #include <FontCacheManager.h>
 #include <FsHelpers.h>
 #include <HalDisplay.h>
 #include <HalPowerManager.h>
 #include <Memory.h>
+#include <StorageLayout.h>
 
 #include <algorithm>
 

@@ -1,8 +1,6 @@
 // Timing and ESP for the Kindle (Linux) build. String lives in
 // ArduinoString.cpp, which stays portable so the host tests can reach it.
 
-#include "ArduinoCompat.h"
-
 #include <sys/sysinfo.h>
 #include <time.h>
 #include <unistd.h>
@@ -10,6 +8,8 @@
 #include <algorithm>
 #include <cstdarg>
 #include <cstdio>
+
+#include "ArduinoCompat.h"
 
 namespace {
 
@@ -56,7 +56,7 @@ void delayMicroseconds(const uint32_t us) {
 EspClass ESP;
 
 uint32_t EspClass::getFreeHeap() const {
-  struct sysinfo info {};
+  struct sysinfo info{};
   if (sysinfo(&info) != 0) {
     return 0;
   }
@@ -76,6 +76,4 @@ void EspClass::restart() const {
 
 // A forma livre do ESP-IDF. O RecoveryBoot e o MemoryManager do SDK chamam
 // esta, nao o ESP.restart() do core Arduino. Mesmo ato, mesmo caminho.
-[[noreturn]] void esp_restart() {
-  ESP.restart();
-}
+[[noreturn]] void esp_restart() { ESP.restart(); }

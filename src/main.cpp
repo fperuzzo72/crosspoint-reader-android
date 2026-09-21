@@ -1,7 +1,5 @@
 #include <Arduino.h>
 #include <BoardConfig.h>
-
-#include <cstdio>
 #include <Epub.h>
 #include <FontCacheManager.h>
 #include <FontDecompressor.h>
@@ -21,6 +19,8 @@
 #include <WiFi.h>
 #include <XteinkDetect.h>
 #include <builtinFonts/all.h>
+
+#include <cstdio>
 #if FREEINK_CAP_TOUCH
 #include <esp_sntp.h>
 #endif
@@ -35,8 +35,8 @@
 #include "RecentBooksStore.h"
 #include "SdCardFontSystem.h"
 #include "activities/Activity.h"
-#include "activities/boot_sleep/SleepActivity.h"
 #include "activities/ActivityManager.h"
+#include "activities/boot_sleep/SleepActivity.h"
 #include "activities/settings/SdFirmwareUpdateActivity.h"
 #include "components/UITheme.h"
 #include "fontIds.h"
@@ -69,84 +69,84 @@ EpdFont notoserif14BoldFont(&notoserif_14_bold);
 EpdFont notoserif14ItalicFont(&notoserif_14_italic);
 EpdFont notoserif14BoldItalicFont(&notoserif_14_bolditalic);
 EpdFontFamily notoserif14FontFamily(&notoserif14RegularFont, &notoserif14BoldFont, &notoserif14ItalicFont,
-                            &notoserif14BoldItalicFont);
+                                    &notoserif14BoldItalicFont);
 
 EpdFont notoserif16RegularFont(&notoserif_16_regular);
 EpdFont notoserif16BoldFont(&notoserif_16_bold);
 EpdFont notoserif16ItalicFont(&notoserif_16_italic);
 EpdFont notoserif16BoldItalicFont(&notoserif_16_bolditalic);
 EpdFontFamily notoserif16FontFamily(&notoserif16RegularFont, &notoserif16BoldFont, &notoserif16ItalicFont,
-                            &notoserif16BoldItalicFont);
+                                    &notoserif16BoldItalicFont);
 
 EpdFont notoserif18RegularFont(&notoserif_18_regular);
 EpdFont notoserif18BoldFont(&notoserif_18_bold);
 EpdFont notoserif18ItalicFont(&notoserif_18_italic);
 EpdFont notoserif18BoldItalicFont(&notoserif_18_bolditalic);
 EpdFontFamily notoserif18FontFamily(&notoserif18RegularFont, &notoserif18BoldFont, &notoserif18ItalicFont,
-                            &notoserif18BoldItalicFont);
+                                    &notoserif18BoldItalicFont);
 
 EpdFont notoserif20RegularFont(&notoserif_20_regular);
 EpdFont notoserif20BoldFont(&notoserif_20_bold);
 EpdFont notoserif20ItalicFont(&notoserif_20_italic);
 EpdFont notoserif20BoldItalicFont(&notoserif_20_bolditalic);
 EpdFontFamily notoserif20FontFamily(&notoserif20RegularFont, &notoserif20BoldFont, &notoserif20ItalicFont,
-                            &notoserif20BoldItalicFont);
+                                    &notoserif20BoldItalicFont);
 
 EpdFont notoserif22RegularFont(&notoserif_22_regular);
 EpdFont notoserif22BoldFont(&notoserif_22_bold);
 EpdFont notoserif22ItalicFont(&notoserif_22_italic);
 EpdFont notoserif22BoldItalicFont(&notoserif_22_bolditalic);
 EpdFontFamily notoserif22FontFamily(&notoserif22RegularFont, &notoserif22BoldFont, &notoserif22ItalicFont,
-                            &notoserif22BoldItalicFont);
+                                    &notoserif22BoldItalicFont);
 
 EpdFont notoserif24RegularFont(&notoserif_24_regular);
 EpdFont notoserif24BoldFont(&notoserif_24_bold);
 EpdFont notoserif24ItalicFont(&notoserif_24_italic);
 EpdFont notoserif24BoldItalicFont(&notoserif_24_bolditalic);
 EpdFontFamily notoserif24FontFamily(&notoserif24RegularFont, &notoserif24BoldFont, &notoserif24ItalicFont,
-                            &notoserif24BoldItalicFont);
+                                    &notoserif24BoldItalicFont);
 
 EpdFont notosans14RegularFont(&notosans_14_regular);
 EpdFont notosans14BoldFont(&notosans_14_bold);
 EpdFont notosans14ItalicFont(&notosans_14_italic);
 EpdFont notosans14BoldItalicFont(&notosans_14_bolditalic);
 EpdFontFamily notosans14FontFamily(&notosans14RegularFont, &notosans14BoldFont, &notosans14ItalicFont,
-                            &notosans14BoldItalicFont);
+                                   &notosans14BoldItalicFont);
 
 EpdFont notosans16RegularFont(&notosans_16_regular);
 EpdFont notosans16BoldFont(&notosans_16_bold);
 EpdFont notosans16ItalicFont(&notosans_16_italic);
 EpdFont notosans16BoldItalicFont(&notosans_16_bolditalic);
 EpdFontFamily notosans16FontFamily(&notosans16RegularFont, &notosans16BoldFont, &notosans16ItalicFont,
-                            &notosans16BoldItalicFont);
+                                   &notosans16BoldItalicFont);
 
 EpdFont notosans18RegularFont(&notosans_18_regular);
 EpdFont notosans18BoldFont(&notosans_18_bold);
 EpdFont notosans18ItalicFont(&notosans_18_italic);
 EpdFont notosans18BoldItalicFont(&notosans_18_bolditalic);
 EpdFontFamily notosans18FontFamily(&notosans18RegularFont, &notosans18BoldFont, &notosans18ItalicFont,
-                            &notosans18BoldItalicFont);
+                                   &notosans18BoldItalicFont);
 
 EpdFont notosans20RegularFont(&notosans_20_regular);
 EpdFont notosans20BoldFont(&notosans_20_bold);
 EpdFont notosans20ItalicFont(&notosans_20_italic);
 EpdFont notosans20BoldItalicFont(&notosans_20_bolditalic);
 EpdFontFamily notosans20FontFamily(&notosans20RegularFont, &notosans20BoldFont, &notosans20ItalicFont,
-                            &notosans20BoldItalicFont);
+                                   &notosans20BoldItalicFont);
 
 EpdFont notosans22RegularFont(&notosans_22_regular);
 EpdFont notosans22BoldFont(&notosans_22_bold);
 EpdFont notosans22ItalicFont(&notosans_22_italic);
 EpdFont notosans22BoldItalicFont(&notosans_22_bolditalic);
 EpdFontFamily notosans22FontFamily(&notosans22RegularFont, &notosans22BoldFont, &notosans22ItalicFont,
-                            &notosans22BoldItalicFont);
+                                   &notosans22BoldItalicFont);
 
 EpdFont notosans24RegularFont(&notosans_24_regular);
 EpdFont notosans24BoldFont(&notosans_24_bold);
 EpdFont notosans24ItalicFont(&notosans_24_italic);
 EpdFont notosans24BoldItalicFont(&notosans_24_bolditalic);
 EpdFontFamily notosans24FontFamily(&notosans24RegularFont, &notosans24BoldFont, &notosans24ItalicFont,
-                            &notosans24BoldItalicFont);
+                                   &notosans24BoldItalicFont);
 
 #ifndef OMIT_FONTS
 #if !CROSSPOINT_OMIT_LARGE_READER_FONTS
@@ -841,7 +841,6 @@ void loop() {
     }
   }
 #endif
-
 
   if (activityManager.requiresExclusiveStorageLoop()) {
     // USB Drive handed the raw SD card to the host. Do not run screenshots,

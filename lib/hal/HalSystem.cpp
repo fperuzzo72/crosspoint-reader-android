@@ -9,12 +9,11 @@
 
 #if !FREEINK_MCU_HOSTED
 
-#include "HalSystem.h"
-
 #include <string>
 
 #include "Arduino.h"
 #include "HalStorage.h"
+#include "HalSystem.h"
 #include "Logging.h"
 #include "esp_debug_helpers.h"
 #include "esp_memory_utils.h"

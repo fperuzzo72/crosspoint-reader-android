@@ -153,8 +153,8 @@ bool AndroidPanel::present() {
   static int reported = 0;
   if (reported < 5) {
     ++reported;
-    std::fprintf(stderr, "[panel] present #%d win=%p stage=%p temConteudo=%d\n", reported,
-                 static_cast<void*>(win), static_cast<void*>(stage), stageHasContent ? 1 : 0);
+    std::fprintf(stderr, "[panel] present #%d win=%p stage=%p temConteudo=%d\n", reported, static_cast<void*>(win),
+                 static_cast<void*>(stage), stageHasContent ? 1 : 0);
     std::fflush(stderr);
   }
   if (win == nullptr || stage == nullptr) {

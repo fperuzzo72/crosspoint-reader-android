@@ -1,14 +1,13 @@
 // FsFile and SdFs over POSIX. See arduino-shim/SdFat.h for why this exists
 // rather than the real SdFat.
 
+#include <BoardConfig.h>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <unistd.h>
 
 #include <cerrno>
 #include <cstring>
-
-#include <BoardConfig.h>
 
 #include "arduino-shim/SdFat.h"
 
@@ -120,7 +119,7 @@ bool FsFile::open(const char* p, const oflag_t flags) {
   const char* resolved = crosspoint_storage::resolve(p);
   std::snprintf(path, sizeof(path), "%s", resolved);
 
-  struct stat st {};
+  struct stat st{};
   if (stat(resolved, &st) == 0 && S_ISDIR(st.st_mode)) {
     dir = opendir(resolved);
     return dir != nullptr;
@@ -194,9 +193,7 @@ size_t FsFile::write(const uint8_t* buf, const size_t count) {
   return n > 0 ? static_cast<size_t>(n) : 0;
 }
 
-size_t FsFile::write(const void* buf, const size_t count) {
-  return write(static_cast<const uint8_t*>(buf), count);
-}
+size_t FsFile::write(const void* buf, const size_t count) { return write(static_cast<const uint8_t*>(buf), count); }
 
 void FsFile::flush() {
   if (fd >= 0) {
@@ -204,17 +201,11 @@ void FsFile::flush() {
   }
 }
 
-bool FsFile::seek(const uint64_t pos) {
-  return fd >= 0 && lseek(fd, static_cast<off_t>(pos), SEEK_SET) >= 0;
-}
+bool FsFile::seek(const uint64_t pos) { return fd >= 0 && lseek(fd, static_cast<off_t>(pos), SEEK_SET) >= 0; }
 
-bool FsFile::seekCur(const int64_t delta) {
-  return fd >= 0 && lseek(fd, static_cast<off_t>(delta), SEEK_CUR) >= 0;
-}
+bool FsFile::seekCur(const int64_t delta) { return fd >= 0 && lseek(fd, static_cast<off_t>(delta), SEEK_CUR) >= 0; }
 
-bool FsFile::seekEnd(const int64_t delta) {
-  return fd >= 0 && lseek(fd, static_cast<off_t>(delta), SEEK_END) >= 0;
-}
+bool FsFile::seekEnd(const int64_t delta) { return fd >= 0 && lseek(fd, static_cast<off_t>(delta), SEEK_END) >= 0; }
 
 uint64_t FsFile::position() {
   if (fd < 0) {
@@ -228,13 +219,11 @@ uint64_t FsFile::size() {
   if (fd < 0) {
     return 0;
   }
-  struct stat st {};
+  struct stat st{};
   return fstat(fd, &st) == 0 ? static_cast<uint64_t>(st.st_size) : 0;
 }
 
-bool FsFile::truncate(const uint64_t length) {
-  return fd >= 0 && ftruncate(fd, static_cast<off_t>(length)) == 0;
-}
+bool FsFile::truncate(const uint64_t length) { return fd >= 0 && ftruncate(fd, static_cast<off_t>(length)) == 0; }
 
 bool FsFile::openNext(FsFile* entry, const oflag_t flags) {
   if (dir == nullptr || entry == nullptr) {
@@ -279,11 +268,13 @@ void FsFile::printName(Print* out) const {
 // ------------------------------------------------------------------ SdFs ---
 
 bool SdFs::exists(const char* p) const {
-  struct stat st {};
+  struct stat st{};
   return p != nullptr && stat(crosspoint_storage::resolve(p), &st) == 0;
 }
 
-bool SdFs::mkdir(const char* p, const bool createParents) { return makeDirs(crosspoint_storage::resolve(p), createParents); }
+bool SdFs::mkdir(const char* p, const bool createParents) {
+  return makeDirs(crosspoint_storage::resolve(p), createParents);
+}
 
 bool SdFs::rmdir(const char* p) { return p != nullptr && ::rmdir(crosspoint_storage::resolve(p)) == 0; }
 
@@ -346,7 +337,7 @@ void SdFs::setVolumePath(const char* path) {
 }
 
 uint64_t SdFs::clusterCount() const {
-  struct statvfs st {};
+  struct statvfs st{};
   if (statvfs(volumePath, &st) != 0) {
     return 0;
   }
@@ -354,7 +345,7 @@ uint64_t SdFs::clusterCount() const {
 }
 
 uint64_t SdFs::freeClusterCount() const {
-  struct statvfs st {};
+  struct statvfs st{};
   if (statvfs(volumePath, &st) != 0) {
     return 0;
   }
@@ -364,7 +355,7 @@ uint64_t SdFs::freeClusterCount() const {
 }
 
 uint32_t SdFs::bytesPerCluster() const {
-  struct statvfs st {};
+  struct statvfs st{};
   if (statvfs(volumePath, &st) != 0) {
     return 0;
   }

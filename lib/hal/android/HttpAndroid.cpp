@@ -52,33 +52,50 @@ bool ensureBridge(JNIEnv* env) {
   }
   g_bridge.cls = static_cast<jclass>(env->NewGlobalRef(local));
   env->DeleteLocalRef(local);
-  g_bridge.open = env->GetStaticMethodID(g_bridge.cls, "open",
-                                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)I");
-  g_bridge.write = env->GetStaticMethodID(g_bridge.cls, "write", "(I[BI)I");
-  g_bridge.finish = env->GetStaticMethodID(g_bridge.cls, "finish", "(I)I");
-  g_bridge.read = env->GetStaticMethodID(g_bridge.cls, "read", "(I[B)I");
-  g_bridge.header = env->GetStaticMethodID(g_bridge.cls, "header",
-                                           "(ILjava/lang/String;)Ljava/lang/String;");
-  g_bridge.contentLength = env->GetStaticMethodID(g_bridge.cls, "contentLength", "(I)J");
-  g_bridge.close = env->GetStaticMethodID(g_bridge.cls, "close", "(I)V");
+
+  // Uma assinatura errada aqui NAO e um retorno nulo silencioso: o
+  // GetStaticMethodID lanca NoSuchMethodError e deixa a excecao PENDENTE. A
+  // proxima chamada JNI feita com excecao pendente faz a VM abortar, e o
+  // processo morre sem passar por nenhum tratamento de erro nosso.
+  //
+  // Por isso cada busca limpa a sua, em vez de uma limpeza no fim: a segunda
+  // busca ja seria a "proxima chamada JNI" da primeira.
+  auto lookup = [&](const char* name, const char* sig) -> jmethodID {
+    jmethodID m = env->GetStaticMethodID(g_bridge.cls, name, sig);
+    if (m == nullptr) {
+      env->ExceptionClear();
+      __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointHttp.%s %s nao resolveu", name, sig);
+    }
+    return m;
+  };
+
+  g_bridge.open = lookup("open", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZI)I");
+  g_bridge.write = lookup("write", "(I[BI)I");
+  g_bridge.finish = lookup("finish", "(I)I");
+  g_bridge.read = lookup("read", "(I[B)I");
+  g_bridge.header = lookup("header", "(ILjava/lang/String;)Ljava/lang/String;");
+  g_bridge.contentLength = lookup("contentLength", "(I)J");
+  g_bridge.close = lookup("close", "(I)V");
   g_bridge.ready = g_bridge.open && g_bridge.write && g_bridge.finish && g_bridge.read && g_bridge.header &&
                    g_bridge.contentLength && g_bridge.close;
-  if (!g_bridge.ready) {
-    env->ExceptionClear();
-    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "metodos do CrossPointHttp nao resolveram");
-  }
   return g_bridge.ready;
 }
 
 const char* methodName(const esp_http_client_method_t m) {
   switch (m) {
-    case HTTP_METHOD_POST: return "POST";
-    case HTTP_METHOD_PUT: return "PUT";
-    case HTTP_METHOD_PATCH: return "PATCH";
-    case HTTP_METHOD_DELETE: return "DELETE";
-    case HTTP_METHOD_HEAD: return "HEAD";
+    case HTTP_METHOD_POST:
+      return "POST";
+    case HTTP_METHOD_PUT:
+      return "PUT";
+    case HTTP_METHOD_PATCH:
+      return "PATCH";
+    case HTTP_METHOD_DELETE:
+      return "DELETE";
+    case HTTP_METHOD_HEAD:
+      return "HEAD";
     case HTTP_METHOD_GET:
-    default: return "GET";
+    default:
+      return "GET";
   }
 }
 
@@ -204,7 +221,7 @@ int esp_http_client_write(const esp_http_client_handle_t client, const char* buf
     return -1;
   }
   crosspoint::android::JniAttach attach;
-  if (!attach) {
+  if (!attach || !g_bridge.ready) {
     return -1;
   }
   JNIEnv* env = attach.env();
@@ -227,7 +244,7 @@ int64_t esp_http_client_fetch_headers(const esp_http_client_handle_t client) {
     return -1;
   }
   crosspoint::android::JniAttach attach;
-  if (!attach) {
+  if (!attach || !g_bridge.ready) {
     return -1;
   }
   JNIEnv* env = attach.env();
@@ -261,7 +278,7 @@ int esp_http_client_read(const esp_http_client_handle_t client, char* buffer, co
     return -1;
   }
   crosspoint::android::JniAttach attach;
-  if (!attach) {
+  if (!attach || !g_bridge.ready) {
     return -1;
   }
   JNIEnv* env = attach.env();
@@ -320,7 +337,7 @@ esp_err_t esp_http_client_get_header(const esp_http_client_handle_t client, cons
   }
   *value = nullptr;
   crosspoint::android::JniAttach attach;
-  if (!attach) {
+  if (!attach || !g_bridge.ready) {
     return ESP_FAIL;
   }
   JNIEnv* env = attach.env();

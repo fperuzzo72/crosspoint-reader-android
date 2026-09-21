@@ -1,0 +1,7 @@
+.pio/
+build/android/one.err
+build/android/census-errors.txt
+build/android/fails.txt
+.DS_Store
+local.properties
+.gradle/

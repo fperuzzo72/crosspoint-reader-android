@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:label="@string/app_name"
+        android:allowBackup="false"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+
+        <!--
+          screenOrientation=portrait: o painel e 824x1648 e o leitor tem a
+          propria nocao de orientacao, que ele aplica no framebuffer. Deixar o
+          Android tambem girar daria duas rotacoes empilhadas.
+
+          configChanges: sem isto, qualquer mudanca de configuracao destroi e
+          recria a Activity. A thread do leitor sobrevive a isso (nativeStart e
+          idempotente), mas a superficie vai embora e volta a cada vez, e uma
+          tela e-ink piscando por causa de uma troca de teclado e feio sem
+          motivo.
+        -->
+        <activity
+            android:name=".ReaderActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode|density">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

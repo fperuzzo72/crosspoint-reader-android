@@ -332,14 +332,95 @@ uma leitura de bateria por `lipc-get-prop com.lab126.powerd`. Num HiBreak as
 duas falham em silencio e o medidor de bateria le 0. Foi separado por aparelho
 depois, mas o link nao teria reclamado nunca.
 
-## Proximo
+## O .so existe
 
-O lado Kotlin: Activity, SurfaceView, GestureDetector, e o Gradle com o CMake
-do NDK. A ponte ja esta definida e e pequena:
+`cmake/android/CMakeLists.txt` constroi de verdade, com o toolchain do NDK:
 
 ```
-nativeSetSurface(Surface?)                      Surface -> ANativeWindow
-nativeGesture(kind, nx, ny, nxEnd, nyEnd, ms)   gesto ja classificado
-nativeContact(down)                             dedo encostado
-nativeStart()                                   sobe a thread do leitor
+libcrosspoint.so   ELF 64-bit LSB shared object, ARM aarch64
+                   41MB com simbolos, 7,9MB depois do strip
+                   4 simbolos JNI exportados, o resto escondido
 ```
+
+Isto e mais forte que o trylink: o trylink pergunta "linkaria", isto linkou.
+
+### O que o CMake teve de aprender
+
+Tres coisas, e as tres estao comentadas no arquivo porque nenhuma e obvia:
+
+**Arquivar por biblioteca, nao linkar objetos soltos.** Ha tres copias de
+miniz nesta arvore, cada uma com uma config que prefixa so parte dos simbolos,
+e o resto colide. O PlatformIO nunca ve o problema porque arquiva cada
+biblioteca: o linker entao puxa um membro so quando ele resolve algo ainda
+indefinido, e duplicata entre arquivos e "o primeiro vence". A primeira versao
+deste CMakeLists linkava solto e produziu dezenas de erros de multipla
+definicao, exatamente como o comentario do `trylink.sh` do Kindle avisava.
+
+**Uma copia de expat, nao duas.** O CrossPoint e o SDK vendorizam expat cada
+um e os dois exportam os mesmos `XML_*` sem prefixo. Vence o do SDK, pelos
+mesmos dois motivos que o porte Kindle registrou: carrega um `expat_config.h`
+de verdade em vez de depender de flags, e o include dele ja vem primeiro.
+
+**`-fvisibility=hidden`, e nao por higiene de ABI.** Numa biblioteca
+COMPARTILHADA tudo e exportado por padrao, entao nada e morto e o
+`--gc-sections` nao descarta nada. Os helpers de checksum do uzlib
+(`uzlib_crc32`, `uzlib_adler32`) sao declarados e chamados de uma funcao que
+nada alcanca, e sem visibilidade escondida apareciam como referencia
+indefinida para codigo que nunca roda.
+
+### Um achado upstream
+
+`MySerialImpl` e declarado em `lib/Logging/Logging.h` e **nao e definido em
+lugar nenhum desta arvore**: nem o membro estatico `instance`, nem `write()`,
+nem `flush()`, nem `printf()`. O unico membro com corpo e o `operator bool()`,
+inline no header.
+
+Isso nao e do porte. `src/main.cpp:813` tem `if (Serial && ...)` fora de
+qualquer guarda, entao a referencia e emitida sempre. Esta definido agora em
+`lib/hal/posix/SerialProxyPosix.cpp`, que precisa ser unidade de traducao
+propria: o `Logging.h` termina com `#define Serial MySerialImpl::instance`, e
+incluir esse header dentro do `ArduinoShim.cpp` transforma o
+`HardwareSerial Serial;` de la em redefinicao com tipo diferente.
+
+## O lado Kotlin
+
+```
+app/src/main/java/org/crosspoint/hibreak/
+  CrossPointNative.kt    as quatro travessias, e nada mais
+  ReaderActivity.kt      SurfaceView + GestureDetector
+app/src/main/AndroidManifest.xml
+cmake/android/CMakeLists.txt
+build.gradle.kts, settings.gradle.kts, app/build.gradle.kts
+```
+
+A Activity nao tem layout XML e nao tem view alguma alem da superficie. O
+CrossPoint desenha a interface dele do zero em 1bpp; qualquer widget Android
+aqui seria uma segunda interface disputando a mesma tela.
+
+Tres decisoes registradas no codigo:
+
+- **`surfaceDestroyed` chama `nativeSetSurface(null)` sincronamente.** Depois
+  que esse metodo retorna a superficie deixa de ser valida e a thread do leitor
+  continua rodando. O lado C++ toma o mesmo mutex da apresentacao, o que faz a
+  chamada esperar um paint em andamento terminar.
+- **A tela nao apaga.** Num e-ink isso custa quase nada, porque o painel so
+  consome ao mudar.
+- **O notch nao e tratado.** A tela vai inteira para baixo do recorte de 49px e
+  o leitor nao precisa saber que ele existe. Recuperar esses pixels exigiria
+  `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES` e ensinar o CrossPoint sobre o
+  inset.
+
+## Estado, sem arredondar
+
+| | |
+| --- | --- |
+| Censo | 100% (224/224) |
+| Trylink | 0 indefinidas |
+| `libcrosspoint.so` | **construido e verificado** |
+| APK | **nao construido** |
+| Rodando no aparelho | **nao** |
+
+O APK nao existe porque esta maquina nao tem JDK, nem Gradle, nem Android SDK.
+Os arquivos do Gradle estao escritos e nao foram executados nenhuma vez, o que
+quer dizer que podem ter erros bobos que so um build revela. O `.so`, esse sim,
+foi construido de verdade.

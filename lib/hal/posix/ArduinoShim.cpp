@@ -589,3 +589,4 @@ TaskHandle_t xSemaphoreGetMutexHolder(const SemaphoreHandle_t) {
 // ----------------------------------------------------------------- OTA ---
 
 UpdateClass Update;
+

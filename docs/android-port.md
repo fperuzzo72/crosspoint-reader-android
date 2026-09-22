@@ -318,6 +318,36 @@ And the bar itself did not respect the side margin: the reader adds
 not. With a small margin that went unnoticed; on a rounded panel, with the
 margin at 60px, the ends fell outside the visible area.
 
+## File transfer
+
+The POSIX shim's web server refused to start if any route registered an upload
+handler, because multipart was never implemented in the Kindle port. Accepting a
+browser's POST and silently dropping the book is the worst outcome available, so
+failing at start-up was the right call while it stood.
+
+It is implemented now, in `lib/hal/posix/MultipartParser.cpp`, and the shape of
+it is the point: **nothing holds the payload**. A book is tens of megabytes
+arriving as fast as the Wi-Fi allows, so the delimiter is searched for inside a
+small sliding window and everything safely before it goes straight to the upload
+handler.
+
+The invariant that makes or breaks it: **a delimiter can straddle two reads**.
+The tail of the window, as long as the delimiter itself, is never emitted until
+the next read proves it is not the start of one. Emitting it eagerly writes the
+first bytes of `\r\n--boundary` into the book, and because the corruption lands
+at the end of a chunk rather than at the start, the file still opens and the
+damage shows up somewhere in the middle of chapter nine.
+
+The parser was pulled out of the web server precisely so a host test can hold it
+to account, the same reasoning that put the 1bpp expansion in `HostedGray`.
+`test/multipart` runs each body through seven chunk sizes down to **one byte at
+a time**, which places the delimiter across a read boundary at every possible
+offset, and includes a payload that begins like the delimiter without being one.
+
+Ordinary form fields become args, so a handler reads them through `arg()`
+without caring the form was multipart. CrossPoint's font upload depends on that:
+it posts the family name alongside the file.
+
 ## Still open
 
 - Scoped storage. The app currently uses All files access with a real folder,

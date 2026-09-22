@@ -1,5 +1,7 @@
 #include "CrossPointWebServer.h"
 
+#include <StorageLayout.h>
+
 #include <ArduinoJson.h>
 #include <BoardConfig.h>
 #include <FsHelpers.h>
@@ -693,7 +695,11 @@ void CrossPointWebServer::handleUpload(UploadState& state) const {
     if (server->hasArg("path")) {
       state.path = normalizeWebPath(server->arg("path"));
     } else {
-      state.path = "/";
+      // No path means "wherever books go", not "the top of storage". On SD card
+      // devices the two are the same; where the library lives in a subfolder
+      // they are not, and a book dropped at the root is a book the reader's
+      // browser does not list.
+      state.path = crosspoint::storage::LIBRARY_ROOT;
     }
 
     LOG_DBG("WEB", "[UPLOAD] START: %s to path: %s", state.fileName.c_str(), state.path.c_str());

@@ -71,7 +71,10 @@ dies, which is worse than not starting because it looks like it worked.
 - **Touch**: taps, long presses and swipes, classified by Android's
   `GestureDetector` and handed to C++ already decided.
 - **OPDS over HTTPS**, including redirects and downloads into `books/`.
-- **File transfer over Wi-Fi**: a web UI for uploading books from a browser.
+- **File transfer over Wi-Fi**: the web UI accepts multipart uploads, so a
+  browser can push books to the device. The streaming parser is covered by a
+  host test (`test/multipart`); the end-to-end path has not yet been exercised
+  on the device itself.
 - **Fonts**: 14, 16, 18 and 20 built in, in Noto Serif and Noto Sans, plus
   families installable into `fonts/`.
 - **Symbols**: arrows, list bullets, geometric shapes and the mathematical
@@ -90,6 +93,10 @@ Listed because a port that hides its edges wastes the next person's afternoon.
 - **Wi-Fi association flows** are the system's job. The selection screen now
   resolves itself instead of opening an empty list, but the menu entries that
   lead there are still worth hiding.
+- **Scoped storage.** The app uses All files access with a real folder, because
+  CrossPoint's file browser, cache and progress store all speak paths. Moving to
+  the Storage Access Framework would mean rewriting the three of them against
+  URIs.
 
 ---
 

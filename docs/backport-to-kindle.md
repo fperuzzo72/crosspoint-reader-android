@@ -1,157 +1,123 @@
-# O que daqui deve voltar para o porte Kindle
+# What should go back to the Kindle port
 
-Este repositório nasceu de uma cópia de `crosspoint-reader-kindle` em `f002274b`.
-O porte Kindle pagou o custo de tirar o CrossPoint do ESP32; este aqui herda esse
-trabalho. Quando algo que consertamos aqui for de camada POSIX e não de Android,
-ele pertence aos dois, e esta é a lista para não perdermos a conta.
+This repository was born as a copy of `crosspoint-reader-kindle` at `f002274b`.
+That port paid the cost of taking CrossPoint off the ESP32; this one inherits
+the work. When something fixed here belongs to the POSIX layer rather than to
+Android, it belongs to both, and this is the ledger.
 
-## A reorganização estrutural, que é o item principal
+## When to guard by device, and when not
 
-No repositório Kindle o shim inteiro mora em `lib/hal/kindle/`, misturando duas
-coisas de natureza diferente:
+Decided: this port exists for **one** device. There is no ambition of
+generality, because the hardware diverges too far between an e-ink phone, a
+Kindle and an ESP32 for an abstraction to be worth what it costs.
 
-- o que é **POSIX genérico** e vale em qualquer Unix (`String`, `millis()`,
-  FreeRTOS sobre pthreads, SdFat sobre POSIX, sockets, servidor HTTP, MD5,
-  base64, e o `arduino-shim/` inteiro);
-- o que é **do Kindle** e não vale em mais lugar nenhum (framebuffer sobre
-  `/dev/fb0` via FBInk, toque via evdev do `zforce2`, expansão 1bpp para 8bpp
-  no formato que o EPDC quer).
+That does not mean everything goes behind `#if FREEINK_DEVICE_HIBREAK`. The
+criterion is what would break *inside this tree*, where the Kindle branch
+compiles from the same code:
 
-Aqui eles estão separados:
+- **Guarded** when the right value here would be wrong for the Kindle: font
+  sizes, margin bounds, the storage root, the refresh ladder.
+- **Unguarded** when it is a fix that holds anywhere. The status bar aligning
+  with the text column is the case: the user changes a setting called "screen
+  margin" expecting it to apply to the whole page, and the bar ignored it.
+  Guarding that would pretend a correction is a local preference.
 
-| Aqui | Lá | Natureza |
+When in doubt, unguarded and noted here. One guard too many hides a fix; one fix
+too many shows up in the diff and somebody argues about it.
+
+## The structural item
+
+In the Kindle repository the whole shim lives in `lib/hal/kindle/`, mixing two
+things of different nature: what is **generic POSIX** and holds on any Unix
+(`String`, `millis()`, FreeRTOS over pthreads, SdFat over POSIX, sockets, the
+HTTP server, MD5, base64, and the whole `arduino-shim/`), and what is **the
+Kindle's** and holds nowhere else (the framebuffer over `/dev/fb0` via FBInk,
+touch over the `zforce2` evdev stream, the 1bpp to 8bpp expansion in the format
+the EPDC wants).
+
+Here they are separated:
+
+| Here | There | Nature |
 | --- | --- | --- |
-| `lib/hal/posix/` (5.621 linhas) | `lib/hal/kindle/` | reaproveitável |
-| `lib/hal/kindle/` (só os 6 arquivos `Kindle*`) | idem | específico |
-| `lib/hal/android/` | não existe | específico |
+| `lib/hal/posix/` (5,621 lines) | `lib/hal/kindle/` | reusable |
+| `lib/hal/kindle/` (only the six `Kindle*` files) | same | device-specific |
+| `lib/hal/android/` | does not exist | device-specific |
 
-**Backport recomendado:** mover `lib/hal/kindle/arduino-shim/` e os dez arquivos
-POSIX para `lib/hal/posix/` no repositório Kindle também, e ajustar o include
-path do `census.sh`, do `trylink.sh` e do `cmake/kindle/`. É um diff mecânico e
-deixa a costura visível, que é o que o próprio doc do porte Kindle argumenta ser
-o achado estrutural do projeto.
+And three files changed name and guard, which holds there too:
 
-## Quando guardar por aparelho, e quando nao
-
-Decidido: este porte existe para UM aparelho. Nao ha ambicao de generalidade,
-porque o hardware diverge demais entre um telefone e-ink, um Kindle e um
-ESP32 para uma abstracao valer o que custa.
-
-Isso NAO quer dizer que tudo vai atras de `#if FREEINK_DEVICE_HIBREAK`. O
-criterio e outro, e e sobre o que quebraria dentro desta arvore:
-
-- **Com guarda** quando o valor certo para este aparelho estaria errado para o
-  Kindle, que compila do mesmo codigo aqui. Os corpos de fonte, os limites da
-  margem, a raiz do armazenamento, a escada de refresh.
-- **Sem guarda** quando o que mudou e uma correcao que vale em qualquer lugar.
-  A barra de status alinhar com a coluna de texto e o caso: o usuario mexe numa
-  configuracao chamada "margem da tela" esperando que valha para a pagina
-  inteira, e a barra nao respeitava. Guardar isso seria fingir que o acerto e
-  uma preferencia local.
-
-Na duvida, sem guarda e anotado aqui. Uma guarda a mais esconde um conserto; um
-conserto a mais aparece no diff e alguem discute.
-
-## Correções classificadas
-
-Cada conserto leva uma destas três marcas:
-
-- **POSIX** — vale nos dois, backport devido.
-- **Android** — bionic, NDK, ciclo de vida ou sandbox. Fica aqui.
-- **Upstream** — é bug do CrossPoint ou do freeink-sdk e devia subir para o
-  repositório de origem, não só para o Kindle.
-
-Da subida de 61% para 100% no censo:
-
-| Marca | Conserto | Onde |
-| --- | --- | --- |
-| **POSIX** | `esp_restart()`, a forma livre do ESP-IDF ao lado do `ESP.restart()` que já existia. O `RecoveryBoot` e o `MemoryManager` do SDK chamam esta. | `arduino-shim/esp_system.h`, `ArduinoPlatform.cpp` |
-| **POSIX** | `StaticTask_t`, opaco, só para `sizeof()` compilar. `xTaskCreateStatic` segue ausente de propósito, então quem tentar criar tarefa estática quebra no link e não em silêncio. | `arduino-shim/freertos/task.h` |
-| **POSIX** | `adc_attenuation_t` e `analogSetAttenuation()` inertes, ao lado do `analogRead()` que já era inerte. | `arduino-shim/Arduino.h` |
-| **POSIX** | `ARDUINOJSON_ENABLE_ARDUINO_STRING=1`. Sem isso o ArduinoJson não detecta ambiente Arduino, cai no `std::string` e todo `as<String>()` falha. O Kindle tem o mesmo `String` de shim e o mesmo problema. | flag de build |
-| **Upstream** | `HomeActivity.h` declarava `struct RecentBook;` adiante e tinha `std::vector<RecentBook>` como membro. Mal formado: instanciar membros de `vector` exige tipo completo. O libstdc++ do ESP32 aceita, o libc++ recusa. Trocado por `#include "RecentBooksStore.h"`. | `src/activities/home/HomeActivity.h` |
-| ~~POSIX~~ | ~~`scripts/fetch-thirdparty.sh`~~ **Não é backport.** O Kindle já tem `tools/kindle/fetch-deps.sh`, que faz o mesmo e é anterior. O que veio de lá para cá foi a convenção, não o contrário: buscar para um diretório gitignored, porque isto é passo de busca e não vendorização no repositório. Corrigido aqui depois de eu ter afirmado o inverso. | — |
-
-O `CROSSPOINT_VERSION` não entra na lista: é define de build que o
-`scripts/git_branch.py` injeta, e fora do PlatformIO só precisa existir.
-
-## Contramão
-
-Coisas que o Kindle resolveu e que vamos precisar rever aqui, não copiar:
-
-- **`arduino-shim/WiFi.h`** lê SSID por wireless extensions (`SIOCGIWESSID`) e
-  RSSI por `/proc/net/wireless`. Wireless extensions estão mortas no Android
-  moderno e `/proc/net/wireless` não é legível por app comum. Precisa de uma
-  variante que passe por `WifiManager` via JNI, ou que falhe honestamente como o
-  Kindle faz nos caminhos de associação.
-- **TLS** continua não implementado. No Kindle isso elimina OPDS e KOReader sync
-  na prática. No Android a saída é diferente e mais fácil, porque existe um
-  `SSLContext` do sistema a uma ponte JNI de distância.
-- **`ESP.restart()`** re-executa o processo no Kindle. No Android reiniciar um
-  processo não é a mesma coisa que reiniciar a Activity, e a semântica certa
-  ainda não foi decidida.
-
-
-## O refactor hospedado, que e o maior backport pendente
-
-Tres arquivos do repositorio Kindle mudaram de nome e de guarda aqui, e a
-mudanca vale igual la:
-
-| Kindle hoje | Aqui | Guarda |
+| Kindle today | Here | Guard |
 | --- | --- | --- |
 | `HalDisplayKindle.cpp` | `HalDisplayHosted.cpp` | `FREEINK_MCU_HOSTED` |
-| `HalGPIOKindle.cpp` | `HalGPIOHosted.cpp` | idem |
-| `HalSystemKindle.cpp` | `HalSystemHosted.cpp` | idem |
+| `HalGPIOKindle.cpp` | `HalGPIOHosted.cpp` | same |
+| `HalSystemKindle.cpp` | `HalSystemHosted.cpp` | same |
 
-Nenhum deles ficou mais complicado: a guarda deixou de nomear um aparelho e
-passou a nomear a familia que o BoardConfig ja derivava, e o tipo do painel
-saiu do `crosspoint::kindle` para um alias em `lib/hal/hosted/HostedPanel.h`.
+None of them got more complicated: the guard stopped naming a device and started
+naming the family BoardConfig already derived, and the panel type moved out of
+`crosspoint::kindle` into an alias in `lib/hal/hosted/HostedPanel.h`.
 
-**Uma armadilha que o backport vai encontrar:** `FREEINK_MCU_HOSTED` e
-DERIVADO dentro do `BoardConfig.h`. Testa-lo antes de incluir aquele header le
-zero e escolhe o ramo errado, e o erro so aparece dezenas de linhas depois como
-`undeclared identifier`. Com `FREEINK_DEVICE_KINDLE` isso nao acontecia porque
-aquele vem da linha de comando. O `HalGPIO.h` tinha exatamente esse problema e
-o proprio comentario dele ja registrava uma versao anterior do mesmo tombo, com
-`FREEINK_CAP_TOUCH`.
+**A trap the backport will hit:** `FREEINK_MCU_HOSTED` is *derived* inside
+`BoardConfig.h`. Testing it before including that header reads zero and picks
+the wrong branch, and the error only surfaces dozens of lines later as
+`undeclared identifier`. With `FREEINK_DEVICE_KINDLE` that never happened
+because it comes from the command line. It bit `HalGPIO.h`, whose own comment
+already recorded an earlier version of the same fall with `FREEINK_CAP_TOUCH`,
+and then bit `CrossPointSettings.h`.
 
-**Pendencia que impede o ramo Kindle de compilar aqui:** `KindleTouch.h` ainda
-declara `Gesture`, `GestureResult` e `TouchTuning` dentro de
-`crosspoint::kindle`, e `lib/hal/hosted/HostedTouch.h` declara os mesmos tres
-em `crosspoint::hosted`. Isso esta assim de proposito, em vez de aliases que
-esconderiam a duplicata: os dois alvos tem que falar UMA lingua de gesto, nao
-duas identicas. O backport move os do Kindle para o `HostedTouch.h`.
+**Pending item that stops the Kindle branch compiling here:** `KindleTouch.h`
+still declares `Gesture`, `GestureResult` and `TouchTuning` inside
+`crosspoint::kindle`, and `lib/hal/hosted/HostedTouch.h` declares the same three
+in `crosspoint::hosted`. That is deliberate rather than papered over with
+aliases: the two targets must speak *one* gesture language, not two identical
+ones. The backport moves the Kindle's into `HostedTouch.h`.
 
-O mesmo vale para `KindleGrayExpand.cpp`, cujas duas funcoes puras viraram
-`lib/hal/hosted/HostedGray.cpp` sem nenhuma alteracao de logica.
+The same holds for `KindleGrayExpand.cpp`, whose two pure functions became
+`lib/hal/hosted/HostedGray.cpp` with no change in logic.
 
-## Achados que nao sao de nenhum dos dois
+## Classified findings
 
-| Marca | O que |
+Each fix carries one of three marks:
+
+- **POSIX** — holds on both, backport owed.
+- **Android** — bionic, NDK, lifecycle or sandbox. Stays here.
+- **Upstream** — a CrossPoint or freeink-sdk bug that should go to the origin
+  repository, not just to the Kindle.
+
+| Mark | What |
 | --- | --- |
-| **Upstream** | `HalSystem.cpp` e `HalGPIO.cpp` guardavam com `!FREEINK_DEVICE_KINDLE` o que na verdade queriam dizer com `!FREEINK_MCU_HOSTED`: os dois incluem coisa de ESP32 (`InputManager`, `xtensa_context.h`) que aparelho hospedado nenhum tem. Funcionava por so existir um alvo hospedado. |
-| **Upstream** | `FirmwareBoardTag.cpp` tem `#error` para aparelho desconhecido, entao cada alvo novo precisa de uma entrada. Correto, e vale registrar que e assim de proposito. |
+| **POSIX** | `esp_restart()`, the ESP-IDF free function alongside the `ESP.restart()` that already existed. The SDK's `RecoveryBoot` and `MemoryManager` call this one. |
+| **POSIX** | `StaticTask_t`, opaque, only so `sizeof()` compiles. `xTaskCreateStatic` stays deliberately absent, so anyone genuinely trying static task creation breaks at link and not in silence. |
+| **POSIX** | Inert `adc_attenuation_t` and `analogSetAttenuation()`, next to the `analogRead()` that was already inert. |
+| **POSIX** | `ARDUINOJSON_ENABLE_ARDUINO_STRING=1`. Without it ArduinoJson does not detect an Arduino environment, falls back to `std::string`, and every `as<String>()` fails. The Kindle has the same shim `String` and the same problem. |
+| **POSIX** | `MySerialImpl` is declared in `lib/Logging/Logging.h` and **defined nowhere in the tree**: not the static member, not `write()`, not `flush()`, not `printf()`. `src/main.cpp:813` references `Serial` outside any guard. Defined here in `lib/hal/posix/SerialProxyPosix.cpp`, which must be its own translation unit because of the `#define Serial` at the end of `Logging.h`. |
+| **POSIX** | The guards in `HalGPIO.h`, `HalSystem.cpp` and `HalGPIO.cpp` said `FREEINK_DEVICE_KINDLE` where they meant `FREEINK_MCU_HOSTED`. It worked only because there was one hosted target. |
+| **Android** | An 8MB stack for the reader thread. Does not apply to the Kindle, where `main()` runs on the process's main thread, which already has a large stack. But the *lesson* applies: any hosted target creating the reader thread by hand must size it. |
+| **Upstream** | `HomeActivity.h` forward-declared `struct RecentBook;` and had a `std::vector<RecentBook>` as a member. Ill-formed: instantiating a vector's members requires a complete type. The ESP32's libstdc++ accepts it, libc++ refuses. |
+| **Upstream** | The size-to-ID `switch` in `CrossPointSettings.cpp` is a hand-maintained mirror of `BUILTIN_READER_POINT_SIZES`. A size present in one list and absent from the other falls to `default` and draws at the wrong size without complaining. |
+| **Upstream** | `FirmwareBoardTag.cpp` has an `#error` for an unknown device, so every new target needs an entry. Correct, and worth recording that it is deliberate. |
+| **Upstream** | `build-font-ids.sh` had a ruby block copied per size. It became a loop when the list went from four sizes to six and the copy grew larger than the logic. |
 
-## Achados posteriores
+## Counter-current
 
-| Marca | O que |
-| --- | --- |
-| **POSIX** | `MySerialImpl` e declarado em `lib/Logging/Logging.h` e **nao e definido em lugar nenhum da arvore**: nem o membro estatico, nem `write()`, nem `flush()`, nem `printf()`. O `src/main.cpp:813` referencia `Serial` fora de qualquer guarda. Definido aqui em `lib/hal/posix/SerialProxyPosix.cpp`, que precisa ser unidade de traducao propria por causa do `#define Serial` no fim do `Logging.h`. O Kindle tem o mesmo problema latente. |
-| **POSIX** | A guarda de `HalGPIO.h`, `HalSystem.cpp` e `HalGPIO.cpp` dizia `FREEINK_DEVICE_KINDLE` onde queria dizer `FREEINK_MCU_HOSTED`. Funcionava por so existir um alvo hospedado. |
-| **Android** | Pilha de 8MB na thread do leitor. Nao se aplica ao Kindle, onde o `main()` roda na thread principal do processo, que ja tem pilha grande. Mas a LICAO se aplica: qualquer alvo hospedado que crie a thread do leitor a mao precisa dimensiona-la. |
-| **Upstream** | O `switch` de corpo para ID em `CrossPointSettings.cpp` e espelho manual de `BUILTIN_READER_POINT_SIZES`. Um tamanho que exista numa lista e falte na outra cai no `default` e desenha no corpo errado sem reclamar. |
-| **Upstream** | `build-font-ids.sh` tinha um bloco ruby copiado por tamanho. Virou laco quando a lista passou de quatro para seis e a copia ficou maior que a logica. |
+Things the Kindle solved that need rethinking here, not copying:
 
-## Armadilhas de build que valem para os dois
+- **`arduino-shim/WiFi.h`** reads the SSID through wireless extensions
+  (`SIOCGIWESSID`) and RSSI through `/proc/net/wireless`. Wireless extensions
+  are dead on modern Android and `/proc/net/wireless` is not readable by an
+  ordinary app. Here the network state comes from `ConnectivityManager`, which
+  additionally distinguishes "has an address" from "has internet".
+- **TLS** is unimplemented in the shim. On the Kindle that rules out OPDS and
+  KOReader sync in practice. Here it crosses into Kotlin, where the system trust
+  store already exists.
+- **`ESP.restart()`** re-execs the process on the Kindle. On Android restarting
+  a process is not the same as restarting the Activity, and the right semantics
+  are still undecided.
 
-- **`FREEINK_MCU_HOSTED` e DERIVADO dentro do `BoardConfig.h`.** Testa-lo antes
-  de incluir aquele header le zero e escolhe o ramo errado, e o erro so aparece
-  dezenas de linhas depois como `undeclared identifier`. Com
-  `FREEINK_DEVICE_KINDLE` isso nao acontecia porque aquele vem da linha de
-  comando. Mordeu em `HalGPIO.h` e de novo em `CrossPointSettings.h`.
-- **Um `-D` com aspas nao sobrevive a ser escrito dentro de um script gerado.**
-  O shell interno come as aspas e a macro vira identificador. Defines vao num
-  header com `-include`.
-- **Num build incremental do Gradle a tarefa de strip pode nao rerodar**, e o
-  `.so` vai inteiro para o APK. O sintoma e o APK saltar de 14MB para 22MB.
-  Build limpo resolve, e a diferenca de tamanho e o sintoma a procurar.
+## Build traps that hold for both
+
+- **A quoted `-D` does not survive being written into a generated script.** The
+  inner shell eats the quotes and the macro becomes an identifier. Defines go in
+  a header via `-include`.
+- **In an incremental Gradle build the strip task may not re-run**, and the
+  unstripped `.so` goes into the APK. The symptom is the APK jumping from 14MB
+  to 22MB. A clean build fixes it, and the size difference is the symptom to
+  look for.

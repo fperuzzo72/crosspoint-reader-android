@@ -1,138 +1,140 @@
-# CrossPoint Reader no Bigme HiBreak Pro
+# CrossPoint Reader on the Bigme HiBreak Pro
 
-Um porte do [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader)
-para rodar como aplicativo Android num telefone e-ink, em vez de como firmware
-num microcontrolador.
+A port of [CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader)
+to run as an ordinary Android application on an e-ink phone, instead of as
+firmware on a microcontroller.
 
-**Funciona no aparelho.** Lê EPUB, navega catálogos OPDS por HTTPS, instala
-fontes do cartão, e responde a toque. Não é uma prova de conceito.
+**It runs on the device.** It reads EPUBs, browses OPDS catalogues over HTTPS,
+loads fonts from storage, and answers touch. This is not a proof of concept.
 
 ---
 
-## O que é isto
+## What this is
 
-O CrossPoint é firmware de e-reader escrito para aparelhos ESP32, onde ele é
-dono da máquina inteira: 380KB de RAM, um painel e-ink no barramento SPI, e
-nenhum sistema operacional entre ele e o hardware.
+CrossPoint is e-reader firmware written for ESP32 devices, where it owns the
+whole machine: 380KB of RAM, an e-ink panel on a SPI bus, and no operating
+system between it and the hardware.
 
-Um Bigme HiBreak Pro não é isso. É um telefone Android com kernel, userspace e
-interface próprios, onde o painel pertence ao sistema. Então este porte não
-substitui nada: ele roda como aplicativo, ao lado de tudo o mais.
+A Bigme HiBreak Pro is not that. It is an Android phone with its own kernel,
+userspace and UI, where the panel belongs to the system. So this port replaces
+nothing: it runs as an app, alongside everything else.
 
-O motor de leitura não mudou. O que se escreveu aqui foi a camada de baixo.
+The reading engine is unchanged. What was written here is the layer underneath.
 
-### O aparelho, medido
+### The device, as measured
 
 | | |
 | --- | --- |
-| Modelo | Bigme HiBreak Pro, build `Bigme_HiBreak_V1.0_20260306` |
+| Model | Bigme HiBreak Pro, build `Bigme_HiBreak_V1.0_20260306` |
 | Android | 14 (SDK 34) |
 | SoC | MediaTek MT6877, arm64-v8a |
-| Painel | 824x1648, 300 dpi, rotação física 270 |
-| Recorte | notch de 49px no topo |
+| Panel | 824x1648, 300 dpi, physical rotation 270 |
+| Cutout | 49px notch at the top |
 
 ---
 
-## Instalação
+## Building
 
-Não há release ainda. Para construir:
+There is no release yet.
 
 ```bash
+scripts/fetch-thirdparty.sh   # once: dependencies platformio.ini declares
 ./gradlew :app:assembleDebug
 ```
 
-Precisa de JDK 17, Android SDK 35 e NDK. O `scripts/fetch-thirdparty.sh` tem de
-rodar uma vez antes, porque busca as dependências que o `platformio.ini` declara
-e que o PlatformIO resolveria sozinho.
+Needs JDK 17, Android SDK 35 and the NDK. The fetch step exists because outside
+PlatformIO nobody resolves `lib_deps`, and 73 files do not compile without
+ArduinoJson alone.
 
-Na primeira abertura o aplicativo pede **acesso a todos os arquivos** e fecha.
-Conceda nos Ajustes e abra de novo. Sem isso ele não sobe, e isso é deliberado:
-a raiz do armazenamento é lida uma vez, dentro do `setup()`, então subir com a
-pasta errada e conceder depois deixaria o leitor preso nela.
+On first launch the app asks for **All files access** and exits. Grant it in
+Settings and open it again. It refuses to start without it, deliberately: the
+storage root is read once, inside `setup()`, so starting with the wrong folder
+and granting afterwards would leave the reader stuck on it until the process
+dies, which is worse than not starting because it looks like it worked.
 
-### O layout no cartão
+### Layout on storage
 
 ```
 /sdcard/CrossPoint/
-  books/                  os EPUB; o navegador abre direto aqui
-  fonts/                  fontes .cpfont por família
-  .crosspoint/            cache por livro, progresso, marcadores
-  crosspoint.log          log da execução atual
-  crosspoint.log.anterior log da execução anterior
+  books/                  the EPUBs; the file browser opens here
+  fonts/                  installable .cpfont families, one folder each
+  .crosspoint/            per-book cache, reading progress, bookmarks
+  crosspoint.log          current run
+  crosspoint.log.previous the run before it
 ```
 
 ---
 
-## O que funciona
+## What works
 
-- **Leitura de EPUB**, com o motor e o toolkit de UI do CrossPoint intactos.
-- **Toque**: toque, toque longo e swipe, classificados pelo `GestureDetector` do
-  Android e entregues ao C++ já prontos.
-- **OPDS sobre HTTPS**, incluindo redirecionamento e download para `books/`.
-- **Fontes**: 14, 16, 18 e 20 embutidas em Noto Serif e Noto Sans, mais
-  famílias instaláveis em `fonts/`.
-- **Símbolos**: setas, marcadores de lista, formas geométricas e os operadores
-  matemáticos que aparecem em texto corrido.
-- **Log em arquivo**, legível por qualquer gerenciador de arquivos, sem cabo.
+- **EPUB reading**, with CrossPoint's engine and UI toolkit untouched.
+- **Touch**: taps, long presses and swipes, classified by Android's
+  `GestureDetector` and handed to C++ already decided.
+- **OPDS over HTTPS**, including redirects and downloads into `books/`.
+- **File transfer over Wi-Fi**: a web UI for uploading books from a browser.
+- **Fonts**: 14, 16, 18 and 20 built in, in Noto Serif and Noto Sans, plus
+  families installable into `fonts/`.
+- **Symbols**: arrows, list bullets, geometric shapes and the mathematical
+  operators that appear in running text.
+- **A log file**, readable by any file manager, with no cable and no adb.
 
-## O que não funciona
+## What does not
 
-Listado porque um porte que esconde as bordas desperdiça a tarde do próximo.
+Listed because a port that hides its edges wastes the next person's afternoon.
 
-- **O servidor web de transferência de arquivos não sobe.** O `WebServerPosix`
-  recusa iniciar se alguma rota registrar handler de upload, e o multipart nunca
-  foi implementado no porte Kindle, de onde a camada POSIX veio. Num telefone dá
-  para contornar com qualquer app de transferência.
-- **O nome da rede não aparece.** Lê-lo exige permissão de localização no
-  Android 10+, porque o SSID identifica onde você está. Mostramos IP e estado de
-  conectado, que não exigem permissão nenhuma.
-- **OTA e flash de firmware** não se aplicam e deviam estar escondidos por
-  capacidade em vez de aparecerem no menu.
+- **The network name is not shown.** Reading the SSID needs location permission
+  on Android 10+, because it identifies where you are. The status bar shows the
+  IP and the connected state, which need no permission at all.
+- **OTA and firmware flashing** do not apply here and should be hidden by
+  capability rather than appearing in the menu.
+- **Wi-Fi association flows** are the system's job. The selection screen now
+  resolves itself instead of opening an empty list, but the menu entries that
+  lead there are still worth hiding.
 
 ---
 
-## Como foi feito
+## How it was done
 
-O caminho está em [docs/android-port.md](docs/android-port.md), com os números
-medidos em cada etapa. O resumo:
+The path is in [docs/android-port.md](docs/android-port.md), with the numbers
+measured at each step. The short version:
 
 | | |
 | --- | --- |
-| Censo de portabilidade | 61% → 100% |
-| Referências indefinidas no link | 20 → 0 |
-| `libcrosspoint.so` | 9,5 MB, arm64-v8a |
+| Portability census | 61% → 100% |
+| Undefined references at link | 20 → 0 |
+| `libcrosspoint.so` | 9.5 MB, arm64-v8a |
 | APK | 16 MB |
 
-A camada POSIX inteira (`String`, `millis()`, FreeRTOS sobre pthreads, SdFat
-sobre POSIX, sockets, MD5, base64) veio pronta do
-[porte Kindle](https://github.com/fperuzzo72/crosspoint-reader-kindle), que já
-havia tirado o CrossPoint do ESP32. Sem ele este porte teria sido outra ordem de
-grandeza de trabalho.
+The whole POSIX layer (`String`, `millis()`, FreeRTOS over pthreads, SdFat over
+POSIX, sockets, MD5, base64) came ready from the
+[Kindle port](https://github.com/fperuzzo72/crosspoint-reader-kindle), which had
+already taken CrossPoint off the ESP32. Without it this port would have been
+another order of magnitude of work.
 
-### A fronteira com o Kotlin
+### The Kotlin boundary
 
-O Kotlin fica com o que o Android faz melhor: ciclo de vida, a Surface, a
-classificação de gestos com os limiares do próprio aparelho, o armazenamento, e
-TLS. O C++ fica com o CrossPoint inteiro, que não sabe nada disso.
+Kotlin keeps what Android does better: the activity lifecycle, the Surface,
+gesture classification with the device's own thresholds, storage, and TLS. C++
+keeps the whole of CrossPoint, which knows none of that.
 
 ```
 Kotlin -> C++    nativeSetSurface, nativeGesture, nativeContact,
                  nativeSetStorageRoot, nativeStart
-C++ -> Kotlin    HTTP (CrossPointHttp), estado da rede (CrossPointNet)
+C++ -> Kotlin    HTTP (CrossPointHttp), network state (CrossPointNet)
 ```
 
-A segunda direção é a mais delicada: o C++ chama a JVM de dentro do loop do
-leitor, que é uma thread nativa. Ver `lib/hal/android/JniBridge.h` para as duas
-regras que isso impõe.
+The second direction is the delicate one: C++ calls into the JVM from inside the
+reader loop, which runs on a native thread. See `lib/hal/android/JniBridge.h`
+for the two rules that imposes.
 
-### O que voltar para o porte Kindle
+### What should go back to the Kindle port
 
-Em [docs/backport-to-kindle.md](docs/backport-to-kindle.md), com cada achado
-marcado como POSIX (vale nos dois), Android (fica aqui) ou upstream (é bug do
-CrossPoint).
+In [docs/backport-to-kindle.md](docs/backport-to-kindle.md), each finding marked
+POSIX (applies to both), Android (stays here) or upstream (it is a CrossPoint
+bug).
 
 ---
 
-## Licença
+## License
 
-MIT, como o CrossPoint e o freeink-sdk. Ver [LICENSE](LICENSE).
+MIT, like CrossPoint and the freeink-sdk. See [LICENSE](LICENSE).

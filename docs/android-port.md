@@ -1,536 +1,328 @@
-# CrossPoint no Bigme HiBreak Pro
+# CrossPoint on the Bigme HiBreak Pro
 
-Alvo: **Bigme HiBreak Pro**, telefone e-ink com Android. Tudo abaixo foi lido
-do aparelho, não inferido.
+Port target: **Bigme HiBreak Pro**, an Android e-ink phone. Everything below was
+read from the device, not inferred.
 
 | | |
 | --- | --- |
-| Modelo | Bigme HiBreak (`ro.product.model`), build `Bigme_HiBreak_V1.0_20260306` |
+| Model | Bigme HiBreak, build `Bigme_HiBreak_V1.0_20260306` |
 | Android | 14, SDK 34 |
 | SoC | MediaTek MT6877, arm64-v8a |
-| Painel | **824x1648**, densidade **300 dpi** |
-| Rotação física | `phy_rotation = 270`, e o Android confirma: `installOrientation ROTATION_270` |
-| Recorte | notch de 49px no topo, `Rect(375, 0 - 450, 49)` |
-| Escala | `density=1.875`, ou seja 439 x 879 dp lógicos |
-| Prazo de apresentação | `presDeadline 31000000` (31ms), não os 16ms de um LCD |
-| Série | `B651DNW2GG1C006000099` |
-| OEM por trás | xrztech (`ro.build.locale.area`) |
+| Panel | **824x1648**, density **300 dpi** |
+| Physical rotation | `phy_rotation = 270`, and Android agrees: `installOrientation ROTATION_270` |
+| Cutout | 49px notch at the top, `Rect(375, 0 - 450, 49)` |
+| Scale | `density=1.875`, so 439 x 879 logical dp |
+| Presentation deadline | `presDeadline 31000000` (31ms), not an LCD's 16ms |
 
-Duas consequências imediatas da geometria:
+This is a cousin of the Kindle port, not of the M5PaperS3 one. Both take
+CrossPoint off the ESP32 and onto a machine that already has an operating
+system. The difference is that on a Kindle the process talks to the kernel's
+EPDC; here it hands pixels to SurfaceFlinger like any other app, and the
+vendor's framework decides the waveform.
 
-- **824 / 8 = 103 exato.** O renderer do CrossPoint trabalha com planos de 1bpp
-  e `DISPLAY_WIDTH_BYTES = WIDTH / 8`. Largura múltipla de 8 evita a classe de
-  bug de padding por linha de cara. Cada plano dá 103 x 1648 = 169.744 bytes.
-- **A dpi física reportada é lixo:** `density 300 (188.554 x 667.61) dpi`. Um
-  painel e-ink tem pixel quadrado; 188 na horizontal contra 667 na vertical é
-  firmware reportando tamanho físico errado. O que vale é a densidade lógica
-  300 com escala 1.875. Não usar a dpi física para nada.
-- **O notch come os 49px do topo.** O CrossPoint desenha barra de status
-  exatamente ali. Vai precisar respeitar o inset, ou o relógio fica embaixo da
-  câmera.
-- **`installOrientation ROTATION_270`.** O eixo nativo do painel está a um
-  quarto de volta do lógico. Pelo caminho Android padrão o sistema resolve; se
-  algum dia formos para o buffer ION do `handwrittenservice`, isso volta cru,
-  que foi precisamente o que o porte Kindle encontrou.
-- **300 dpi contra os ~212 do X4.** A UI do CrossPoint foi desenhada para
-  painéis bem menos densos. Em 300 dpi tudo sai fisicamente menor, e as fontes
-  são bitmap (EpdFont), não vetoriais. Ou se geram tamanhos maiores, ou se
-  renderiza em escala. Isto é trabalho de UI, não de porte, mas é melhor saber
-  agora.
+Four consequences of the geometry:
 
-Este porte é primo do porte Kindle, não do porte M5PaperS3. Os dois tiram o
-CrossPoint do ESP32 e o colocam num sistema operacional que já é dono da
-máquina. A diferença é que no Kindle o processo fala com o painel através do
-EPDC do kernel, e aqui ele fala com o SurfaceFlinger como qualquer aplicativo
-Android, com o framework do fabricante decidindo o waveform.
+- **824 / 8 = 103 exactly.** The renderer works in 1bpp planes with
+  `DISPLAY_WIDTH_BYTES = WIDTH / 8`. A width that is a multiple of 8 avoids the
+  row-padding class of bug outright. Each plane is 103 x 1648 = 169,744 bytes.
+- **The reported physical dpi is garbage:** `density 300 (188.554 x 667.61) dpi`.
+  An e-ink panel has square pixels; 188 horizontal against 667 vertical is
+  firmware reporting the wrong physical size. What counts is the logical density
+  300 with scale 1.875. Do not use the physical dpi for anything.
+- **The notch eats the top 49px.** CrossPoint draws its own status bar there, so
+  the app goes fullscreen under the cutout and the reader never learns it
+  exists. Reclaiming those pixels would need
+  `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES` and teaching CrossPoint the inset.
+- **`installOrientation ROTATION_270`.** The panel's native axis is a quarter
+  turn from the logical one. On the ordinary Android path the system resolves
+  it; it would come back raw only on the ION overlay path.
 
-## Ponto de partida, medido
+## Where the port cuts
 
-Censo com o clang do NDK (`aarch64-linux-android28-clang++`, arm64-v8a),
-`-fsyntax-only` sobre cada `.cpp` de `src/`, `lib/` e `freeink-sdk/libs`:
+The structural finding, inherited from the Kindle port: **no file outside
+`lib/hal/` includes `EInkDisplay.h`**. The HAL is a real seam. That reframed the
+job from "286k lines coupled to the ESP32" into "re-implement the HAL, and reuse
+the POSIX shim somebody already wrote".
 
-| Depois de | Compila | Causa dominante restante |
+## The census
+
+Running the NDK's clang (`aarch64-linux-android28-clang++`, arm64-v8a) with
+`-fsyntax-only` over every `.cpp` in `src/`, `lib/` and `freeink-sdk/libs`:
+
+| After | Compiling | Dominant remaining cause |
 | --- | --- | --- |
-| primeira rodada, camada POSIX do Kindle herdada | 61% (144/235) | `ArduinoJson.h` (73 arquivos) |
-| buscar as dependencias declaradas | 94% (221/235) | `CROSSPOINT_VERSION` (6) |
-| shims, o conserto do `RecentBook` e a flag do ArduinoJson | **100% (221/221)** | nenhuma |
+| first run, with the Kindle's POSIX layer inherited | 61% (144/235) | `ArduinoJson.h` (73 files) |
+| fetching the declared dependencies | 94% (221/235) | `CROSSPOINT_VERSION` (6) |
+| shims, the `RecentBook` fix, the ArduinoJson flag | **100% (221/221)** | none |
 
-Duas ressalvas, porque um censo diz menos do que parece. Ele responde "este
-arquivo compilaria", nao "isto linka" e muito menos "isto roda". E o
-denominador caiu de 235 para 221 porque `FreeInkDisplay/src` saiu da conta:
-sao os `PanelDriver` e o `EpdBus`, que falam com um painel cru por SPI ou i80,
-e aqui nao ha painel cru. O porte Kindle excluiu pelo mesmo motivo, e foi o
-maior passo unico do `trylink` dele.
+For comparison, the Kindle port's first run was 25% and it took six steps to
+reach 82%. The entire difference is the POSIX layer arriving ready.
 
-O proximo numero que importa e o de referencias indefinidas, nao o de arquivos
-que compilam.
+Two caveats, because a census says less than it looks. It answers "would this
+file compile", not "does this link" and certainly not "does this run". And the
+denominator fell from 235 to 221 because `FreeInkDisplay/src` left the count:
+those are the `PanelDriver` implementations and the `EpdBus` they talk through,
+and there is no raw panel here.
 
-## O link
+83 of the 91 first-run failures were an unvendored third-party header, not a
+portability problem. The only real code finding was `RecentBook`: `HomeActivity.h`
+forward-declared `struct RecentBook;` and then had a `std::vector<RecentBook>`
+as a member. Instantiating a vector's members with an incomplete type is
+ill-formed. The ESP32's libstdc++ accepts it, the NDK's libc++ refuses, and
+libc++ is right. That is a CrossPoint bug, not an Android one.
 
-`tools/android/trylink.sh`, adaptado do `trylink.sh` do porte Kindle, com as
-licoes duras dele intactas: invalidacao de objeto por qualquer header, exclusao
-dos `.c` que um wrapper ja inclui, e arquivamento por biblioteca em vez de
-objetos soltos (tres copias de miniz nesta arvore tornam isso obrigatorio).
+## The link
 
-| Depois de | Indefinidas |
+`tools/android/trylink.sh`, adapted from the Kindle port's, with its hard-won
+lessons intact: object invalidation on any header change, exclusion of the `.c`
+files a wrapper already includes, and archiving per library rather than linking
+loose objects.
+
+| After | Undefined |
 | --- | --- |
-| primeira tentativa | 20 |
-| `third_party/*.cpp` no link e os `.inl` na busca | 18 |
-| `-lz` (o Android traz zlib; o PNGdec a usa) | **14** |
+| first attempt | 20 |
+| `third_party/*.cpp` in the link and the `.inl` files in the fetch | 18 |
+| `-lz` (Android ships zlib; PNGdec uses it) | **14** |
 
-Para comparacao, o porte Kindle comecou em 255 e desceu em cinco degraus ate 92
-antes de chegar a zero.
+The Kindle port started at 255 and came down in five steps to 92 before
+reaching zero.
 
-**As 14 que restam sao uma coisa so:**
+**The remaining 14 were one thing:** `KindleFrameBuffer` (11 methods) and
+`KindleTouchDevice` (3). Nothing scattered, no networking, no filesystem, no
+FreeRTOS. That list was not a list of problems; it was the specification for
+`lib/hal/android/`.
 
-```
-crosspoint::kindle::KindleFrameBuffer     11 metodos
-  begin, display, displayStart, waitComplete, stageFrame,
-  stageGrayOverlay, refresh, reopen, panelContentWasReplaced,
-  deepSleep, ~KindleFrameBuffer
-crosspoint::kindle::KindleTouchDevice      3 metodos
-  begin, update, ~KindleTouchDevice
-```
+Two build traps worth recording:
 
-Nada espalhado, nada de rede, nada de sistema de arquivos, nada de FreeRTOS.
-A `lib/hal/HalDisplay.cpp` e a `HalGPIO.cpp` desta arvore ainda sao as do
-Kindle e chamam o backend de la. Essa lista nao e uma lista de problemas: e a
-**especificacao do `lib/hal/android/`**. Implementar esses 14 metodos e o porte
-linkar sao a mesma frase.
+- **A quoted `-D` does not survive being written into a generated script.** The
+  inner shell eats the quotes and `CROSSPOINT_VERSION` becomes an identifier
+  rather than a string. Defines now come from a generated header via `-include`.
+- **A file that fails to compile hides references rather than creating them.**
+  When `CROSSPOINT_VERSION` broke four files, the total stayed at 20 and the set
+  changed completely. The number means nothing unless you know which objects are
+  missing.
 
-Duas armadilhas de build que custaram tempo e ficam registradas:
+## The hosted HAL
 
-- **`-D` com aspas nao sobrevive a ser escrito dentro do `cc-one.sh`**: o shell
-  interno come as aspas e `CROSSPOINT_VERSION` vira identificador em vez de
-  string. Os defines agora saem num header gerado com `-include`, que e como o
-  porte Kindle ja fazia.
-- **Um arquivo que nao compila esconde referencias em vez de criar.** Quando o
-  `CROSSPOINT_VERSION` quebrou quatro arquivos, o total continuou 20 e o
-  conjunto mudou inteiro. O numero so significa alguma coisa quando se sabe
-  quais objetos faltam, entao conferir isso faz parte de ler a medida.
+Writing a `HalDisplayAndroid.cpp` next to `HalDisplayKindle.cpp` would have
+duplicated 345 lines. The two devices share nothing in hardware, but HalDisplay
+needs the same sequence from both (compose, stage the base, paint the gray
+planes over it, present once), and the Kindle file was already written against
+that shape.
 
-Para comparação, a primeira rodada do porte Kindle deu 25% e ele levou seis
-etapas para chegar a 82%. A diferença é toda a camada POSIX que veio pronta.
+So the guard stopped naming a device and started naming the family BoardConfig
+already derived:
 
-Das 91 falhas da primeira rodada, 83 eram header de terceiro não vendorizado e
-nenhuma era problema de portabilidade. As oito restantes viraram seis consertos,
-listados e classificados em [backport-to-kindle.md](backport-to-kindle.md).
-
-O único achado de código real foi o `RecentBook`: `HomeActivity.h` declarava
-`struct RecentBook;` adiante e depois tinha um `std::vector<RecentBook>` como
-membro. Instanciar os membros de um `vector` com tipo incompleto é mal formado.
-O libstdc++ do ESP32 aceita, o libc++ do NDK recusa, e o libc++ está certo. Isso
-é bug do CrossPoint, não do Android.
-
-## Os headers que faltam
-
-Todos são dependências já declaradas no `platformio.ini`, todos são C ou C++
-portável, nenhum foi buscado:
-
-| Header | Biblioteca | Versão declarada | Arquivos |
-| --- | --- | --- | --- |
-| `ArduinoJson.h` | bblanchon/ArduinoJson | 7.4.2 | 73 |
-| `PNGdec.h` | bitbank2/PNGdec | 1.1.6 | 2 |
-| `JPEGDEC.h` | bitbank2/JPEGDEC | pin de commit | 2 |
-| `qrcode.h` | ricmoo/QRCode | 0.0.1 | 1 |
-| `pngle.h`, `stb_truetype.h` | vendorizadas em outro lugar | | 2 |
-
-`ArduinoJson` sozinho levou o censo de 61% para 94%. Todos estão presos por
-versão em [`scripts/fetch-thirdparty.sh`](../scripts/fetch-thirdparty.sh), que é
-o que o doc do porte Kindle dizia valer mais do que qualquer shim a mais: virar
-a tabela de busca manual num passo de dependência de verdade.
-
-Uma armadilha do ArduinoJson que custou o último arquivo: ele só registra o
-conversor para `String` quando detecta ambiente Arduino, olhando por `ARDUINO`.
-Com o `String` vindo do nosso shim a detecção não dispara, ele cai no
-`std::string` e todo `as<String>()` falha. A flag é
-`ARDUINOJSON_ENABLE_ARDUINO_STRING=1`.
-
-## O painel: o que a Bigme expõe
-
-A Bigme não publica SDK. O framework interno chama-se `xrz`. Um levantamento
-por engenharia reversa de terceiros (`imedwei/inksdk`) o descreveu num **HiBreak
-Plus**; **confirmamos no nosso Pro** que é o mesmo framework, e encontramos mais
-do que aquele material descrevia, porque ele olhou o caminho da caneta e não o
-do sistema.
-
-### O que está no aparelho, confirmado
-
-```
-handwrittenservice  (PID 1066, root)  [com.xrz.IHandwrittenService]
-/system/framework/xrz.framework.server.jar          114.534 bytes, world-readable
-```
-
-O jar contém só o lado servidor (`DisplayPolicyService`,
-`DisplayPolicyController`, `AppFreezeService`, `SplitScreenService`,
-`DatabaseHelper`). As classes `xrz.framework.manager.*`, incluindo a
-`EinkRefreshMode`, são apenas **referenciadas** aqui: elas moram no
-`framework.jar` do boot classpath, que ainda não foi puxado.
-
-Superfície de API lida das strings do dex, bem maior que a publicada:
-
-```
-setRefreshMode / getRefreshMode              setLayerRefreshMode
-setRefreshModeForPackage(packageName, ...)   getRefreshModeForPackage
-setRefreshFrequency / setRefreshFrequencyForPackage
-setIsRefreshSetting / setIsRefreshSettingForPackage
-forceGlobalRefresh                           getEinkMode
-readWaveForm / readFactoryWaveForm           sendGlobalHandwrittenRequest
-```
-
-### A escada de modos
-
-Os valores saem das propriedades do sistema, que são as que o próprio aparelho
-usa:
-
-| Propriedade | Valor | Leitura |
-| --- | --- | --- |
-| `ro.vendor.xrz.default_refresh_mode` | 178 | padrão, texto e UI |
-| `sys.video_refresh_mode` | 179 | vídeo: o mais rápido, pior qualidade |
-| `sys.comic_refresh_mode` | 180 | quadrinhos: tons de cinza |
-| `sys.maga_refresh_mode` | -2147483471 | revista |
-| `vendor.xrz.logo_refresh_mode` | -2147483471 | logo do boot |
-| `vendor.xrz.bootanimation_refresh_mode` | 180 | animação de boot |
-| `vendor.xrz.force_global_refresh_mode` | -1 | desligado, e **gravável** |
-
-`-2147483471` é `0x80000000 | 177`. Então **o inteiro carrega flag no bit
-alto**, não é enum simples, e os modos base se agrupam em 177, 178, 179, 180.
-
-**Hipótese de mapeamento**, ainda não verificada no painel:
-
-| CrossPoint | Bigme | Por quê |
-| --- | --- | --- |
-| `FULL_REFRESH` | `0x80000000 \| 177` | o que revista e logo usam: melhor qualidade |
-| `HALF_REFRESH` | 178 | o padrão de texto e UI |
-| `FAST_REFRESH` | 179 | o de vídeo: mais rápido |
-| imagens | 180 | o de quadrinhos: cinza |
-
-### A descoberta que pode dispensar API nenhuma
-
-O `DatabaseHelper` do jar carrega esta tabela:
-
-```sql
-CREATE TABLE policy_org (
-  package_name text, refresh_mode integer default '-1',
-  refresh_frequency integer, app_contrast integer, app_anti_flicker integer,
-  app_anti_alias integer, app_text_enhance integer, app_dark_level integer,
-  app_color_enhance integer, app_brightness_level integer,
-  app_auto_clean integer, app_color_mode integer, app_scroll_flip integer,
-  app_dpi integer, ... )
-```
-
-**O sistema já guarda modo de refresh por aplicativo.** É isso que o
-`com.xrz.sys.control` (rodando, em `/data/app`) expõe ao usuário. Ou seja: para
-a v1, provavelmente não precisamos de reflexão, nem de JNI, nem de API nenhuma.
-O usuário escolhe o modo do CrossPoint no painel de controle do próprio
-aparelho, e o sistema aplica. A API programática vira otimização, não
-requisito.
-
-**Decisão de projeto:** a v1 não usa nada disso. Sai pelo caminho Android
-padrão e deixa o sistema decidir o refresh, que é o que ele já faz para
-qualquer aplicativo que nunca pensou no assunto. O `XrzEinkManager` é a saída
-de emergência se a cadência incomodar, e é uma chamada reflexiva de distância.
-A HAL já define os três modos, então ligar é ligar, não reprojetar.
-
-Um aviso do material levantado que vale guardar: no Bigme os dois compositores
-coexistem, e árvore de views repintando em cadência alta custa caro (1062ms p95
-a 30Hz). Um leitor que repinta por virada de página é o perfil bom desse
-hardware, não o ruim.
-
-## O adb deste aparelho é instável
-
-Vale registrar porque custou tempo. A interface USB é correta (classe 255,
-subclasse 66, protocolo 1) e o adb acha o aparelho, mas a conexão cai depois de
-poucos comandos:
-
-```
-usb_osx.cpp:322  Add usb device B651DNW2GG1C006000099
-usb_osx.cpp:631  usb_read failed with status: e00002ed   <- kIOReturnNotResponding
-transport.cpp    connection terminated: read failed      <- em loop
-```
-
-O lado do Mac está inteiro; é o daemon do Android que larga a conexão. O
-contorno é não depender de sessões longas: um comando por invocação, com retry,
-e nada refeito. O jar de 114KB precisou de três tentativas.
-
-Para trabalho de verdade, a depuração sem fio (`adb pair` / `adb connect`)
-provavelmente vale mais do que insistir no cabo.
-
-### Ainda não puxado
-
-- `/system/framework/framework.jar`, onde moram `XrzEinkManager` e a
-  `EinkRefreshMode` com os valores nomeados. É grande, e sobre esta conexão vai
-  doer.
-
-## O que ainda não foi decidido
-
-- Pasta de ebooks sob scoped storage. É a parte que não vem de graça de lugar
-  nenhum, e provavelmente o maior item de design do porte.
-- Ciclo de vida: o CrossPoint tem um loop principal que presume ser dono da
-  máquina; uma Activity é pausada, morta e recriada.
-- O que compilar fora por capability: servidor web, modo AP, OTA, flasher,
-  Calibre. Tudo redundante num telefone.
-
-
-## O backend, e o refactor que ele forcou
-
-Escrever um `HalDisplayAndroid.cpp` ao lado do `HalDisplayKindle.cpp` teria
-duplicado 345 linhas. Os dois aparelhos nao tem nada em comum no hardware, mas
-o HalDisplay precisa da mesma sequencia dos dois (compoe, encena a base, pinta
-os planos de cinza por cima, apresenta uma vez), e o arquivo do Kindle ja
-estava escrito contra essa forma.
-
-Entao a guarda deixou de ser `FREEINK_DEVICE_KINDLE` e passou a ser
-`FREEINK_MCU_HOSTED`, que o BoardConfig ja derivava:
-
-| Antes | Agora | Linhas |
+| Before | Now | Lines |
 | --- | --- | --- |
 | `HalDisplayKindle.cpp` | `HalDisplayHosted.cpp` | 345 |
 | `HalGPIOKindle.cpp` | `HalGPIOHosted.cpp` | 206 |
 | `HalSystemKindle.cpp` | `HalSystemHosted.cpp` | 231 |
 
-`lib/hal/hosted/HostedPanel.h` escolhe o painel e o toque em tempo de
-compilacao. Sem classe base virtual de proposito: um binario por aparelho, e
-uma vtable so pagaria indirecao por uma decisao que o preprocessador ja tomou.
+`lib/hal/hosted/HostedPanel.h` picks the panel and the touch device at compile
+time. There is deliberately no virtual base class: one binary per device, and a
+vtable would only pay for indirection on a decision the preprocessor already
+made.
 
-O que e novo e especifico:
+Two design decisions worth stating:
 
-```
-lib/hal/hosted/HostedGray.{h,cpp}     expansao 1bpp->8bpp e overlay de cinza
-lib/hal/hosted/HostedTouch.h          Gesture, GestureResult, TouchTuning
-lib/hal/hosted/HostedPanel.h          o seletor
-lib/hal/android/AndroidPanel.{h,cpp}  ANativeWindow, 824x1648, RGBX_8888
-lib/hal/android/AndroidTouchDevice.*  caixa de correio, nao classificador
-lib/hal/android/Jni.cpp               as quatro travessias da fronteira
-```
+**Touch is not classified in C++.** On the Kindle the backend reads the raw
+evdev stream and decides what is a tap, a long press and a swipe, because
+nothing else will. On Android that piece already exists and is better than the
+one we would write: `GestureDetector` knows this device's slop and this system's
+long-press threshold. So classification stays in Kotlin and what crosses JNI is
+a finished gesture. `AndroidTouchDevice` is only the thread handoff.
 
-### Duas decisoes que valem registro
+**No surface is not an error.** An Activity is paused and destroyed out from
+under the process while the reader thread stays alive and painting. The composed
+frame survives in `stage` and is re-presented when the surface returns. That is
+the deep difference between this target and the other two, where the panel is
+always there.
 
-**O toque nao e classificado em C++.** No Kindle o backend le evdev cru e
-decide sozinho o que e toque, toque longo e swipe, porque ninguem mais vai
-fazer isso. No Android essa peca ja existe e e melhor do que a que
-escreveriamos: o `GestureDetector` conhece o slop do aparelho e os limiares do
-sistema. Entao a classificacao fica no Kotlin e o que atravessa o JNI e o
-gesto pronto. O `AndroidTouchDevice` e so o encaixe de threads.
+## The shared library
 
-**Sem superficie nao e erro.** Uma Activity e pausada e destruida sob os pes do
-processo, e a thread do CrossPoint continua viva e pintando. O quadro composto
-sobrevive em `stage` e e reapresentado quando a superficie volta. Esta e a
-diferenca de fundo entre este alvo e os outros dois, onde o painel esta sempre
-la.
+`cmake/android/CMakeLists.txt` builds for real with the NDK toolchain:
+`libcrosspoint.so`, ELF 64-bit aarch64, 9.5 MB, four JNI symbols exported and
+the rest hidden. That is stronger than the trylink: the trylink asks whether it
+would link, this linked.
 
-### O link
+Three things the CMake had to learn, all commented in the file:
 
-```
-0 referencias indefinidas
-```
+**Archive per library, do not link loose objects.** There are three copies of
+miniz in this tree, each with a config that prefixes only some of its symbols.
+PlatformIO never sees the problem because it archives each library: the linker
+then pulls a member only when it resolves something still undefined, and
+duplicates across archives are "first wins". The first version of this file
+linked loose and produced dozens of multiple-definition errors, exactly as the
+Kindle's `trylink.sh` comment warned.
 
-E aqui vale a mesma desconfianca que o resto deste documento: **linkar nao e
-funcionar.** O primeiro rename do `HalSystemKindle.cpp` para `Hosted` linkou
-perfeitamente enquanto levava junto `access("/mnt/us/crosspoint/crosspoint")` e
-uma leitura de bateria por `lipc-get-prop com.lab126.powerd`. Num HiBreak as
-duas falham em silencio e o medidor de bateria le 0. Foi separado por aparelho
-depois, mas o link nao teria reclamado nunca.
+**One copy of expat, not two.** CrossPoint and the SDK each vendor expat and
+both export the same unprefixed `XML_*`. The SDK's wins, for the same two
+reasons the Kindle port recorded: it carries a real `expat_config.h` instead of
+relying on build flags, and its include directory already comes first.
 
-## O .so existe
+**`-fvisibility=hidden`, and not for ABI hygiene.** In a *shared* library
+everything is exported by default, so nothing is dead and `--gc-sections`
+discards nothing. uzlib's checksum helpers are declared and called from a
+function nothing reaches, and without hidden visibility they surfaced as
+undefined references to code that never runs.
 
-`cmake/android/CMakeLists.txt` constroi de verdade, com o toolchain do NDK:
+### An upstream finding
 
-```
-libcrosspoint.so   ELF 64-bit LSB shared object, ARM aarch64
-                   41MB com simbolos, 7,9MB depois do strip
-                   4 simbolos JNI exportados, o resto escondido
-```
+`MySerialImpl` is declared in `lib/Logging/Logging.h` and **is not defined
+anywhere in this tree**: not the static member, not `write()`, not `flush()`,
+not `printf()`. The only member with a body is the inline `operator bool()`.
 
-Isto e mais forte que o trylink: o trylink pergunta "linkaria", isto linkou.
+That is not a port problem. `src/main.cpp:813` has `if (Serial && ...)` outside
+any guard, so the reference is always emitted. It is defined now in
+`lib/hal/posix/SerialProxyPosix.cpp`, which has to be its own translation unit:
+`Logging.h` ends with `#define Serial MySerialImpl::instance`, and including
+that header inside `ArduinoShim.cpp` turns its `HardwareSerial Serial;` into a
+redefinition with a different type.
 
-### O que o CMake teve de aprender
+## Networking
 
-Tres coisas, e as tres estao comentadas no arquivo porque nenhuma e obvia:
+The POSIX shim speaks HTTP over raw sockets and **refuses https explicitly**,
+with no silent downgrade. The refusal is correct (sending OPDS credentials in
+the clear would be worse than failing) but it rules out almost every real
+catalogue and KOReader sync.
 
-**Arquivar por biblioteca, nao linkar objetos soltos.** Ha tres copias de
-miniz nesta arvore, cada uma com uma config que prefixa so parte dos simbolos,
-e o resto colide. O PlatformIO nunca ve o problema porque arquiva cada
-biblioteca: o linker entao puxa um membro so quando ele resolve algo ainda
-indefinido, e duplicata entre arquivos e "o primeiro vence". A primeira versao
-deste CMakeLists linkava solto e produziu dezenas de erros de multipla
-definicao, exatamente como o comentario do `trylink.sh` do Kindle avisava.
+The two ways out were to embed mbedtls in C++ or to cross into Kotlin. We
+crossed: TLS already exists there, uses the *system* trust store (which the
+device keeps current, and which C++ would have to carry and let age along with
+the binary), honours proxies and VPNs, and costs no new dependency.
 
-**Uma copia de expat, nao duas.** O CrossPoint e o SDK vendorizam expat cada
-um e os dois exportam os mesmos `XML_*` sem prefixo. Vence o do SDK, pelos
-mesmos dois motivos que o porte Kindle registrou: carrega um `expat_config.h`
-de verdade em vez de depender de flags, e o include dele ja vem primeiro.
+This inverted the bridge for the first time. Until then Kotlin called C++ and
+every call arrived with a ready `JNIEnv`. Now C++ calls the JVM from inside the
+reader loop, which runs on a `std::thread` the JVM has never heard of. Hence
+`JniBridge`: the `JavaVM` cached in `JNI_OnLoad`, per-thread attach with detach
+only by whoever attached, and the application's class loader captured at load
+time. That last one is not fussiness: on a native attached thread `FindClass`
+resolves against the *system* class loader, which cannot see our classes.
 
-**`-fvisibility=hidden`, e nao por higiene de ABI.** Numa biblioteca
-COMPARTILHADA tudo e exportado por padrao, entao nada e morto e o
-`--gc-sections` nao descarta nada. Os helpers de checksum do uzlib
-(`uzlib_crc32`, `uzlib_adler32`) sao declarados e chamados de uma funcao que
-nada alcanca, e sem visibilidade escondida apareciam como referencia
-indefinida para codigo que nunca roda.
+Redirects stay with C++ on purpose. CrossPoint has its own logic in
+`set_redirection`, and two layers following the same 302 would lose the second
+one's headers.
 
-### Um achado upstream
+`ACCESS_FINE_LOCATION` is deliberately absent. Reading the SSID needs location
+permission on Android 10+. The shim's `SSID()` already returns empty outside
+wireless-extensions and `RSSI()` returns 0, so the bar shows the IP and the
+connected state without inventing a name.
 
-`MySerialImpl` e declarado em `lib/Logging/Logging.h` e **nao e definido em
-lugar nenhum desta arvore**: nem o membro estatico `instance`, nem `write()`,
-nem `flush()`, nem `printf()`. O unico membro com corpo e o `operator bool()`,
-inline no header.
+## The bug that cost the most, and how it was found
 
-Isso nao e do porte. `src/main.cpp:813` tem `if (Serial && ...)` fora de
-qualquer guarda, entao a referencia e emitida sempre. Esta definido agora em
-`lib/hal/posix/SerialProxyPosix.cpp`, que precisa ser unidade de traducao
-propria: o `Logging.h` termina com `#define Serial MySerialImpl::instance`, e
-incluir esse header dentro do `ArduinoShim.cpp` transforma o
-`HardwareSerial Serial;` de la em redefinicao com tipo diferente.
+Downloading a book over OPDS killed the app. No message, no error, nothing in
+the log: the process simply vanished.
 
-## O lado Kotlin
+**Three wrong hypotheses before the right one**, recorded because two of them
+became legitimate fixes without being the bug:
 
-```
-app/src/main/java/org/crosspoint/hibreak/
-  CrossPointNative.kt    as quatro travessias, e nada mais
-  ReaderActivity.kt      SurfaceView + GestureDetector
-app/src/main/AndroidManifest.xml
-cmake/android/CMakeLists.txt
-build.gradle.kts, settings.gradle.kts, app/build.gradle.kts
-```
+1. *"Android 11 closed NETLINK and getifaddrs cannot see the interfaces."*
+   False on this device, proved by a log printing both answers side by side:
+   `framework=1 getifaddrs=1`. The fix (using ConnectivityManager) stayed for a
+   different and good reason: it distinguishes "has an address" from "has
+   internet", and a captive portal gives the first and not the second.
+2. *"A pending JNI exception."* `GetStaticMethodID` with a wrong signature throws
+   `NoSuchMethodError` and leaves the exception pending; the next JNI call made
+   that way aborts the VM. A real crash path, fixed, not this crash.
+3. *"An `Error` escaping across the JNI boundary."* The bridge caught
+   `Exception`, which does not cover `OutOfMemoryError`. Also real, also fixed,
+   also not it.
 
-A Activity nao tem layout XML e nao tem view alguma alem da superficie. O
-CrossPoint desenha a interface dele do zero em 1bpp; qualquer widget Android
-aqui seria uma segunda interface disputando a mesma tela.
-
-Tres decisoes registradas no codigo:
-
-- **`surfaceDestroyed` chama `nativeSetSurface(null)` sincronamente.** Depois
-  que esse metodo retorna a superficie deixa de ser valida e a thread do leitor
-  continua rodando. O lado C++ toma o mesmo mutex da apresentacao, o que faz a
-  chamada esperar um paint em andamento terminar.
-- **A tela nao apaga.** Num e-ink isso custa quase nada, porque o painel so
-  consome ao mudar.
-- **O notch nao e tratado.** A tela vai inteira para baixo do recorte de 49px e
-  o leitor nao precisa saber que ele existe. Recuperar esses pixels exigiria
-  `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES` e ensinar o CrossPoint sobre o
-  inset.
-
-## Estado, sem arredondar
-
-| | |
-| --- | --- |
-| Censo | 100% (224/224) |
-| Trylink | 0 indefinidas |
-| `libcrosspoint.so` | **construido e verificado** |
-| APK | **nao construido** |
-| Rodando no aparelho | **nao** |
-
-O APK nao existe porque esta maquina nao tem JDK, nem Gradle, nem Android SDK.
-Os arquivos do Gradle estao escritos e nao foram executados nenhuma vez, o que
-quer dizer que podem ter erros bobos que so um build revela. O `.so`, esse sim,
-foi construido de verdade.
-
-## O bug que custou mais caro, e como ele foi achado
-
-O download de livros pelo OPDS fechava o aplicativo. Sem mensagem, sem erro, sem
-nada no log: o processo simplesmente sumia.
-
-**Três hipóteses erradas antes da certa**, e vale registrar as tres porque duas
-delas viraram consertos legitimos mesmo sem serem o bug:
-
-1. *"O Android 11 fechou o NETLINK e o getifaddrs nao enxerga as interfaces."*
-   Falso neste aparelho, provado por um log que imprimiu as duas respostas lado
-   a lado: `framework=1 getifaddrs=1`. O conserto (usar o ConnectivityManager)
-   ficou por outro motivo, que e bom: ele distingue "tem endereco" de "tem
-   internet", e um portal cativo da a primeira e nao a segunda.
-2. *"Excecao pendente no JNI."* O `GetStaticMethodID` com assinatura errada
-   lanca `NoSuchMethodError` e deixa a excecao pendente; a proxima chamada JNI
-   feita assim aborta a VM. Era um caminho de crash real e foi consertado, mas
-   nao era este crash.
-3. *"Um `Error` escapando pela fronteira JNI."* O bridge capturava `Exception`,
-   que nao cobre `OutOfMemoryError`. Tambem real, tambem consertado, tambem nao
-   era.
-
-**O que resolveu foi parar de deduzir.** Um handler de sinal registrando o
-sinal da morte deu os dois fatos que decidiram:
+**What solved it was to stop deducing.** A signal handler recording the killing
+signal gave the two facts that decided it:
 
 ```
-*** morreu com sinal 11 (Segmentation fault), endereco 0xe5c ***
+*** died with signal 11 (Segmentation fault), address 0xe5c ***
 ```
 
-- **SIGSEGV e nao SIGABRT** eliminou de uma vez as duas familias que eu vinha
-  perseguindo: nao era a runtime reclamando de JNI nem falta de memoria na ART.
-- **O ponto da morte MUDAVA entre execucoes.** Uma vez dentro do `finish()` do
-  JNI, outra antes dele chegar. Ponteiro nulo fixo nao anda pelo codigo;
-  estouro de pilha anda, porque o endereco que falta depende da profundidade em
-  que se estava.
+- **SIGSEGV and not SIGABRT** eliminated both families at once: it was not the
+  runtime complaining about JNI, nor an ART allocation failure.
+- **The point of death MOVED between runs.** Once inside the JNI `finish()`,
+  once before reaching it. A fixed null pointer does not walk around the code;
+  a stack overflow does, because the address that faults depends on how deep you
+  were.
 
-A thread do leitor subia com `std::thread`, que no bionic pega o padrao de
-**1MB**. E pouco para esta arvore: no ESP32 as tarefas tem pilha dimensionada a
-mao justamente porque o parser de XML, o layout de capitulo e a cadeia de render
-descem fundo, e o proprio CrossPoint carrega um `TaskWatchdog` e medicoes de
-high water mark por causa disso. Agora sao **8MB**, via
-`pthread_attr_setstacksize`, que e o que a thread principal de um processo
-Android ja tem.
+The reader thread was started with `std::thread`, which on bionic takes the
+**1MB** default. That is not enough for this tree: on the ESP32 tasks have
+hand-sized stacks precisely because the XML parser, chapter layout and the
+render chain go deep, and CrossPoint itself carries a `TaskWatchdog` and high
+water mark measurements because of it. It is **8MB** now, via
+`pthread_attr_setstacksize`, which is what a process's main thread on Android
+already has.
 
-### O que fica de metodo
+### What stays as method
 
-O handler de sinal fica no binario para sempre. Ele transforma "o aplicativo
-sumiu" em "SIGSEGV no endereco tal", e essa diferenca decidiu um bug que tres
-rodadas de leitura de codigo nao tinham decidido.
+The signal handler stays in the binary permanently. It turns "the app vanished"
+into "SIGSEGV at address such-and-such", and that difference decided a bug three
+rounds of code reading had not.
 
-O log em arquivo tambem, e com uma lição: ele era aberto TRUNCANDO a cada
-abertura do aplicativo. O caso em que o log importa e quando o processo morre, e
-a unica forma de ler o arquivo e reabrindo o aplicativo, que era exatamente o
-que apagava a evidencia. Duas sessoes de depuracao foram perdidas assim antes de
-alguem notar. Agora a execucao anterior vira `crosspoint.log.anterior`.
+The log file stays too, with a lesson: it was opened **truncating** on every
+app launch. The case where the log matters is when the process dies, and the
+only way to read the file is to reopen the app, which was exactly what erased
+the evidence. Two debugging sessions were lost that way before anyone noticed.
+The previous run is now kept as `crosspoint.log.previous`.
 
-## Fontes
+## Fonts
 
-Os corpos foram decididos lendo no aparelho, nao por escala.
+The sizes were decided by reading on the device, not by scaling.
 
-Eu previ que os 300 dpi exigiriam multiplicar os corpos por 1,42 em relacao aos
-~212 dpi do X4. Medido com os olhos: 18 e agradavel, 16 e bom, 14 e legivel, 12
-e pequeno demais, e 22 e 24 sao grandes demais para uso real. A lista embutida e
-`{14, 16, 18, 20}`.
+The prediction was that 300 dpi would require multiplying sizes by 1.42 against
+the X4's ~212 dpi. Measured with human eyes: 18 is pleasant, 16 is good, 14 is
+legible, 12 is too small, and 22 and 24 are too large for real use. The built-in
+list is `{14, 16, 18, 20}`.
 
-A interface usa outra familia (Ubuntu, dois estilos, fundida com um recorte
-vietnamita). Os temas pedem `UI_10_FONT_ID` e `UI_12_FONT_ID` em dezenas de
-lugares, entao o que muda neste aparelho e o que cada ID ENTREGA, nao cada
-chamada: o ID e uma chave, nao uma medida.
+The UI uses a different family (Ubuntu, two styles, merged with a Vietnamese
+cut). The themes ask for `UI_10_FONT_ID` and `UI_12_FONT_ID` in dozens of
+places, so what changes on this device is what each ID *delivers*, not each
+call: the ID is a key, not a measurement.
 
 ```
-SMALL   -> ubuntu 12    barra de status (12 usos no tema, contra 3 do UI_10)
-UI_10   -> ubuntu 14    linhas de configuracao
-UI_12   -> ubuntu 16    corpo da interface
+SMALL   -> ubuntu 12    status bar (12 uses in the theme, against 3 for UI_10)
+UI_10   -> ubuntu 14    settings rows
+UI_12   -> ubuntu 16    interface body
 ```
 
-### Simbolos
+### Symbols
 
-Os quadrados com "?" nao eram configuracao. **Nenhuma fonte de origem do
-repositorio tinha aqueles glifos**: NotoSerif e Ubuntu davam 0 de 112 setas e 1
-de 96 formas geometricas. Os intervalos estavam ligados no conversor e nao havia
-o que converter.
+The boxes with "?" were not a configuration problem. **No source font in the
+repository had those glyphs**: NotoSerif and Ubuntu gave 0 of 112 arrows and 1
+of 96 geometric shapes. The intervals were enabled in the converter and there
+was nothing to convert.
 
-Duas fontes entraram na pilha porque uma nao bastava: a Symbols2 cobre formas
-geometricas (96/96) e dingbats (145/192) mas so 13 de 112 setas e nao tem a
-U+2192; a Math tem 99 de 112 setas e tem a U+2192.
+Two fonts joined the stack because one was not enough: Symbols2 covers geometric
+shapes (96/96) and dingbats (145/192) but only 13 of 112 arrows and lacks
+U+2192; Math has 99 of 112 arrows and has U+2192.
 
-E os intervalos padrao tiveram de ser estreitados junto, o que nao e economia de
-enfeite: enquanto nenhuma fonte tinha esses glifos, pedir os blocos inteiros de
-Setas e Matematica custava **zero**. Com a Math na pilha eles passaram a ser
-encontrados e a custar +180KB por arquivo. Estreitados para o que aparece em
-texto corrido, o custo e +27,6KB (13%).
+The default intervals had to be narrowed at the same time, and that is not
+cosmetic thrift: while no font had those glyphs, asking for the whole Arrows and
+Math blocks cost **zero**. With Math in the stack they started being found and
+costing +180KB per file. Narrowed to what appears in running text, the cost is
++27.6KB (13%).
 
-Arabe, hebraico, cirilico e grego sairam: este porte le em portugues e ingles.
-Arabe e hebraico sozinhos eram metade do peso da fonte de interface, medido em
-440,8 KB contra 219,3 KB no corpo 16.
+Arabic, Hebrew, Cyrillic and Greek are out: this port reads Portuguese and
+English. Arabic and Hebrew alone were half the weight of the UI font, measured
+at 440.8 KB against 219.3 KB at size 16.
 
-## A margem inferior
+## The bottom margin
 
-O leitor faz `orientedMarginBottom += std::max(screenMargin, statusBarHeight)`.
-**Maximo, nao soma.** Com a barra em 46px e o maximo da configuracao em 40, a
-margem inferior nunca teve efeito neste aparelho: a barra sempre ganhava.
+The reader does `orientedMarginBottom += std::max(screenMargin, statusBarHeight)`.
+**Maximum, not sum.** With the bar at 46px and the setting's maximum at 40, the
+bottom margin never had any effect on this device: the bar always won.
 
-Maximo agora 130 (~11mm a 300 dpi), passo 10, padrao 60. Como 60 > 46, a margem
-existe ja na primeira abertura.
+The maximum is 130 now (~11mm at 300 dpi), step 10, default 60. Since 60 > 46,
+the margin exists from first launch.
 
-E a propria barra nao respeitava a margem lateral: o leitor soma `screenMargin`
-ao recuo do bezel antes de compor a pagina, e a barra nao somava. Com a margem
-pequena isso passava despercebido; num painel de cantos arredondados, com a
-margem em 60px, as pontas caiam fora da area visivel.
+And the bar itself did not respect the side margin: the reader adds
+`screenMargin` to the bezel inset before composing the page, and the bar did
+not. With a small margin that went unnoticed; on a rounded panel, with the
+margin at 60px, the ends fell outside the visible area.
+
+## Still open
+
+- Scoped storage. The app currently uses All files access with a real folder,
+  which is what a file-based reader needs. A user-chosen folder through the
+  Storage Access Framework would mean rewriting the file browser, the cache and
+  the progress store against URIs rather than paths.
+- Hiding by capability the menu entries that cannot work here: OTA, firmware
+  flashing, hotspot mode.

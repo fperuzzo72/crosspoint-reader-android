@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  O icone: um livro visto pela capa, 1 bit.
+  O icone: um livro aberto com escrita, 1 bit.
 
-  Desenhado como vetor e nao como conjunto de PNG por dois motivos. Escala
-  para qualquer densidade sem serrilhado, e sao dois kilobytes em vez de seis
-  bitmaps que teriam de ser regerados a cada ajuste.
+  Vetor e nao PNG: escala para qualquer densidade sem serrilhado e sao dois
+  kilobytes em vez de seis bitmaps que teriam de ser regerados a cada ajuste.
 
-  A geometria respeita a zona segura do icone adaptativo: o Android recorta a
-  arte num circulo de 66dp dentro dos 108dp da tela, e qualquer coisa fora
-  disso pode ser cortada dependendo do formato que o lançador usa. O livro
-  ocupa 34x52dp centrado, cujo canto fica a 31dp do centro, com folga.
+  Contorno e nao silhueta cheia. Uma massa preta com o formato de livro aberto
+  le como duas asas; o contorno com as linhas de texto dentro le como livro.
 
-  1 bit de verdade: so #000000 e #FFFFFF, sem cinza nem anti-serrilhado
-  declarado. Num painel e-ink um tom intermediario vira ruido de dithering.
+  As linhas de escrita tem comprimentos DIFERENTES, e a ultima e curta. Linhas
+  todas iguais leem como papel pautado; e a irregularidade que diz "texto".
+  Elas tambem acompanham a inclinacao da pagina, subindo em direcao a borda
+  externa, senao flutuariam sobre uma pagina inclinada.
+
+  Zona segura: o Android recorta a arte num circulo de 66dp dentro dos 108dp
+  da tela. Esta forma ocupa 62,3dp de diametro a partir do centro, medido
+  sobre os pontos das curvas, entao nenhum lançador a corta.
+
+  1 bit de verdade: so #000000, sobre o fundo branco da camada de tras.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -20,15 +25,32 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- A capa. Cantos levemente arredondados: um retangulo perfeito parece
-         um erro de renderizacao em tamanho de lançador. -->
+    <!-- Pagina esquerda. A curva do topo sobe da lombada para a borda: e ela
+         que forma o V central que faz o livro parecer aberto. -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M40,28 h28 a3,3 0 0 1 3,3 v46 a3,3 0 0 1 -3,3 h-28 a3,3 0 0 1 -3,-3 v-46 a3,3 0 0 1 3,-3 z" />
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineJoin="round"
+        android:pathData="M51.5,40 C45,33.5 39,31.5 33,31 L33,75 C39,75.5 45,77 51.5,80 Z" />
 
-    <!-- O vinco da lombada. É o que faz a forma ler como livro e não como
-         cartão: sem ele, o retângulo é ambíguo em 48dp. -->
+    <!-- Pagina direita, espelhada em x=54. -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M44,32 h2 v44 h-2 z" />
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineJoin="round"
+        android:pathData="M56.5,40 C63,33.5 69,31.5 75,31 L75,75 C69,75.5 63,77 56.5,80 Z" />
+
+    <!-- Escrita da pagina esquerda. -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2.8"
+        android:strokeLineCap="round"
+        android:pathData="M48.9,47.3 L35.6,43.7 M48.9,56.3 L35.6,52.7 M48.9,65.3 L40.8,63.1" />
+
+    <!-- Escrita da pagina direita. -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2.8"
+        android:strokeLineCap="round"
+        android:pathData="M59.1,47.3 L72.4,43.7 M59.1,56.3 L72.4,52.7 M59.1,65.3 L67.2,63.1" />
 </vector>

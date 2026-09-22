@@ -1,1 +1,0 @@
-/Users/fperuzzo/github/crosspoint-reader-android/cmake/android/CMakeLists.txt

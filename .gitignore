@@ -13,3 +13,10 @@ app/build/
 build/android/cmake/
 build/android/defines.h
 build/android/link/
+
+# Artefatos do build nativo do Gradle. Voltaram uma vez porque um
+# "git checkout -- ." reverteu estas linhas e o "git add -A" seguinte os
+# readicionou; se sumirem de novo, e esse o caminho.
+app/.cxx/
+build/android/cmake/
+build/android/defines.h

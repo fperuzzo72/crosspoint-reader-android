@@ -131,3 +131,27 @@ O mesmo vale para `KindleGrayExpand.cpp`, cujas duas funcoes puras viraram
 | --- | --- |
 | **Upstream** | `HalSystem.cpp` e `HalGPIO.cpp` guardavam com `!FREEINK_DEVICE_KINDLE` o que na verdade queriam dizer com `!FREEINK_MCU_HOSTED`: os dois incluem coisa de ESP32 (`InputManager`, `xtensa_context.h`) que aparelho hospedado nenhum tem. Funcionava por so existir um alvo hospedado. |
 | **Upstream** | `FirmwareBoardTag.cpp` tem `#error` para aparelho desconhecido, entao cada alvo novo precisa de uma entrada. Correto, e vale registrar que e assim de proposito. |
+
+## Achados posteriores
+
+| Marca | O que |
+| --- | --- |
+| **POSIX** | `MySerialImpl` e declarado em `lib/Logging/Logging.h` e **nao e definido em lugar nenhum da arvore**: nem o membro estatico, nem `write()`, nem `flush()`, nem `printf()`. O `src/main.cpp:813` referencia `Serial` fora de qualquer guarda. Definido aqui em `lib/hal/posix/SerialProxyPosix.cpp`, que precisa ser unidade de traducao propria por causa do `#define Serial` no fim do `Logging.h`. O Kindle tem o mesmo problema latente. |
+| **POSIX** | A guarda de `HalGPIO.h`, `HalSystem.cpp` e `HalGPIO.cpp` dizia `FREEINK_DEVICE_KINDLE` onde queria dizer `FREEINK_MCU_HOSTED`. Funcionava por so existir um alvo hospedado. |
+| **Android** | Pilha de 8MB na thread do leitor. Nao se aplica ao Kindle, onde o `main()` roda na thread principal do processo, que ja tem pilha grande. Mas a LICAO se aplica: qualquer alvo hospedado que crie a thread do leitor a mao precisa dimensiona-la. |
+| **Upstream** | O `switch` de corpo para ID em `CrossPointSettings.cpp` e espelho manual de `BUILTIN_READER_POINT_SIZES`. Um tamanho que exista numa lista e falte na outra cai no `default` e desenha no corpo errado sem reclamar. |
+| **Upstream** | `build-font-ids.sh` tinha um bloco ruby copiado por tamanho. Virou laco quando a lista passou de quatro para seis e a copia ficou maior que a logica. |
+
+## Armadilhas de build que valem para os dois
+
+- **`FREEINK_MCU_HOSTED` e DERIVADO dentro do `BoardConfig.h`.** Testa-lo antes
+  de incluir aquele header le zero e escolhe o ramo errado, e o erro so aparece
+  dezenas de linhas depois como `undeclared identifier`. Com
+  `FREEINK_DEVICE_KINDLE` isso nao acontecia porque aquele vem da linha de
+  comando. Mordeu em `HalGPIO.h` e de novo em `CrossPointSettings.h`.
+- **Um `-D` com aspas nao sobrevive a ser escrito dentro de um script gerado.**
+  O shell interno come as aspas e a macro vira identificador. Defines vao num
+  header com `-include`.
+- **Num build incremental do Gradle a tarefa de strip pode nao rerodar**, e o
+  `.so` vai inteiro para o APK. O sintoma e o APK saltar de 14MB para 22MB.
+  Build limpo resolve, e a diferenca de tamanho e o sintoma a procurar.

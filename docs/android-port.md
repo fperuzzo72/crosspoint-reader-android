@@ -424,3 +424,113 @@ O APK nao existe porque esta maquina nao tem JDK, nem Gradle, nem Android SDK.
 Os arquivos do Gradle estao escritos e nao foram executados nenhuma vez, o que
 quer dizer que podem ter erros bobos que so um build revela. O `.so`, esse sim,
 foi construido de verdade.
+
+## O bug que custou mais caro, e como ele foi achado
+
+O download de livros pelo OPDS fechava o aplicativo. Sem mensagem, sem erro, sem
+nada no log: o processo simplesmente sumia.
+
+**Três hipóteses erradas antes da certa**, e vale registrar as tres porque duas
+delas viraram consertos legitimos mesmo sem serem o bug:
+
+1. *"O Android 11 fechou o NETLINK e o getifaddrs nao enxerga as interfaces."*
+   Falso neste aparelho, provado por um log que imprimiu as duas respostas lado
+   a lado: `framework=1 getifaddrs=1`. O conserto (usar o ConnectivityManager)
+   ficou por outro motivo, que e bom: ele distingue "tem endereco" de "tem
+   internet", e um portal cativo da a primeira e nao a segunda.
+2. *"Excecao pendente no JNI."* O `GetStaticMethodID` com assinatura errada
+   lanca `NoSuchMethodError` e deixa a excecao pendente; a proxima chamada JNI
+   feita assim aborta a VM. Era um caminho de crash real e foi consertado, mas
+   nao era este crash.
+3. *"Um `Error` escapando pela fronteira JNI."* O bridge capturava `Exception`,
+   que nao cobre `OutOfMemoryError`. Tambem real, tambem consertado, tambem nao
+   era.
+
+**O que resolveu foi parar de deduzir.** Um handler de sinal registrando o
+sinal da morte deu os dois fatos que decidiram:
+
+```
+*** morreu com sinal 11 (Segmentation fault), endereco 0xe5c ***
+```
+
+- **SIGSEGV e nao SIGABRT** eliminou de uma vez as duas familias que eu vinha
+  perseguindo: nao era a runtime reclamando de JNI nem falta de memoria na ART.
+- **O ponto da morte MUDAVA entre execucoes.** Uma vez dentro do `finish()` do
+  JNI, outra antes dele chegar. Ponteiro nulo fixo nao anda pelo codigo;
+  estouro de pilha anda, porque o endereco que falta depende da profundidade em
+  que se estava.
+
+A thread do leitor subia com `std::thread`, que no bionic pega o padrao de
+**1MB**. E pouco para esta arvore: no ESP32 as tarefas tem pilha dimensionada a
+mao justamente porque o parser de XML, o layout de capitulo e a cadeia de render
+descem fundo, e o proprio CrossPoint carrega um `TaskWatchdog` e medicoes de
+high water mark por causa disso. Agora sao **8MB**, via
+`pthread_attr_setstacksize`, que e o que a thread principal de um processo
+Android ja tem.
+
+### O que fica de metodo
+
+O handler de sinal fica no binario para sempre. Ele transforma "o aplicativo
+sumiu" em "SIGSEGV no endereco tal", e essa diferenca decidiu um bug que tres
+rodadas de leitura de codigo nao tinham decidido.
+
+O log em arquivo tambem, e com uma lição: ele era aberto TRUNCANDO a cada
+abertura do aplicativo. O caso em que o log importa e quando o processo morre, e
+a unica forma de ler o arquivo e reabrindo o aplicativo, que era exatamente o
+que apagava a evidencia. Duas sessoes de depuracao foram perdidas assim antes de
+alguem notar. Agora a execucao anterior vira `crosspoint.log.anterior`.
+
+## Fontes
+
+Os corpos foram decididos lendo no aparelho, nao por escala.
+
+Eu previ que os 300 dpi exigiriam multiplicar os corpos por 1,42 em relacao aos
+~212 dpi do X4. Medido com os olhos: 18 e agradavel, 16 e bom, 14 e legivel, 12
+e pequeno demais, e 22 e 24 sao grandes demais para uso real. A lista embutida e
+`{14, 16, 18, 20}`.
+
+A interface usa outra familia (Ubuntu, dois estilos, fundida com um recorte
+vietnamita). Os temas pedem `UI_10_FONT_ID` e `UI_12_FONT_ID` em dezenas de
+lugares, entao o que muda neste aparelho e o que cada ID ENTREGA, nao cada
+chamada: o ID e uma chave, nao uma medida.
+
+```
+SMALL   -> ubuntu 12    barra de status (12 usos no tema, contra 3 do UI_10)
+UI_10   -> ubuntu 14    linhas de configuracao
+UI_12   -> ubuntu 16    corpo da interface
+```
+
+### Simbolos
+
+Os quadrados com "?" nao eram configuracao. **Nenhuma fonte de origem do
+repositorio tinha aqueles glifos**: NotoSerif e Ubuntu davam 0 de 112 setas e 1
+de 96 formas geometricas. Os intervalos estavam ligados no conversor e nao havia
+o que converter.
+
+Duas fontes entraram na pilha porque uma nao bastava: a Symbols2 cobre formas
+geometricas (96/96) e dingbats (145/192) mas so 13 de 112 setas e nao tem a
+U+2192; a Math tem 99 de 112 setas e tem a U+2192.
+
+E os intervalos padrao tiveram de ser estreitados junto, o que nao e economia de
+enfeite: enquanto nenhuma fonte tinha esses glifos, pedir os blocos inteiros de
+Setas e Matematica custava **zero**. Com a Math na pilha eles passaram a ser
+encontrados e a custar +180KB por arquivo. Estreitados para o que aparece em
+texto corrido, o custo e +27,6KB (13%).
+
+Arabe, hebraico, cirilico e grego sairam: este porte le em portugues e ingles.
+Arabe e hebraico sozinhos eram metade do peso da fonte de interface, medido em
+440,8 KB contra 219,3 KB no corpo 16.
+
+## A margem inferior
+
+O leitor faz `orientedMarginBottom += std::max(screenMargin, statusBarHeight)`.
+**Maximo, nao soma.** Com a barra em 46px e o maximo da configuracao em 40, a
+margem inferior nunca teve efeito neste aparelho: a barra sempre ganhava.
+
+Maximo agora 130 (~11mm a 300 dpi), passo 10, padrao 60. Como 60 > 46, a margem
+existe ja na primeira abertura.
+
+E a propria barra nao respeitava a margem lateral: o leitor soma `screenMargin`
+ao recuo do bezel antes de compor a pagina, e a barra nao somava. Com a margem
+pequena isso passava despercebido; num painel de cantos arredondados, com a
+margem em 60px, as pontas caiam fora da area visivel.

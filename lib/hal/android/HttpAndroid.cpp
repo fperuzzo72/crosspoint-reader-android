@@ -261,8 +261,6 @@ int64_t esp_http_client_fetch_headers(const esp_http_client_handle_t client) {
   // o openConnection do lado Kotlin e preguicoso e o responseCode e que abre o
   // socket, faz o handshake e le os cabecalhos. Sem as duas linhas, morrer
   // dentro da chamada e voltar com erro dela produzem o mesmo log.
-  std::fprintf(stderr, "[http] finish(handle %d) chamando...\n", client->handle);
-  std::fflush(stderr);
   client->status = env->CallStaticIntMethod(g_bridge.cls, g_bridge.finish, client->handle);
   if (env->ExceptionCheck()) {
     env->ExceptionClear();
@@ -319,15 +317,6 @@ int esp_http_client_read(const esp_http_client_handle_t client, char* buffer, co
     client->consumed += n;
   }
   env->DeleteLocalRef(arr);
-  // Uma linha a cada 64 leituras, mais a primeira e o fim. O suficiente para
-  // o log dizer ate onde a transferencia chegou antes de morrer, sem encher o
-  // arquivo com uma linha por pedaco.
-  static int reads = 0;
-  if (++reads <= 1 || n <= 0 || reads % 64 == 0) {
-    std::fprintf(stderr, "[http] read #%d n=%d total=%lld\n", reads, static_cast<int>(n),
-                 static_cast<long long>(client->consumed));
-    std::fflush(stderr);
-  }
   return n;
 }
 

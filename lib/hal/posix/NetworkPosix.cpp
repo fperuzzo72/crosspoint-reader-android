@@ -94,19 +94,13 @@ WiFiClass WiFi;
 
 wl_status_t WiFiClass::status() {
 #if FREEINK_DEVICE_HIBREAK
-  // Pergunta ao framework, nao ao getifaddrs. Ver NetAndroid.h: o Android 11
-  // fechou NETLINK para aplicativo comum e o getifaddrs deixou de enxergar as
-  // interfaces, entao esta funcao respondia "sem rede" com o Wi-Fi ligado e o
-  // OPDS abria a tela de escolha de rede que aqui nao tem o que escolher.
-  //
-  // O log sai uma vez e compara as duas respostas, porque a frase acima era
-  // uma hipotese quando foi escrita e o aparelho e quem decide.
+  // Pergunta ao framework. Ver NetAndroid.h para o porque, e para a hipotese
+  // errada que eu havia escrito aqui antes de medir.
   const bool framework = crosspoint::android::netIsOnline();
   static bool said = false;
   if (!said) {
     said = true;
-    std::fprintf(stderr, "[net] online: framework=%d getifaddrs=%d\n", framework ? 1 : 0,
-                 firstInetInterface(nullptr, 0, nullptr) ? 1 : 0);
+    std::fprintf(stderr, "[net] online=%d\n", framework ? 1 : 0);
     std::fflush(stderr);
   }
   return framework ? WL_CONNECTED : WL_DISCONNECTED;

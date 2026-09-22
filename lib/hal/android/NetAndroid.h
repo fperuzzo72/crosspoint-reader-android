@@ -3,14 +3,19 @@
 
 // Estado da rede pelo framework, e nao pelo getifaddrs.
 //
-// O shim POSIX pergunta ao getifaddrs se ha interface no ar com IPv4. Num
-// Kindle isso responde certo; aqui nao, porque o Android 11 fechou o acesso a
-// NETLINK para aplicativo comum e o getifaddrs passa a enxergar pouco mais que
-// o loopback. O CrossPoint conclui que nao ha rede e abre a tela de escolha de
-// Wi-Fi, que neste aparelho nao tem o que escolher.
+// O motivo NAO e o que este comentario dizia antes. Eu havia escrito que o
+// Android 11 fecha o acesso a NETLINK para aplicativo comum e que por isso o
+// getifaddrs deixava de enxergar as interfaces. Medido no aparelho, com as
+// duas respostas lado a lado no log, isso e falso: o getifaddrs funciona aqui.
 //
-// De quebra, o ConnectivityManager distingue "tem endereco" de "tem
-// internet": um portal cativo da a primeira e nao a segunda.
+// O motivo que sobra, e que e bom por si so: o ConnectivityManager distingue
+// "tem endereco" de "tem internet". Um portal cativo de hotel da a primeira e
+// nao a segunda, e NET_CAPABILITY_VALIDATED e a diferenca. O getifaddrs nao
+// tem como responder isso.
+//
+// Fica registrado que a causa original do sintoma (a tela de escolha de rede
+// abrindo com Wi-Fi ligado) continua sem explicacao. O conserto funciona; o
+// diagnostico que eu dei para ele estava errado.
 
 namespace crosspoint::android {
 

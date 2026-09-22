@@ -14,6 +14,7 @@
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <jni.h>
+#include <pthread.h>
 #include <unistd.h>
 
 #include <atomic>
@@ -39,6 +40,24 @@ void loop();
 namespace {
 
 std::atomic<bool> g_running{false};
+
+// Pilha da thread do leitor.
+//
+// O bionic da 1MB por padrao a uma pthread. Isso e pouco para esta arvore: no
+// ESP32 as tarefas tem pilha dimensionada a mao justamente porque o parser de
+// XML, o layout de capitulo e a cadeia de render descem fundo, e o CrossPoint
+// ja carrega um TaskWatchdog e medicoes de high water mark por causa disso.
+//
+// Um estouro de pilha aqui nao aparece como erro: aparece como SIGSEGV num
+// endereco qualquer, em um ponto do codigo que MUDA conforme a profundidade em
+// que se estava. Foi exatamente o sintoma observado: a mesma operacao morrendo
+// ora dentro do JNI, ora antes dele.
+//
+// 8MB e o que a thread principal de um processo Android ja tem, entao nao e
+// numero inventado: e igualar o leitor ao que o sistema considera normal.
+constexpr size_t READER_STACK_BYTES = 8u * 1024u * 1024u;
+
+void* readerTrampoline(void*);
 
 // Log em arquivo, alem do logcat.
 //
@@ -116,9 +135,16 @@ void installCrashHandler() {
   }
 }
 
+void readerThread();
+
+void* readerTrampoline(void*) {
+  readerThread();
+  return nullptr;
+}
+
 void readerThread() {
   installCrashHandler();
-  logLine("[jni] thread do leitor iniciando");
+  logLine("[jni] thread do leitor iniciando, pilha de %zu MB", READER_STACK_BYTES / (1024u * 1024u));
   setup();
   logLine("[jni] setup() retornou; entrando no loop");
   unsigned long long iterations = 0;
@@ -209,7 +235,17 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeStart(
   if (!g_running.compare_exchange_strong(expected, true)) {
     return;
   }
-  std::thread(readerThread).detach();
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_attr_setstacksize(&attr, READER_STACK_BYTES);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+  pthread_t tid;
+  const int rc = pthread_create(&tid, &attr, readerTrampoline, nullptr);
+  pthread_attr_destroy(&attr);
+  if (rc != 0) {
+    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "pthread_create falhou: %d", rc);
+    g_running.store(false);
+  }
 }
 
 }  // extern "C"

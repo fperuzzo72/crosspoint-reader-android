@@ -6,6 +6,7 @@
 #include <base64.h>
 #include <esp_wifi.h>
 
+#include <cstdio>
 #include <functional>
 #include <string>
 
@@ -295,9 +296,15 @@ HttpDownloader::DownloadError HttpDownloader::downloadToFile(const std::string& 
                                                              bool downgradeRedirectsToHttp) {
   LOG_DBG("HTTP", "Downloading: %s -> %s", url.c_str(), destPath.c_str());
 
+  std::fprintf(stderr, "[dl] exists?\n");
+  std::fflush(stderr);
   if (Storage.exists(destPath.c_str())) {
+    std::fprintf(stderr, "[dl] existe, removendo\n");
+    std::fflush(stderr);
     Storage.remove(destPath.c_str());
   }
+  std::fprintf(stderr, "[dl] abrindo destino\n");
+  std::fflush(stderr);
   HalFile file;
   if (!Storage.openFileForWrite("HTTP", destPath.c_str(), file)) {
     LOG_ERR("HTTP", "Failed to open file for writing");

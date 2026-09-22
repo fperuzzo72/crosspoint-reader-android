@@ -1,45 +1,47 @@
 #pragma once
 #include <cstdint>
 
-// A expansao 1bpp -> 8bpp cinza, e a composicao dos dois planos de overlay.
+// The 1bpp to 8bpp gray expansion, and the composition of the two overlay
+// planes.
 //
-// Nao dependem de hardware nenhum, e por isso sao a unica parte de um backend
-// hospedado que um teste de host consegue cobrar. Vivem aqui, e nao dentro do
-// backend de um aparelho, porque Kindle e Android precisam exatamente das
-// mesmas duas funcoes.
+// Neither depends on any hardware, which is why they are the one part of a
+// hosted backend a host test can hold to account. They live here rather than
+// inside one device's backend because the Kindle and Android need exactly the
+// same two functions.
 //
-// Contrato do framebuffer, casando com o HalDisplay: o CrossPoint compoe num
-// buffer 1bpp empacotado, linhas alinhadas em byte a widthBytes cada, MSB = o
-// pixel mais a esquerda, bit SET = BRANCO (o clearScreen enche com 0xFF).
+// Framebuffer contract, matching HalDisplay: CrossPoint composes into a packed
+// 1bpp buffer, rows byte-aligned at widthBytes each, MSB = leftmost pixel, a
+// SET bit meaning WHITE (clearScreen fills with 0xFF).
 
 namespace crosspoint::hosted {
 
 inline constexpr uint8_t GRAY_BLACK = 0x00;
 inline constexpr uint8_t GRAY_WHITE = 0xFF;
-// Os dois niveis intermediarios que os planos de cinza do renderer expressam.
+// The two intermediate levels the renderer's gray planes can express.
 inline constexpr uint8_t GRAY_DARK = 0x55;
 inline constexpr uint8_t GRAY_LIGHT = 0xAA;
 
-// dstRowBytes e o stride do destino, que pode ser maior que a largura: no KT3
-// o framebuffer reporta 608 bytes por linha num painel de 600px, e avancar por
-// largura em vez de stride cisalha a imagem progressivamente.
+// dstRowBytes is the destination stride, which can be wider than the width: on
+// the KT3 the framebuffer reports 608 bytes per row for a 600px panel, and
+// stepping by width instead of stride shears the image progressively.
 //
-// Bits alem de `width` no ultimo byte de origem de cada linha sao padding e
-// nao sao emitidos, entao largura que nao e multipla de 8 continua correta.
+// Bits beyond `width` in each row's final source byte are padding and are not
+// emitted, so a width that is not a multiple of 8 stays correct.
 void expand1bppToGray8(const uint8_t* src, uint8_t* dst, uint16_t width, uint16_t height, uint16_t srcRowBytes,
                        uint32_t dstRowBytes);
 
-// Pinta os dois planos 1bpp de cinza sobre um quadro 8bpp que ja tem a base
-// preto-e-branco. O renderer codifica um pixel cinza como um par de bits, um
-// de cada plano, como (LSB, MSB):
+// Paints the two 1bpp gray planes over an 8bpp frame that already holds the
+// black-and-white base. The renderer encodes a gray pixel as a pair of bits,
+// one from each plane, as (LSB, MSB):
 //
-//   (0,0)  nao e cinza; o que a base pintou vale
-//   (1,1)  escuro
-//   (0,1)  claro
-//   (1,0)  a codificacao nao produz; fica com a base em vez de ser chutado
+//   (0,0)  not gray; whatever the base painted stands
+//   (1,1)  dark
+//   (0,1)  light
+//   (1,0)  the encoding never produces this; left to the base rather than
+//          guessed
 //
-// Pixels que os planos nao reivindicam nao sao escritos, por isso `dst` e
-// entrada e saida.
+// Pixels the planes do not claim are not written, which is why `dst` is
+// in-out.
 void overlayGrayPlanesOnGray8(const uint8_t* lsbPlane, const uint8_t* msbPlane, uint8_t* dst, uint16_t width,
                               uint16_t height, uint16_t srcRowBytes, uint32_t dstRowBytes);
 

@@ -2,12 +2,12 @@
 #include <Arduino.h>
 #include <BoardConfig.h>
 #if FREEINK_MCU_HOSTED
-// Os alvos hospedados desviam do FreeInkDisplay inteiro em vez de ganharem
-// mais um driver: aquela pilha existe para dirigir um painel cru por SPI/i80,
-// e aqui o painel pertence ao sistema operacional. Incluir EInkDisplay.h
-// arrastaria toda a arvore de PanelDriver e EpdBus para um build que nunca
-// pode usa-la, que foi de onde vieram 251 dos simbolos indefinidos da primeira
-// tentativa de link no Kindle.
+// The hosted targets bypass FreeInkDisplay entirely rather than gaining one
+// more driver: that stack exists to drive a raw panel over SPI/i80, and here
+// the panel belongs to the operating system. Including EInkDisplay.h would drag
+// the whole PanelDriver and EpdBus tree into a build that can never use it,
+// which is where 251 of the undefined symbols in the Kindle's first link
+// attempt came from.
 #include "hosted/HostedPanel.h"
 // The grayscale descriptor types still come from the SDK: they are the HAL's
 // vocabulary, not the panel driver's, and this header carries no Arduino or

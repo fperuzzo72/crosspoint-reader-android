@@ -1,9 +1,9 @@
 #!/bin/sh
-# Compila UM arquivo com exatamente o mesmo include path do censo e mostra o
-# erro inteiro. Equivalente ao whichfailed.sh do porte Kindle.
+# Compiles ONE file with exactly the census's include path and shows the whole
+# error. Equivalent to whichfailed.sh in the Kindle port.
 set -u
 cd "$(dirname "$0")/../.." || exit 1
-[ $# -ge 1 ] || { echo "uso: build/android/one.sh <arquivo.cpp> [flags extras]"; exit 1; }
+[ $# -ge 1 ] || { echo "usage: build/android/one.sh <file.cpp> [extra flags]"; exit 1; }
 F=$1; shift
 NDK="${ANDROID_NDK_HOME:-/opt/homebrew/share/android-ndk}"
 API=${ANDROID_API:-28}

@@ -1,21 +1,20 @@
-// O proxy Serial do Logging.h, em unidade de traducao propria.
+// The Serial proxy from Logging.h, in its own translation unit.
 //
-// MySerialImpl e declarado em lib/Logging/Logging.h e NAO e definido em lugar
-// nenhum desta arvore: nem o membro estatico `instance`, nem write(), nem
-// flush(), nem printf(). O unico membro com corpo e o operator bool(), inline
-// no header.
+// MySerialImpl is declared in lib/Logging/Logging.h and is NOT defined anywhere
+// in this tree: not the static member `instance`, not write(), not flush(), not
+// printf(). The only member with a body is the inline operator bool().
 //
-// Isso nao e do porte. src/main.cpp:813 tem `if (Serial && ...)` fora de
-// qualquer guarda, entao a referencia e emitida sempre; o que variava era se
-// algum lugar do build de firmware a satisfazia. Neste repositorio nao ha
-// esse lugar, e o linker do NDK cobra.
+// That is not the port's doing. src/main.cpp:813 has `if (Serial && ...)`
+// outside any guard, so the reference is always emitted; what varied was
+// whether somewhere in the firmware build satisfied it. There is no such place
+// in this repository, and the NDK's linker charges for it.
 //
-// Por que um arquivo so para isto: o Logging.h termina com
-// `#define Serial MySerialImpl::instance`. Incluir esse header dentro do
-// ArduinoShim.cpp faz o `HardwareSerial Serial;` de la virar
-// `HardwareSerial MySerialImpl::instance;` e o compilador acusa redefinicao
-// com tipo diferente. Os dois nao podem coexistir na mesma unidade, entao
-// cada um fica na sua.
+// Why a file just for this: Logging.h ends with
+// `#define Serial MySerialImpl::instance`. Including that header inside
+// ArduinoShim.cpp turns its `HardwareSerial Serial;` into
+// `HardwareSerial MySerialImpl::instance;` and the compiler reports a
+// redefinition with a different type. The two cannot coexist in one unit, so
+// each gets its own.
 
 #include <Logging.h>
 

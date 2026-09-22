@@ -426,23 +426,22 @@ void setupDisplayAndFonts(bool seamless = false) {
   renderer.insertFont(NOTOSANS_18_FONT_ID, notosans18FontFamily);
   renderer.insertFont(NOTOSANS_20_FONT_ID, notosans20FontFamily);
 #if FREEINK_DEVICE_HIBREAK
-  // UI_10 e o corpo das linhas de configuracao (20 usos no tema). Sobe para
-  // 14. Dentro da barra de status ele so desenha o "~" do marcador de
-  // estimativa, centrado contra a altura de linha do SMALL: com 14 contra 12
-  // esse centramento fica 2px alto, que e o preco de uma tecla em uma linha.
+  // UI_10 is the body of the settings rows (20 uses in the theme). It goes to
+  // 14. Inside the status bar it only draws the "~" estimate marker, centred
+  // against SMALL's line height: at 14 against 12 that centring sits 2px high,
+  // which is the price of one character on one line.
   renderer.insertFont(UI_10_FONT_ID, ui14FontFamily);
 #else
   renderer.insertFont(UI_10_FONT_ID, ui10FontFamily);
 #endif
 #if FREEINK_DEVICE_HIBREAK
-  // 300 dpi: a interface desenhada para 10 e 12 sai fisicamente pequena demais.
-  // Os temas pedem estes IDs em dezenas de lugares, entao o que muda e o que
-  // cada ID ENTREGA, nao cada chamada. O ID e uma chave, nao uma medida, e por
-  // isso o nome da constante passa a nao descrever o corpo.
+  // 300 dpi: an interface drawn for 10 and 12 comes out physically too small.
+  // The themes ask for these IDs in dozens of places, so what changes is what
+  // each ID DELIVERS, not each call. The ID is a key, not a measurement, which
+  // is why the constant's name stops describing the size.
   //
-  // Os dois sobem juntos um degrau da escada: UI_10 entrega 12 (barra de
-  // status, rotulos de botao) e UI_12 entrega 16 (corpo da interface).
-  // Testado no aparelho: 14 ainda ficava pequeno.
+  // Measured on the device: 14 was still small for the interface body, so
+  // UI_12 delivers 16.
   renderer.insertFont(UI_12_FONT_ID, ui16FontFamily);
 #else
   renderer.insertFont(UI_12_FONT_ID, ui12FontFamily);
@@ -450,10 +449,10 @@ void setupDisplayAndFonts(bool seamless = false) {
   renderer.insertFont(UI_14_FONT_ID, ui14FontFamily);
   renderer.insertFont(UI_16_FONT_ID, ui16FontFamily);
 #if FREEINK_DEVICE_HIBREAK
-  // A barra de status desenha com SMALL_FONT_ID doze vezes contra tres do
-  // UI_10, entao subir os outros dois nao a tocou. SMALL e a notosans_8, a
-  // menor da arvore. Aqui ela entrega 12, que e o advanceY para o qual a
-  // faixa da barra foi dimensionada (29px).
+  // The status bar draws with SMALL_FONT_ID twelve times against UI_10's
+  // three, so raising the other two never touched it. SMALL is notosans_8, the
+  // smallest in the tree. Here it delivers 12, which is the advanceY the bar's
+  // lane was sized for (29px).
   renderer.insertFont(SMALL_FONT_ID, ui12FontFamily);
 #else
   renderer.insertFont(SMALL_FONT_ID, smallFontFamily);

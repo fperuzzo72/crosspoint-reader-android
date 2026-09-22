@@ -1,15 +1,15 @@
-# Build nativo do CrossPoint para o Bigme HiBreak Pro.
+# Native build of CrossPoint for the Bigme HiBreak Pro.
 #
-# Produz libcrosspoint.so, que a Activity Kotlin carrega. Nao produz
-# executavel: um aplicativo Android nao entra por main(), entra pela Activity,
-# e a thread do leitor sobe pelo nativeStart() do Jni.cpp.
+# Produces libcrosspoint.so, which the Kotlin Activity loads. It produces no
+# executable: an Android app does not enter through main(), it enters through an
+# Activity, and the reader thread starts from Jni.cpp's nativeStart().
 #
-# Adaptado do cmake/kindle/CMakeLists.txt. O que muda em relacao a ele:
-#   - biblioteca compartilhada em vez de executavel;
-#   - sem FBInk, sem librt (o bionic poe clock_gettime na libc);
-#   - sem -static-libstdc++: a STL vem pelo ANDROID_STL do Gradle;
-#   - as bibliotecas de terceiros vem de third_party/, buscadas por
-#     scripts/fetch-thirdparty.sh, em vez de build/kindle/thirdparty.
+# Adapted from cmake/kindle/CMakeLists.txt. What differs:
+#   - a shared library instead of an executable;
+#   - no FBInk, no librt (bionic puts clock_gettime in libc);
+#   - no -static-libstdc++: the STL comes from Gradle's ANDROID_STL;
+#   - third-party libraries come from third_party/, fetched by
+#     scripts/fetch-thirdparty.sh, rather than build/kindle/thirdparty.
 
 cmake_minimum_required(VERSION 3.22)
 project(crosspoint_hibreak CXX C)
@@ -23,43 +23,43 @@ set(THIRD_PARTY "${REPO_ROOT}/third_party")
 
 if(NOT EXISTS "${THIRD_PARTY}/ArduinoJson.h")
   message(FATAL_ERROR
-    "third_party/ nao foi populado. Rode scripts/fetch-thirdparty.sh uma vez: "
-    "ele busca as dependencias que o platformio.ini declara e que o PlatformIO "
-    "resolveria sozinho. Sem elas 73 arquivos nao compilam.")
+    "third_party/ has not been populated. Run scripts/fetch-thirdparty.sh once: "
+    "it fetches the dependencies platformio.ini declares and PlatformIO would "
+    "resolve on its own. Without them 73 files do not compile.")
 endif()
 
 if(NOT CROSSPOINT_VERSION)
   set(CROSSPOINT_VERSION "hibreak-dev")
 endif()
 
-# Section GC, como o build de firmware faz. Nao e so tamanho: alguns helpers
-# vendorizados sao declarados e chamados de funcoes que nada alcanca, e sem
-# isto aparecem como referencia indefinida para codigo morto.
+# Section GC, as the firmware build does. Not only about size: some vendored
+# helpers are declared and called from functions nothing reaches, and without
+# this they show up as undefined references to dead code.
 add_compile_options(-ffunction-sections -fdata-sections)
 add_link_options(-Wl,--gc-sections)
 
-# Visibilidade escondida por padrao, e isto nao e so higiene de ABI. Numa
-# biblioteca COMPARTILHADA tudo e exportado por padrao, entao nada e morto e o
-# --gc-sections nao descarta nada. Os helpers de checksum do uzlib
-# (uzlib_crc32, uzlib_adler32) sao declarados e chamados de uma funcao que nada
-# alcanca, e sem isto aparecem como referencia indefinida para codigo que nunca
-# roda. O que precisa ser exportado ja e marcado: as funcoes JNI carregam
-# JNIEXPORT, que e visibility("default").
+# Hidden visibility by default, and this is not merely ABI hygiene. In a SHARED
+# library everything is exported by default, so nothing is dead and
+# --gc-sections discards nothing. uzlib's checksum helpers (uzlib_crc32,
+# uzlib_adler32) are declared and called from a function nothing reaches, and
+# without this they show up as undefined references to code that never runs.
+# What needs exporting is already marked: the JNI functions carry JNIEXPORT,
+# which is visibility("default").
 add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden)
 
-# Os globs levam CONFIGURE_DEPENDS: sem isso o CMake guarda a lista e um
-# arquivo novo so entra no build depois de uma reconfiguracao manual. O
-# sintoma e um simbolo indefinido de algo que voce acabou de escrever, que e
-# um jeito caro de descobrir uma opcao de glob.
+# The globs carry CONFIGURE_DEPENDS: without it CMake caches the list and a new
+# file only enters the build after a manual reconfigure. The symptom is an
+# undefined symbol for something you just wrote, which is an expensive way to
+# discover a glob option.
 
-# --- vocabulario comum ------------------------------------------------------
-# Um alvo INTERFACE carrega includes e defines para todos os outros, senao cada
-# biblioteca teria de repetir a lista inteira.
+# --- shared vocabulary ------------------------------------------------------
+# An INTERFACE target carries includes and defines for everything else, or each
+# library would have to repeat the whole list.
 add_library(cp_common INTERFACE)
 
 target_include_directories(cp_common INTERFACE
-  # arduino-shim vem PRIMEIRO para o `#include <Arduino.h>` de dentro do SDK
-  # resolver aqui, que e o que evita ter de editar o SDK.
+  # arduino-shim goes FIRST so that `#include <Arduino.h>` inside the SDK
+  # resolves here, which is what avoids having to edit the SDK.
   ${HAL_DIR}/posix/arduino-shim
   ${THIRD_PARTY}
   ${HAL_DIR}/posix
@@ -77,8 +77,8 @@ target_include_directories(cp_common INTERFACE
   ${REPO_ROOT}/freeink-sdk/libs/book/FreeInkBook/third_party/tjpgd
 )
 
-# Cada biblioteca de lib/ e um diretorio de include por si so: os headers ficam
-# na raiz de cada uma e se incluem entre si por nome simples.
+# Each lib/ library is an include directory of its own: the headers sit at each
+# root and include one another by bare name.
 file(GLOB LIB_DIRS LIST_DIRECTORIES true ${REPO_ROOT}/lib/*)
 foreach(dir ${LIB_DIRS})
   if(IS_DIRECTORY ${dir})
@@ -92,26 +92,27 @@ target_compile_definitions(cp_common INTERFACE
   FREEINK_DEVICE_HIBREAK=1
   ANDROID=1
   CROSSPOINT_VERSION="${CROSSPOINT_VERSION}"
-  # O ArduinoJson so registra o conversor de String quando detecta ambiente
-  # Arduino, olhando por ARDUINO. Aqui o String vem do shim, a deteccao nao
-  # dispara, ele cai no std::string e todo as<String>() falha.
+  # ArduinoJson only registers the String converter when it detects an Arduino
+  # environment by looking for ARDUINO. Here String comes from the shim, the
+  # detection never fires, it falls back to std::string and every as<String>()
+  # fails.
   ARDUINOJSON_ENABLE_ARDUINO_STRING=1
-  # expat e configurado por defines, nao por header de config.
+  # expat is configured by defines, not by a config header.
   XML_GE=0
   XML_CONTEXT_BYTES=1024
 )
 
-# --- uma biblioteca estatica por biblioteca ---------------------------------
-# Isto nao e organizacao, e necessidade. Ha tres copias de miniz nesta arvore
-# (a do CrossPoint, a do FreeInkBook, a do ContentProtection), cada uma com uma
-# config que prefixa so parte dos simbolos, e o resto colide. O PlatformIO
-# nunca ve o problema porque arquiva cada biblioteca: o linker entao puxa um
-# membro so quando ele resolve algo ainda indefinido, e duplicata entre
-# arquivos e "o primeiro vence", nao erro.
+# --- one static library per library ---------------------------------
+# This is not tidiness, it is necessity. There are three copies of miniz in this
+# tree (CrossPoint's, FreeInkBook's, ContentProtection's), each with a config
+# that prefixes only some of its symbols, and the rest collide. PlatformIO never
+# sees the problem because it archives each library: the linker then pulls a
+# member only when it resolves something still undefined, and duplicates across
+# archives are "first wins", not an error.
 #
-# Linkar objetos soltos forca toda definicao para dentro e transforma um
-# arranjo que funciona em dezenas de erros de multipla definicao. Foi
-# exatamente o que aconteceu na primeira versao deste arquivo.
+# Linking loose objects forces every definition in and turns a working layout
+# into dozens of multiple-definition errors. That is exactly what happened in
+# the first version of this file.
 set(CP_ARCHIVES "")
 
 function(cp_add_archive name)
@@ -124,15 +125,15 @@ function(cp_add_archive name)
   set(CP_ARCHIVES ${CP_ARCHIVES} ${name} PARENT_SCOPE)
 endfunction()
 
-# Regra unica para C vendorizado, valida na arvore inteira: todo .c sob um
-# third_party/ e incluido por um wrapper *_impl.c que aplica um prefixo de
-# simbolo antes. Compilar os dois da a cada simbolo duas definicoes.
+# One rule for vendored C, valid across the whole tree: every .c under a
+# third_party/ is included by an *_impl.c wrapper that applies a symbol prefix
+# first. Compiling both gives every symbol two definitions.
 #
-# lib/expat sai inteiro: o CrossPoint e o SDK vendorizam expat cada um e os
-# dois exportam os mesmos XML_* sem prefixo, entao so um pode entrar. Vence o
-# do SDK, pelos mesmos dois motivos que o porte Kindle registrou: ele carrega
-# um expat_config.h de verdade em vez de depender de flags de build, e o
-# diretorio de include dele ja vem primeiro.
+# lib/expat drops out entirely: CrossPoint and the SDK each vendor expat and
+# both export the same unprefixed XML_*, so only one can go in. The SDK's wins,
+# for the same two reasons the Kindle port recorded: it carries a real
+# expat_config.h rather than relying on build flags, and its include directory
+# already comes first.
 macro(cp_filter_sources var)
   list(FILTER ${var} EXCLUDE REGEX "/third_party/")
   list(FILTER ${var} EXCLUDE REGEX "/lib/expat/")
@@ -144,8 +145,8 @@ foreach(dir ${LIB_DIRS})
     continue()
   endif()
   get_filename_component(libname ${dir} NAME)
-  # lib/hal entra solto no .so: define os globais que nada referencia por nome
-  # (o `HalDisplay display;`), que um arquivo .a descartaria.
+  # lib/hal goes into the .so loose: it defines the globals nothing references
+  # by name (the `HalDisplay display;`), which an archive would drop.
   if(libname STREQUAL "hal" OR libname STREQUAL "expat")
     continue()
   endif()
@@ -160,8 +161,8 @@ foreach(dir ${SDK_LIB_DIRS})
     continue()
   endif()
   get_filename_component(libname ${dir} NAME)
-  # A pilha de PanelDriver fala com um barramento SPI/i80 que este alvo nao
-  # tem; o HalDisplay hospedado desvia dela inteira.
+  # The PanelDriver stack talks to a SPI/i80 bus this target does not have; the
+  # hosted HalDisplay bypasses all of it.
   if(libname STREQUAL "FreeInkDisplay")
     file(GLOB srcs CONFIGURE_DEPENDS ${dir}/src/bus/EpdBusNull.cpp)
   else()
@@ -171,17 +172,17 @@ foreach(dir ${SDK_LIB_DIRS})
   cp_add_archive(cp_sdk_${libname} ${srcs})
 endforeach()
 
-# As bibliotecas buscadas. pngle NAO entra: o SDK ja vendoriza a dele por
-# src/vendor/pngle_impl.c e as duas exportam os mesmos simbolos.
+# The fetched libraries. pngle does NOT go in: the SDK already vendors its own
+# through src/vendor/pngle_impl.c and the two export the same symbols.
 cp_add_archive(cp_fetched
   ${THIRD_PARTY}/JPEGDEC.cpp
   ${THIRD_PARTY}/PNGdec.cpp
   ${THIRD_PARTY}/qrcode.c
 )
 
-# --- o .so ------------------------------------------------------------------
-# src/ e lib/hal/ entram soltos: definem os globais que nada referencia por
-# nome, que um arquivo .a descartaria.
+# --- the .so ------------------------------------------------------------------
+# src/ and lib/hal/ go in loose: they define the globals nothing references by
+# name (the `HalDisplay display;`), which an archive would drop.
 file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS ${REPO_ROOT}/src/*.cpp ${HAL_DIR}/*.cpp)
 list(FILTER APP_SOURCES EXCLUDE REGEX "/lib/hal/kindle/")
 list(FILTER APP_SOURCES EXCLUDE REGEX "/test/|/tools/")
@@ -190,6 +191,6 @@ add_library(crosspoint SHARED ${APP_SOURCES})
 target_link_libraries(crosspoint PRIVATE cp_common ${CP_ARCHIVES})
 
 
-# log: __android_log_print. android: ANativeWindow_*. z: o PNGdec usa zlib, e
-# o bionic ja traz uma, entao nao ha motivo para vendorizar outra copia.
+# log: __android_log_print. android: ANativeWindow_*. z: PNGdec uses zlib and
+# bionic already ships one, so there is no reason to vendor another copy.
 target_link_libraries(crosspoint PRIVATE log android z)

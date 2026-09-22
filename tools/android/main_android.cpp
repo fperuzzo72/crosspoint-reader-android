@@ -1,33 +1,32 @@
-// Ponto de entrada provisorio do build Android.
+// Entry point for the trylink measurement, not for the app.
 //
-// O CrossPoint e escrito contra o modelo Arduino: o core fornece main(), chama
-// setup() uma vez e loop() para sempre. Nem o Android nem um Linux qualquer tem
-// esse core, entao alguem precisa ser ele.
+// CrossPoint is written against the Arduino model: the core supplies main(),
+// calls setup() once and then loop() forever. Neither Android nor a plain Linux
+// has that core, so somebody has to be it.
 //
-// Este arquivo NAO e a forma final. Um aplicativo Android nao entra por main():
-// entra por uma Activity, ou por android_main() se for NativeActivity. Isto
-// aqui existe para o trylink poder medir, porque sem um main() o link reporta
-// "undefined reference to main" e esconde o numero que a gente quer.
+// This file is NOT the shipping path. An Android app does not enter through
+// main(): it enters through an Activity. This exists so tools/android/trylink.sh
+// can measure, because without a main() the link reports "undefined reference
+// to main" and hides the number we actually want.
 //
-// Quando a camada Android de verdade existir, ela substitui este arquivo, e as
-// tres decisoes abaixo continuam valendo porque nenhuma delas e sobre main():
+// The three decisions below outlive it, because none of them is about main():
 //
-//  - SIGPIPE ignorado. Escrever num socket cujo par sumiu mata um processo
-//    Linux por padrao. Num ESP32 esse sinal nao existe, entao a arvore nunca
-//    precisou se defender disso.
+//  - SIGPIPE ignored. Writing to a socket whose peer vanished kills a Linux
+//    process by default. On an ESP32 that signal does not exist, so the tree
+//    never had to defend against it.
 //
-//  - SIGINT e SIGTERM marcam uma flag em vez de matar, para o loop conseguir
-//    deixar a tela num estado legivel em vez de congelar meio quadro.
+//  - SIGINT and SIGTERM set a flag rather than killing, so the loop can leave
+//    the screen in a readable state instead of freezing half a frame.
 //
-//  - stdout e stderr sem buffer, senao um crash perde exatamente as linhas que
-//    explicam o crash.
+//  - stdout and stderr unbuffered, or a crash loses exactly the lines that
+//    explain the crash.
 
 #include <unistd.h>
 
 #include <csignal>
 #include <cstdio>
 
-// Definidos em src/main.cpp, compartilhado com todos os outros alvos.
+// Defined in src/main.cpp, shared with every other target.
 void setup();
 void loop();
 

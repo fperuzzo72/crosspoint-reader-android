@@ -2,37 +2,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-      MANAGE_EXTERNAL_STORAGE, e nao as permissoes de midia.
+      MANAGE_EXTERNAL_STORAGE, and not the media permissions.
 
-      O CrossPoint e um leitor baseado em ARQUIVO: ele navega pastas, guarda
-      cache por livro, escreve progresso e marcadores ao lado do EPUB. As
-      permissoes granulares do Android moderno (READ_MEDIA_*) cobrem imagem,
-      audio e video, e um .epub nao e nenhum dos tres. O Storage Access
-      Framework cobriria, mas entrega URIs e nao caminhos, e a arvore inteira
-      do CrossPoint fala POSIX por cima do shim: seria reescrever o navegador
-      de arquivos, o cache e o armazenamento de progresso para um modelo que o
-      leitor nao tem.
+      CrossPoint is a FILE-based reader: it browses folders, keeps a per-book
+      cache, and writes progress and bookmarks next to the EPUB. Modern
+      Android's granular permissions (READ_MEDIA_*) cover images, audio and
+      video, and an .epub is none of the three. The Storage Access Framework
+      would cover it, but it hands back URIs rather than paths, and the whole
+      CrossPoint tree speaks POSIX through the shim: adopting it means
+      rewriting the file browser, the cache and the progress store against a
+      model the reader does not have.
 
-      Esta e a mesma escolha que os leitores de EPUB sérios do Android fazem,
-      e pelo mesmo motivo. O usuario concede em Ajustes > Acesso especial, com
-      um dialogo do proprio sistema, e pode revogar quando quiser.
+      This is the same choice serious Android EPUB readers make, for the same
+      reason. The user grants it in Settings > Special app access, through the
+      system's own dialog, and can revoke it whenever.
     -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
     <!--
-      INTERNET: OPDS, sincronizacao KOReader e download de fontes. Sem ela
-      toda conexao falha com SecurityException e o erro aparece como "servidor
-      nao respondeu", que manda procurar no lugar errado.
+      INTERNET: OPDS, KOReader sync and font downloads. Without it every
+      connection fails with SecurityException and the error surfaces as "the
+      server did not respond", which sends you looking in the wrong place.
 
-      ACCESS_NETWORK_STATE: saber se ha rede antes de tentar, para a mensagem
-      ser "sem conexao" e nao um timeout de quinze segundos.
+      ACCESS_NETWORK_STATE: knowing whether there is a network before trying,
+      so the message is "no connection" and not a fifteen-second timeout.
 
-      Deliberadamente AUSENTE: ACCESS_FINE_LOCATION. Ler o nome da rede
-      conectada exige permissao de localizacao no Android 10+, porque o SSID
-      identifica onde voce esta. O CrossPoint mostra o nome da rede na barra;
-      aqui ele mostra o IP e o estado de conectado, que vem de getifaddrs sem
-      permissao nenhuma. Pedir localizacao por um rotulo seria a primeira vez
-      neste porte que uma permissao ampla e pedida por algo cosmetico.
+      Deliberately ABSENT: ACCESS_FINE_LOCATION. Reading the connected
+      network's name needs location permission on Android 10+, because the SSID
+      identifies where you are. CrossPoint shows the network name in the status
+      bar; here it shows the IP and the connected state instead. Asking for
+      location over a label would be the first time in this port a broad
+      permission is requested for something cosmetic.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -46,15 +46,15 @@
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
 
         <!--
-          screenOrientation=portrait: o painel e 824x1648 e o leitor tem a
-          propria nocao de orientacao, que ele aplica no framebuffer. Deixar o
-          Android tambem girar daria duas rotacoes empilhadas.
+          screenOrientation=portrait: the panel is 824x1648 and the reader has
+          its own notion of orientation, which it applies in the framebuffer.
+          Letting Android rotate as well would stack two rotations.
 
-          configChanges: sem isto, qualquer mudanca de configuracao destroi e
-          recria a Activity. A thread do leitor sobrevive a isso (nativeStart e
-          idempotente), mas a superficie vai embora e volta a cada vez, e uma
-          tela e-ink piscando por causa de uma troca de teclado e feio sem
-          motivo.
+          configChanges: without this, any configuration change destroys and
+          recreates the Activity. The reader thread survives that (nativeStart
+          is idempotent), but the surface goes away and comes back each time,
+          and an e-ink screen flashing because the keyboard changed is ugly for
+          no reason.
         -->
         <activity
             android:name=".ReaderActivity"

@@ -1,13 +1,13 @@
-// esp_http_client sobre a ponte Kotlin.
+// esp_http_client over the Kotlin bridge.
 //
-// Substitui o HttpClientPosix.cpp neste alvo. Aquele fala HTTP sobre socket
-// cru e recusa https explicitamente, o que deixa de fora quase todo catalogo
-// OPDS real e a sincronizacao KOReader. Aqui a requisicao atravessa para o
-// Kotlin, onde TLS, a loja de certificados do sistema, proxy e VPN ja existem.
+// Replaces HttpClientPosix.cpp on this target. That one speaks HTTP over raw
+// sockets and refuses https explicitly, which rules out almost every real OPDS
+// catalogue and KOReader sync. Here the request crosses into Kotlin, where TLS,
+// the system trust store, proxies and VPNs already exist.
 //
-// A forma da API nao muda em nada para quem chama: init, set_header, open,
-// fetch_headers, read, close, cleanup. O CrossPoint nao sabe que atravessou
-// uma fronteira de linguagem, e nao deveria mesmo saber.
+// The API's shape does not change at all for the caller: init, set_header,
+// open, fetch_headers, read, close, cleanup. CrossPoint does not know it
+// crossed a language boundary, and should not have to.
 
 #include <BoardConfig.h>
 
@@ -24,11 +24,11 @@
 
 namespace {
 
-// Metodos do CrossPointHttp, resolvidos na primeira requisicao e mantidos.
-// jmethodID e estavel enquanto a classe estiver carregada, e a nossa fica
-// carregada enquanto o processo viver.
+// CrossPointHttp's methods, resolved on the first request and kept. A
+// jmethodID is stable while the class stays loaded, and ours stays loaded for
+// the life of the process.
 struct Bridge {
-  jclass cls = nullptr;  // referencia GLOBAL
+  jclass cls = nullptr;  // GLOBAL reference
   jmethodID open = nullptr;
   jmethodID write = nullptr;
   jmethodID finish = nullptr;
@@ -47,24 +47,24 @@ bool ensureBridge(JNIEnv* env) {
   }
   jclass local = crosspoint::android::findAppClass(env, "org/crosspoint/hibreak/CrossPointHttp");
   if (local == nullptr) {
-    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointHttp nao encontrada");
+    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointHttp not found");
     return false;
   }
   g_bridge.cls = static_cast<jclass>(env->NewGlobalRef(local));
   env->DeleteLocalRef(local);
 
-  // Uma assinatura errada aqui NAO e um retorno nulo silencioso: o
-  // GetStaticMethodID lanca NoSuchMethodError e deixa a excecao PENDENTE. A
-  // proxima chamada JNI feita com excecao pendente faz a VM abortar, e o
-  // processo morre sem passar por nenhum tratamento de erro nosso.
+  // A wrong signature here is NOT a silent null return: GetStaticMethodID
+  // throws NoSuchMethodError and leaves the exception PENDING. The next JNI
+  // call made with a pending exception aborts the VM, and the process dies
+  // without passing through any error handling of ours.
   //
-  // Por isso cada busca limpa a sua, em vez de uma limpeza no fim: a segunda
-  // busca ja seria a "proxima chamada JNI" da primeira.
+  // Hence each lookup clears its own, rather than one clear at the end: the
+  // second lookup would already be the first one's "next JNI call".
   auto lookup = [&](const char* name, const char* sig) -> jmethodID {
     jmethodID m = env->GetStaticMethodID(g_bridge.cls, name, sig);
     if (m == nullptr) {
       env->ExceptionClear();
-      __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointHttp.%s %s nao resolveu", name, sig);
+      __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointHttp.%s %s did not resolve", name, sig);
     }
     return m;
   };
@@ -101,11 +101,12 @@ const char* methodName(const esp_http_client_method_t m) {
 
 }  // namespace
 
-// O handle que o CrossPoint carrega. Do lado Kotlin a conexao e um inteiro
-// num mapa; aqui guardamos esse inteiro mais o que a API expoe por ponteiro.
+// The handle CrossPoint carries. On the Kotlin side a connection is an integer
+// in a map; here we keep that integer plus whatever the API exposes by
+// pointer.
 struct esp_http_client {
   std::string url;
-  std::string headers;  // linhas "Chave: Valor"
+  std::string headers;  // "Key: Value" lines
   esp_http_client_method_t method = HTTP_METHOD_GET;
   int timeoutMs = 15000;
   int handle = -1;
@@ -113,7 +114,7 @@ struct esp_http_client {
   int64_t contentLength = -1;
   int64_t consumed = 0;
   bool bodyPending = false;
-  std::string headerScratch;  // dono do char* que get_header devolve
+  std::string headerScratch;  // owns the char* get_header hands back
 };
 
 esp_http_client_handle_t esp_http_client_init(const esp_http_client_config_t* config) {
@@ -169,18 +170,18 @@ esp_err_t esp_http_client_set_redirection(const esp_http_client_handle_t client)
   if (client == nullptr) {
     return ESP_FAIL;
   }
-  // O Kotlin nao segue redirecionamento de proposito (ver CrossPointHttp.open):
-  // quem decide e o CrossPoint, que ja tem a propria logica. Aqui so trocamos
-  // a URL pelo Location e a proxima abertura vai para o lugar novo.
+  // Kotlin does not follow redirects on purpose (see CrossPointHttp.open):
+  // CrossPoint decides, and already has its own logic. Here we only swap the
+  // URL for the Location and the next open goes to the new place.
   char* location = nullptr;
   if (esp_http_client_get_header(client, "Location", &location) == ESP_OK && location != nullptr &&
       location[0] != '\0') {
-    std::fprintf(stderr, "[http] redirecionando para %s\n", location);
+    std::fprintf(stderr, "[http] redirecting to %s\n", location);
     std::fflush(stderr);
     client->url = location;
     return ESP_OK;
   }
-  std::fprintf(stderr, "[http] status de redirecionamento sem Location\n");
+  std::fprintf(stderr, "[http] redirect status with no Location\n");
   std::fflush(stderr);
   return ESP_FAIL;
 }
@@ -191,7 +192,7 @@ esp_err_t esp_http_client_open(const esp_http_client_handle_t client, const int 
   }
   crosspoint::android::JniAttach attach;
   if (!attach || !ensureBridge(attach.env())) {
-    std::fprintf(stderr, "[http] open: ponte JNI indisponivel\n");
+    std::fprintf(stderr, "[http] open: JNI bridge unavailable\n");
     std::fflush(stderr);
     return ESP_FAIL;
   }
@@ -219,8 +220,8 @@ esp_err_t esp_http_client_open(const esp_http_client_handle_t client, const int 
   client->status = -1;
   client->contentLength = -1;
   client->consumed = 0;
-  // Sem corpo para escrever, a resposta ja pode ser pedida; com corpo, quem
-  // chama escreve antes e o fetch_headers fecha a requisicao.
+  // With no body to write the response can be requested straight away; with a
+  // body the caller writes first and fetch_headers closes the request.
   client->bodyPending = writeLen > 0;
   return ESP_OK;
 }
@@ -257,20 +258,19 @@ int64_t esp_http_client_fetch_headers(const esp_http_client_handle_t client) {
     return -1;
   }
   JNIEnv* env = attach.env();
-  // Antes e depois da chamada, porque e aqui que a requisicao sai de verdade:
-  // o openConnection do lado Kotlin e preguicoso e o responseCode e que abre o
-  // socket, faz o handshake e le os cabecalhos. Sem as duas linhas, morrer
-  // dentro da chamada e voltar com erro dela produzem o mesmo log.
+  // This is where the request actually goes out: Kotlin's openConnection is
+  // lazy and responseCode is what opens the socket, does the handshake and
+  // reads the headers.
   client->status = env->CallStaticIntMethod(g_bridge.cls, g_bridge.finish, client->handle);
   if (env->ExceptionCheck()) {
     env->ExceptionClear();
-    std::fprintf(stderr, "[http] finish lancou excecao\n");
+    std::fprintf(stderr, "[http] finish threw\n");
     std::fflush(stderr);
     return -1;
   }
   client->bodyPending = false;
   if (client->status < 0) {
-    std::fprintf(stderr, "[http] finish devolveu erro (-1); ver logcat por CrossPointHttp\n");
+    std::fprintf(stderr, "[http] finish returned an error (-1); see logcat for CrossPointHttp\n");
     std::fflush(stderr);
     return -1;
   }
@@ -331,8 +331,8 @@ bool esp_http_client_is_complete_data_received(const esp_http_client_handle_t cl
   if (client == nullptr) {
     return false;
   }
-  // Sem Content-Length (resposta em chunks) nao ha como afirmar; o chamador
-  // ja trata o fim pelo read() devolvendo 0.
+  // With no Content-Length (a chunked response) there is no way to assert it;
+  // the caller already handles the end by read() returning 0.
   return client->contentLength < 0 || client->consumed >= client->contentLength;
 }
 
@@ -372,11 +372,11 @@ esp_err_t esp_http_client_get_header(const esp_http_client_handle_t client, cons
     return ESP_FAIL;
   }
   if (jval == nullptr) {
-    return ESP_OK;  // cabecalho ausente nao e erro
+    return ESP_OK;  // a missing header is not an error
   }
   const char* utf = env->GetStringUTFChars(jval, nullptr);
-  // O contrato do esp_http_client devolve um ponteiro que o chamador NAO
-  // libera, valido ate a proxima chamada. Um membro do cliente e dono dele.
+  // esp_http_client's contract hands back a pointer the caller does NOT free,
+  // valid until the next call. A member of the client owns it.
   client->headerScratch = utf != nullptr ? utf : "";
   env->ReleaseStringUTFChars(jval, utf);
   env->DeleteLocalRef(jval);

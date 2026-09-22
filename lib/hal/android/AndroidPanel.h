@@ -1,18 +1,18 @@
 #pragma once
 
-// Backend de display do Bigme HiBreak Pro.
+// Display backend for the Bigme HiBreak Pro.
 //
-// Nos alvos ESP32 o FreeInk dirige um painel cru por SPI/i80. No Kindle o EPDC
-// do kernel e dono do painel e o userspace ganha um /dev/fb0. Aqui nem isso:
-// a superficie vem do SurfaceFlinger, entregue por uma Activity Kotlin via
-// JNI, e quem decide o waveform e o framework xrz do fabricante.
+// On ESP32 targets FreeInk drives a raw panel over SPI/i80. On a Kindle the
+// kernel's EPDC owns the panel and userspace gets a /dev/fb0. Here, neither:
+// the surface comes from SurfaceFlinger, handed over by a Kotlin Activity
+// through JNI, and the vendor's xrz framework decides the waveform.
 //
-// O que isso muda em relacao aos outros dois: a superficie pode NAO EXISTIR a
-// qualquer momento. Uma Activity Android e pausada e destruida sob os pes do
-// processo, e a thread do CrossPoint continua viva e pintando. Entao cada
-// metodo aqui trata "sem superficie" como estado normal e nao como erro, e o
-// quadro composto sobrevive em `stage` para ser reapresentado quando a
-// superficie voltar.
+// What that changes against the other two: the surface may NOT EXIST at any
+// moment. An Android Activity is paused and destroyed out from under the
+// process while CrossPoint's thread stays alive and painting. So every method
+// here treats "no surface" as a normal state rather than an error, and the
+// composed frame survives in `stage` to be re-presented when the surface
+// returns.
 
 #include <cstddef>
 #include <cstdint>
@@ -24,18 +24,18 @@ struct ANativeWindow;
 
 namespace crosspoint::android {
 
-// Medidos no aparelho, nao supostos: 824x1648 a 300 dpi.
-// 824 / 8 = 103 exato, entao nao ha padding de linha na origem.
+// Measured on the device, not assumed: 824x1648 at 300 dpi.
+// 824 / 8 = 103 exactly, so there is no row padding on the source side.
 inline constexpr uint16_t HIBREAK_WIDTH = 824;
 inline constexpr uint16_t HIBREAK_HEIGHT = 1648;
 inline constexpr uint16_t HIBREAK_WIDTH_BYTES = HIBREAK_WIDTH / 8;
 inline constexpr uint32_t HIBREAK_BUFFER_SIZE = static_cast<uint32_t>(HIBREAK_WIDTH_BYTES) * HIBREAK_HEIGHT;
 
-// Espelha HalDisplay::RefreshMode para o HalDisplay hospedado poder repassar o
-// argumento direto. Na v1 o valor e registrado e nao usado: o caminho e o
-// Android padrao e o sistema escolhe o waveform. Fica aqui porque o
-// XrzEinkManager e uma chamada reflexiva de distancia e a escada de modos ja
-// esta levantada (177/178/179/180).
+// Mirrors HalDisplay::RefreshMode so the hosted HalDisplay can forward its
+// argument straight through. In v1 the value is recorded and unused: the path
+// is ordinary Android and the system picks the waveform. It stays because
+// XrzEinkManager is one reflective call away and the mode ladder has already
+// been surveyed (177/178/179/180).
 enum class Waveform : uint8_t { Full, Half, Fast };
 
 class AndroidPanel {
@@ -46,8 +46,9 @@ class AndroidPanel {
   AndroidPanel(const AndroidPanel&) = delete;
   AndroidPanel& operator=(const AndroidPanel&) = delete;
 
-  // Aloca o quadro de composicao. Nao espera superficie: ela chega quando a
-  // Activity resolver, e ate la tudo compoe normalmente e nada aparece.
+  // Allocates the composition frame. Does not wait for a surface: it arrives
+  // when the Activity decides, and until then everything composes normally and
+  // nothing shows.
   bool begin();
   void end();
   bool isOpen() const { return stage != nullptr; }
@@ -56,9 +57,9 @@ class AndroidPanel {
   uint16_t height() const { return HIBREAK_HEIGHT; }
 
   bool display(const uint8_t* frame, Waveform waveform);
-  // Sem marcador de conclusao do lado do Android: o post e assincrono mas nao
-  // ha o que esperar. Sempre retorna false, que no contrato do HalDisplay
-  // significa "terminou inline, nao chame waitComplete".
+  // There is no completion marker on the Android side: the post is async but
+  // there is nothing to wait for. Always returns false, which in HalDisplay's
+  // contract means "finished inline, do not call waitComplete".
   bool displayStart(const uint8_t* frame, Waveform waveform);
   bool reopen();
 
@@ -66,53 +67,54 @@ class AndroidPanel {
   bool stageGrayOverlay(const uint8_t* lsbPlane, const uint8_t* msbPlane);
   bool refresh(Waveform waveform);
 
-  // Ninguem mais pinta a nossa Surface: o compositor e quem compoe, e o que
-  // ele poe por cima nao substitui os nossos pixels no nosso buffer. A
-  // pergunta que isto responde no Kindle (o framework apagou a tela que
-  // dividimos?) nao existe aqui.
+  // Nobody else paints our Surface: the compositor composes, and what it puts
+  // on top does not replace our pixels in our buffer. The question this answers
+  // on the Kindle (did the framework blank the screen we share?) does not exist
+  // here.
   bool panelContentWasReplaced() const { return false; }
 
   uint8_t peekPixel(uint16_t x, uint16_t y) const;
   void waitComplete() {}
   void deepSleep() {}
 
-  // Chamados do JNI, na thread da Activity, nao na do CrossPoint.
-  // Tomam o mesmo mutex que a apresentacao.
+  // Called from JNI, on the Activity's thread, not CrossPoint's.
+  // They take the same mutex as presentation.
   void attachSurface(ANativeWindow* window);
   void detachSurface();
 
-  // Instancia unica: o JNI precisa alcancar o painel sem carregar um ponteiro
-  // pela cadeia inteira do HalDisplay.
+  // Single instance: JNI needs to reach the panel without threading a pointer
+  // through the whole HalDisplay chain.
   static AndroidPanel& instance();
 
  private:
-  // Os tres assumem o mutex ja tomado. display() precisa compor e apresentar
-  // sob UM unico lock: entre as duas metades a Activity pode trocar a
-  // superficie, e o quadro sairia pela metade.
+  // All three assume the mutex is already held. display() must compose and
+  // present under ONE lock: between the two halves the Activity can swap the
+  // surface, and the frame would go out half-written.
   bool stageFrameLocked(const uint8_t* frame);
   bool present();
 
-  // O ESTADO E ESTATICO, e isto e o conserto de um bug que deu tela preta.
+  // THE STATE IS STATIC, and this is the fix for a bug that gave a black
+  // screen.
   //
-  // O HalDisplay declara `crosspoint::hosted::Panel panel;` como membro POR
-  // VALOR, enquanto o JNI alcanca o painel por instance(). Eram dois objetos:
-  // a Surface ia para o singleton e o leitor pintava no membro, entao nada
-  // chegava a tela e nada falhava em lugar nenhum.
+  // HalDisplay declares `crosspoint::hosted::Panel panel;` as a BY-VALUE
+  // member, while JNI reaches the panel through instance(). They were two
+  // objects: the Surface went to the singleton and the reader painted into the
+  // member, so nothing reached the screen and nothing failed anywhere.
   //
-  // Ha exatamente um painel neste processo, entao estado estatico e a verdade
-  // e nao um truque: qualquer AndroidPanel e uma alca para o mesmo painel.
-  // A alternativa seria o membro do HalDisplay virar referencia, o que muda a
-  // assinatura compartilhada com o ramo Kindle por causa de um problema que so
-  // este alvo tem.
+  // There is exactly one panel in this process, so static state is the truth
+  // rather than a trick: any AndroidPanel is a handle onto the same panel. The
+  // alternative was making HalDisplay's member a reference, which changes a
+  // signature shared with the Kindle branch over a problem only this target
+  // has.
   static std::mutex mtx;
   static ANativeWindow* win;
-  // Quadro composto em 8bpp cinza, do tamanho do painel. 824*1648 = 1,36MB,
-  // irrelevante num telefone e o que permite stageFrame e stageGrayOverlay
-  // chegarem ao painel numa apresentacao so, como no Kindle.
+  // The composed frame in 8bpp gray, panel-sized. 824*1648 = 1.36MB,
+  // irrelevant on a phone, and what lets stageFrame and stageGrayOverlay reach
+  // the panel in a single presentation, as on the Kindle.
   static uint8_t* stage;
   static Waveform lastWaveform;
-  // A superficie apareceu depois do ultimo quadro composto: o proximo
-  // attachSurface reapresenta em vez de deixar a tela com lixo.
+  // The surface arrived after the last composed frame: the next attachSurface
+  // re-presents rather than leaving the screen with whatever was there.
   static bool stageHasContent;
 };
 

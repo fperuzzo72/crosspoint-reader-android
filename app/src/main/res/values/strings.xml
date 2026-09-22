@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CrossPoint</string>
-    <string name="needs_all_files">O CrossPoint precisa de acesso a todos os arquivos para ler a pasta /CrossPoint. Conceda e abra de novo.</string>
+    <string name="needs_all_files">CrossPoint needs All files access to read the /CrossPoint folder. Grant it and open the app again.</string>
 </resources>

@@ -729,19 +729,19 @@ void BaseTheme::drawStatusBar(GfxRenderer& renderer, const float bookProgress, c
   int orientedMarginTop, orientedMarginRight, orientedMarginBottom, orientedMarginLeft;
   renderer.getOrientedViewableTRBL(&orientedMarginTop, &orientedMarginRight, &orientedMarginBottom,
                                    &orientedMarginLeft);
-  // A barra alinha com a COLUNA DE TEXTO, nao com a borda util do painel.
+  // The bar aligns with the TEXT COLUMN, not with the panel's usable edge.
   //
-  // O leitor soma screenMargin ao recuo do bezel antes de compor a pagina
-  // (EpubReaderActivity, onde orientedMarginLeft/Right recebem exatamente
-  // isto). A barra nao somava, entao ficava screenMargin pixels mais perto da
-  // borda que o texto acima dela. Com a margem pequena a diferenca passava
-  // despercebida; num painel de cantos arredondados, e com a margem em 60px,
-  // as pontas da barra caem fora da area visivel.
+  // The reader adds screenMargin to the bezel inset before composing the page
+  // (EpubReaderActivity, where orientedMarginLeft/Right receive exactly this).
+  // The bar did not, so it sat screenMargin pixels closer to the edge than the
+  // text above it. With a small margin the difference went unnoticed; on a
+  // rounded panel, with the margin at 60px, the bar's ends fall outside the
+  // visible area.
   //
-  // Somar aqui e nao em cada um dos seis sitios abaixo: eles todos derivam
-  // destas duas variaveis, inclusive a largura do titulo e a barra de
-  // progresso quando ela nao esta em modo "preencher margem" (esse modo e
-  // escolha explicita do usuario por ir de ponta a ponta, e continua indo).
+  // Added here and not at each of the six sites below: they all derive from
+  // these two variables, including the title width and the progress bar when it
+  // is not in "fill margin" mode (that mode is an explicit choice to run edge
+  // to edge, and it still does).
   orientedMarginLeft += SETTINGS.screenMargin;
   orientedMarginRight += SETTINGS.screenMargin;
   const auto sb = SETTINGS.statusBarSpec();

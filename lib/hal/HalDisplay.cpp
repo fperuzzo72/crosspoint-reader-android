@@ -1,9 +1,9 @@
 // The FreeInkDisplay-backed HalDisplay, used by every ESP32 target.
 //
-// Os alvos hospedados (Kindle, HiBreak) usam o HalDisplayHosted.cpp: o painel
-// pertence ao sistema operacional e nao a um barramento nosso, e compilar este
-// arquivo la arrastaria toda a arvore de PanelDriver e EpdBus para um build
-// que nunca pode usa-la.
+// The hosted targets (Kindle, HiBreak) use HalDisplayHosted.cpp: the panel
+// belongs to the operating system rather than to a bus of ours, and compiling
+// this file there would drag the whole PanelDriver and EpdBus tree into a build
+// that can never use it.
 #include <BoardConfig.h>
 
 #if !FREEINK_MCU_HOSTED

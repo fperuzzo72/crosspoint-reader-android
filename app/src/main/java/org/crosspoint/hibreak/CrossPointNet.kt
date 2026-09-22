@@ -5,28 +5,22 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 
 /**
- * Estado da rede para o lado C++.
+ * Network state for the C++ side.
  *
- * O shim POSIX responde "conectado" perguntando ao getifaddrs se existe
- * interface no ar com endereco IPv4. Isso vale num Kindle e nao vale aqui: o
- * Android 11 fechou o acesso a NETLINK para aplicativo comum, entao o
- * getifaddrs tende a enxergar so o loopback, que o filtro descarta. O
- * resultado e o CrossPoint concluir que nao ha rede e abrir a tela de escolha
- * de Wi-Fi, que neste aparelho nao tem o que escolher porque quem associa e o
- * sistema.
+ * The POSIX shim answers "connected" by asking getifaddrs whether an interface
+ * is up with an IPv4 address. ConnectivityManager answers better, and for a
+ * reason that has nothing to do with permissions: it distinguishes "has an
+ * address" from "has internet". A hotel captive portal gives an address and no
+ * internet, and VALIDATED is the difference.
  *
- * O ConnectivityManager responde melhor por um segundo motivo, independente da
- * restricao: ele distingue "tem endereco" de "tem internet". Um portal
- * cativo de hotel da endereco e nao da internet, e VALIDATED e a diferenca.
- *
- * Usa ACCESS_NETWORK_STATE, que ja esta no manifesto. Nao usa localizacao:
- * nada aqui precisa do nome da rede.
+ * Uses ACCESS_NETWORK_STATE, already in the manifest. Does not use location:
+ * nothing here needs the network's name.
  */
 object CrossPointNet {
 
     private var appContext: Context? = null
 
-    /** Chamado uma vez pela Activity, antes de subir a thread do leitor. */
+    /** Called once by the Activity, before starting the reader thread. */
     @JvmStatic
     fun init(context: Context) {
         appContext = context.applicationContext
@@ -35,7 +29,7 @@ object CrossPointNet {
     private fun cm(): ConnectivityManager? =
         appContext?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 
-    /** Ha rede com internet de fato, nao apenas um endereco atribuido. */
+    /** There is a network with actual internet, not merely an assigned address. */
     @JvmStatic
     fun isOnline(): Boolean {
         val cm = cm() ?: return false
@@ -46,8 +40,8 @@ object CrossPointNet {
     }
 
     /**
-     * IPv4 local em ordem de rede (o mesmo formato que o sin_addr do shim),
-     * ou 0 quando nao ha.
+     * Local IPv4 in network order (the same layout as the shim's sin_addr), or 0
+     * when there is none.
      */
     @JvmStatic
     fun localIpV4(): Int {
@@ -57,8 +51,8 @@ object CrossPointNet {
         for (addr in link.linkAddresses) {
             val bytes = addr.address.address
             if (bytes.size == 4) {
-                // Ordem de rede: primeiro octeto no byte baixo, que e como o
-                // sin_addr chega ao IPAddress do lado C++.
+                // Network order: first octet in the low byte, which is how
+                // sin_addr reaches IPAddress on the C++ side.
                 return (bytes[0].toInt() and 0xFF) or
                     ((bytes[1].toInt() and 0xFF) shl 8) or
                     ((bytes[2].toInt() and 0xFF) shl 16) or

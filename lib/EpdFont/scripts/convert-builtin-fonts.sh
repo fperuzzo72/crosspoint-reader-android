@@ -4,24 +4,24 @@ set -e
 
 cd "$(dirname "$0")"
 
-# 12 saiu: a 300 dpi do HiBreak ele fica pequeno demais para ler, medido no
-# aparelho e nao inferido. 20, 22 e 24 entraram pelo mesmo teste.
+# 12 is out: at the HiBreak's 300 dpi it is too small to read, measured on the
+# device rather than inferred. 20 came in by the same test.
 #
-# Num ESP32 esta lista seria uma decisao de orcamento: os glifos sao a maior
-# parte do binario e ha 380KB de RAM. Neste alvo esse teto nao existe, entao a
-# lista e sobre leitura e nao sobre memoria.
-# 22 e 24 sairam: testados no aparelho e grandes demais para uso real. 12
-# saiu antes por ser pequeno demais. Sobra 14/16/18/20, que e a faixa que se
-# usa lendo.
-# Setas, formas geometricas, dingbats e os operadores matematicos que aparecem
-# em texto corrido. NENHUMA fonte de origem deste repositorio os tinha: medido,
-# NotoSerif e Ubuntu davam 0 de 112 setas e 1 de 96 formas geometricas. Por
-# isso saiam como quadrado com "?" nos livros.
+# On an ESP32 this list would be a budget decision: the glyphs are most of the
+# binary and there is 380KB of RAM. On this target that ceiling does not exist,
+# so the list is about reading rather than about memory.
+# 22 and 24 are out: tested on the device and too large for real use. 12 went
+# earlier for being too small. What remains is 14/16/18/20, the range you
+# actually read at.
+# Arrows, geometric shapes, dingbats and the mathematical operators that appear
+# in running text. NO source font in this repository had them: measured,
+# NotoSerif and Ubuntu gave 0 of 112 arrows and 1 of 96 geometric shapes. That
+# is why they came out as boxes with "?" in books.
 #
-# Duas fontes porque uma nao basta: a Symbols2 cobre formas geometricas (96/96)
-# e dingbats (145/192) mas so 13 de 112 setas e nao tem a U+2192; a Math tem
-# 99 de 112 setas e a U+2192. A pilha e ordenada por prioridade decrescente,
-# entao elas entram DEPOIS da fonte principal e so preenchem o que falta.
+# Two fonts because one is not enough: Symbols2 covers geometric shapes (96/96)
+# and dingbats (145/192) but only 13 of 112 arrows and lacks U+2192; Math has
+# 99 of 112 arrows and has U+2192. The stack is ordered by descending priority,
+# so they go in AFTER the main font and only fill what is missing.
 SYMBOL_FONTS=(
   ../builtinFonts/source/NotoSansMath/NotoSansMath-Regular.ttf
   ../builtinFonts/source/NotoSansSymbols2/NotoSansSymbols2-Regular.ttf
@@ -31,9 +31,9 @@ READER_FONT_STYLES=("Regular" "Italic" "Bold" "BoldItalic")
 NOTOSERIF_FONT_SIZES=(14 16 18 20)
 NOTOSANS_FONT_SIZES=(14 16 18 20)
 
-# UI_ONLY=1 pula as fontes de leitura. Elas sao deterministicas (o ID e a soma
-# dos SHA-256 dos cabecalhos, e regerar produz arquivo identico), entao pular
-# nao muda nada alem do tempo.
+# UI_ONLY=1 skips the reader fonts. They are deterministic (the ID is the sum
+# of the headers' SHA-256, and regenerating produces identical files), so
+# skipping changes nothing but the time.
 if [ -z "${UI_ONLY:-}" ]; then
 
 for size in ${NOTOSERIF_FONT_SIZES[@]}; do

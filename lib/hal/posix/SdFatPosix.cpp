@@ -14,17 +14,17 @@
 namespace crosspoint_storage {
 namespace {
 
-// A raiz padrao e do Kindle porque foi o primeiro alvo hospedado. No Android
-// nao ha caminho fixo que sirva: o diretorio do aplicativo depende do nome do
-// pacote e do usuario, e so o framework sabe qual e. O Kotlin descobre e
-// chama setRoot() pelo JNI antes de subir a thread do leitor.
+// The default root is the Kindle's because it was the first hosted target. On
+// Android there is no fixed path that works: the app's directory depends on the
+// package name and the user, and only the framework knows it. Kotlin finds out
+// and calls setRoot() over JNI before starting the reader thread.
 //
-// Este valor existe para o caso de essa chamada faltar. Aponta para um lugar
-// que nao existe no Android de proposito: um default que silenciosamente
-// funcionasse esconderia a chamada faltando ate alguem perguntar por que os
-// livros somem entre uma instalacao e outra.
+// This value exists in case that call is missing. It points somewhere that does
+// not exist on Android on purpose: a default that silently worked would hide
+// the missing call until somebody asked why the books vanish between
+// installs.
 #if FREEINK_DEVICE_HIBREAK
-char g_root[256] = "/nao-inicializado";
+char g_root[256] = "/uninitialised-storage-root";
 #else
 char g_root[256] = "/mnt/us";
 #endif

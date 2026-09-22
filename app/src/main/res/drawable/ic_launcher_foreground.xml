@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  O icone: um livro aberto com escrita, 1 bit.
+  The icon: an open book with writing, 1 bit.
 
-  Vetor e nao PNG: escala para qualquer densidade sem serrilhado e sao dois
-  kilobytes em vez de seis bitmaps que teriam de ser regerados a cada ajuste.
+  Vector and not PNG: it scales to any density without aliasing, and it is two
+  kilobytes instead of six bitmaps that would have to be regenerated on every
+  adjustment.
 
-  Contorno e nao silhueta cheia. Uma massa preta com o formato de livro aberto
-  le como duas asas; o contorno com as linhas de texto dentro le como livro.
+  Outline rather than a filled silhouette. A black mass shaped like an open
+  book reads as two wings; the outline with text lines inside reads as a book.
 
-  As linhas de escrita tem comprimentos DIFERENTES, e a ultima e curta. Linhas
-  todas iguais leem como papel pautado; e a irregularidade que diz "texto".
-  Elas tambem acompanham a inclinacao da pagina, subindo em direcao a borda
-  externa, senao flutuariam sobre uma pagina inclinada.
+  The writing lines have DIFFERENT lengths, and the last one is short. Lines of
+  equal length read as ruled paper; it is the irregularity that says "text".
+  They also follow the page's tilt, rising toward the outer edge, or they would
+  float above a slanted page.
 
-  Zona segura: o Android recorta a arte num circulo de 66dp dentro dos 108dp
-  da tela. Esta forma ocupa 62,3dp de diametro a partir do centro, medido
-  sobre os pontos das curvas, entao nenhum lançador a corta.
+  Safe zone: Android clips the art to a 66dp circle inside the 108dp canvas.
+  This shape occupies 62.3dp of diameter from the centre, measured over the
+  curve points, so no launcher crops it.
 
-  1 bit de verdade: so #000000, sobre o fundo branco da camada de tras.
+  Genuinely 1 bit: only #000000, over the white of the layer behind.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -25,29 +26,29 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Pagina esquerda. A curva do topo sobe da lombada para a borda: e ela
-         que forma o V central que faz o livro parecer aberto. -->
+    <!-- Left page. The top curve rises from the gutter to the outer edge: it
+         is what forms the central V that makes the book read as open. -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="3.5"
         android:strokeLineJoin="round"
         android:pathData="M51.5,40 C45,33.5 39,31.5 33,31 L33,75 C39,75.5 45,77 51.5,80 Z" />
 
-    <!-- Pagina direita, espelhada em x=54. -->
+    <!-- Right page, mirrored about x=54. -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="3.5"
         android:strokeLineJoin="round"
         android:pathData="M56.5,40 C63,33.5 69,31.5 75,31 L75,75 C69,75.5 63,77 56.5,80 Z" />
 
-    <!-- Escrita da pagina esquerda. -->
+    <!-- Writing on the left page. -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="2.8"
         android:strokeLineCap="round"
         android:pathData="M48.9,47.3 L35.6,43.7 M48.9,56.3 L35.6,52.7 M48.9,65.3 L40.8,63.1" />
 
-    <!-- Escrita da pagina direita. -->
+    <!-- Writing on the right page. -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="2.8"

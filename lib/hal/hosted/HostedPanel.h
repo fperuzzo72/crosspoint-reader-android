@@ -1,18 +1,18 @@
 #pragma once
 #include <BoardConfig.h>
 
-// Seletor do painel para os alvos hospedados.
+// Panel selector for the hosted targets.
 //
-// Kindle e HiBreak nao tem nada em comum no hardware: um fala com o EPDC do
-// kernel por /dev/fb0, o outro entrega pixels ao SurfaceFlinger. Mas a FORMA
-// que o HalDisplay precisa e a mesma (compoe um quadro, encena, apresenta),
-// e por isso os dois compartilham HalDisplayHosted.cpp em vez de terem uma
-// copia de 345 linhas cada.
+// The Kindle and the HiBreak share nothing in hardware: one talks to the
+// kernel's EPDC through /dev/fb0, the other hands pixels to SurfaceFlinger. But
+// the SHAPE HalDisplay needs is the same (compose a frame, stage it, present),
+// which is why both share HalDisplayHosted.cpp instead of carrying 345 lines
+// each.
 //
-// Um alvo hospedado novo entra aqui e implementa a mesma superficie de
-// metodos. Nao ha classe base virtual de proposito: a escolha e em tempo de
-// compilacao, um binario por aparelho, e uma vtable so pagaria indirecao por
-// uma decisao que o preprocessador ja tomou.
+// A new hosted target goes here and implements the same method surface. There
+// is deliberately no virtual base class: the choice is made at compile time,
+// one binary per device, and a vtable would only pay for indirection on a
+// decision the preprocessor already made.
 
 #include "HostedTouch.h"
 
@@ -22,12 +22,12 @@
 namespace crosspoint::hosted {
 using Panel = kindle::KindleFrameBuffer;
 using Waveform = kindle::Waveform;
-// PENDENTE no repositorio Kindle: o KindleTouch.h ainda declara Gesture,
-// GestureResult e TouchTuning dentro de crosspoint::kindle, e o HostedTouch.h
-// declara os mesmos tres em crosspoint::hosted. Enquanto o backport nao mover
-// os do Kindle para ca, este ramo nao compila. Esta assim de proposito, em vez
-// de aliases que escondessem a duplicata: os dois alvos tem que falar UMA
-// lingua de gesto, nao duas identicas.
+// PENDING in the Kindle repository: KindleTouch.h still declares Gesture,
+// GestureResult and TouchTuning inside crosspoint::kindle, while HostedTouch.h
+// declares the same three in crosspoint::hosted. Until the backport moves the
+// Kindle's here, this branch does not compile. It is deliberate rather than
+// papered over with aliases: the two targets must speak ONE gesture language,
+// not two identical ones.
 using Touch = kindle::KindleTouchDevice;
 inline constexpr uint16_t PANEL_WIDTH = kindle::KT3_WIDTH;
 inline constexpr uint16_t PANEL_HEIGHT = kindle::KT3_HEIGHT;

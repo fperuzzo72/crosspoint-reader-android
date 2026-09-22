@@ -259,16 +259,16 @@ class CrossPointSettings : public PersistableStore<CrossPointSettings> {
 
   // Reader screen margin settings
 #if FREEINK_DEVICE_HIBREAK
-  // A margem inferior NAO soma com a barra de status, compete com ela:
+  // The bottom margin does NOT add to the status bar, it competes with it:
   //   orientedMarginBottom += std::max(screenMargin, statusBarHeight)
-  // Com a barra em 46px (29 da faixa + 16 da barra de progresso + 1) e o
-  // maximo em 40, a configuracao nunca tinha efeito embaixo: a barra sempre
-  // ganhava e o texto encostava nela sem folga.
+  // With the bar at 46px (29 of lane + 16 of progress bar + 1) and the maximum
+  // at 40, the setting never had any effect at the bottom: the bar always won
+  // and the text touched it with no gap.
   //
-  // A 300 dpi os 40px do original sao ~3,4mm, apertado mesmo se funcionasse.
-  // O maximo sobe para 130 (~11mm) e o passo para 10, senao seriam 25 toques
-  // para atravessar a faixa. O padrao vai a 60, acima dos 46 da barra, para a
-  // margem existir de fato assim que o aplicativo abre.
+  // At 300 dpi the original 40px is ~3.4mm, tight even if it worked. The
+  // maximum goes to 130 (~11mm) and the step to 10, or it would be 25 taps to
+  // cross the range. The default goes to 60, above the bar's 46, so the margin
+  // actually exists the moment the app opens.
   static constexpr uint8_t SCREEN_MARGIN_MIN = 10;
   static constexpr uint8_t SCREEN_MARGIN_MAX = 130;
   static constexpr uint8_t SCREEN_MARGIN_STEP = 10;
@@ -284,9 +284,9 @@ class CrossPointSettings : public PersistableStore<CrossPointSettings> {
 // OPDS server list. Persisted via a category-less SettingInfo::String in
 // SettingsList.h, so it stays out of the on-device Settings screen.
 #if FREEINK_DEVICE_HIBREAK
-  // "" significa a raiz do armazenamento, que neste aparelho e
-  // /sdcard/CrossPoint, ao LADO de books/ e nao dentro. Um livro baixado por
-  // OPDS cairia num lugar onde o navegador nao olha.
+  // "" means the storage root, which on this device is /sdcard/CrossPoint,
+  // BESIDE books/ rather than inside it. A book downloaded over OPDS would land
+  // somewhere the browser does not look.
   char opdsDownloadFolder[64] = "/books";
 #else
   char opdsDownloadFolder[64] = "";

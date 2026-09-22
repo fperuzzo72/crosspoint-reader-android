@@ -1,13 +1,13 @@
-// HalDisplay para os alvos hospedados: Kindle e HiBreak.
+// HalDisplay for the hosted targets: Kindle and HiBreak.
 //
-// Substitui o HalDisplay.cpp, que repassa tudo para o FreeInkDisplay. Aqui a
-// metade do painel e crosspoint::hosted::Panel, escolhida em tempo de
-// compilacao em hosted/HostedPanel.h, e o framebuffer em que o CrossPoint
-// compoe e nosso, porque a metade do painel so recebe quadro pronto.
+// Replaces HalDisplay.cpp, which forwards everything to FreeInkDisplay. Here
+// the panel half is crosspoint::hosted::Panel, chosen at compile time in
+// hosted/HostedPanel.h, and the framebuffer CrossPoint composes into is ours,
+// because the panel half only ever receives a finished frame.
 //
-// Os dois aparelhos nao tem nada em comum no hardware, mas precisam
-// exatamente da mesma sequencia: compor, encenar a base, pintar os planos de
-// cinza por cima, apresentar uma vez. Por isso um arquivo e nao dois.
+// The two devices share nothing in hardware, but they need exactly the same
+// sequence: compose, stage the base, paint the gray planes over it, present
+// once. Hence one file and not two.
 //
 // Excluding this file's counterpart from the build is what removes the whole
 // PanelDriver and EpdBus tree, which is where 251 of the undefined symbols in

@@ -35,9 +35,9 @@ constexpr UiFontSize kUiFontSizes[] = {
     {SMALL_FONT_ID, 8},
 #endif
 #if FREEINK_DEVICE_HIBREAK
-    // Casa com o que o main.cpp registra sob cada ID neste aparelho. Se o mapa
-    // dissesse 10 e 12 enquanto as fontes entregam 12 e 16, o fallback CJK
-    // sairia menor que o latim ao lado dele.
+    // Matches what main.cpp registers under each ID on this device. If the map
+    // said 10 and 12 while the fonts deliver 12 and 16, the CJK fallback would
+    // come out smaller than the Latin next to it.
     {UI_10_FONT_ID, 14},
     {UI_12_FONT_ID, 16},
 #else

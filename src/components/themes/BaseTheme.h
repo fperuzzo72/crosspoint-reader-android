@@ -18,20 +18,20 @@ struct Rect {
   explicit Rect(int x = 0, int y = 0, int width = 0, int height = 0) : x(x), y(y), width(width), height(height) {}
 };
 
-// A faixa reservada para a barra de status, em pixels.
+// The lane reserved for the status bar, in pixels.
 //
-// NAO e derivada da fonte: o UITheme::getStatusBarHeight() soma esta constante
-// com a altura da barra de progresso e pronto. Entao o corpo usado na barra
-// tem de caber aqui, ou o texto invade a area da pagina acima dele.
+// It is NOT derived from the font: UITheme::getStatusBarHeight() adds this
+// constant to the progress bar's height and stops there. So the size used in
+// the bar has to fit here, or the text intrudes into the page above it.
 //
-// Medido nos cabecalhos gerados (advanceY da Ubuntu): 10 pede 24, 12 pede 29,
-// 14 pede 34, 16 pede 38. Com 19 reservados, a fonte de 10 ja estourava por
-// 5px em todos os alvos; ninguem notava porque 5px de descida sobre a margem
-// da pagina nao encosta em glifo nenhum.
+// Measured in the generated headers (Ubuntu's advanceY): 10 wants 24, 12 wants
+// 29, 14 wants 34, 16 wants 38. With 19 reserved, the size-10 font already
+// overflowed by 5px on every target; nobody noticed because 5px of descent over
+// the page margin touches no glyph.
 //
-// No HiBreak a barra usa 12, entao a reserva passa a ser o advanceY dele. Sai
-// mais alta que o original e o texto para de invadir, o que e melhor do que
-// era antes e nao so diferente.
+// On the HiBreak the bar uses 12, so the reservation becomes its advanceY. It
+// comes out taller than the original and the text stops intruding, which is
+// better than it was rather than merely different.
 #if FREEINK_DEVICE_HIBREAK
 inline constexpr int STATUS_BAR_VERTICAL_MARGIN = 29;
 #else

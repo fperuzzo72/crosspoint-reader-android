@@ -89,21 +89,21 @@ void WifiSelectionActivity::onEnter() {
   Activity::onEnter();
 
 #if FREEINK_DEVICE_HIBREAK
-  // Esta tela nao se aplica aqui, e o conserto mora nela e nao nos nove
-  // chamadores: OPDS, sincronizacao KOReader, download de fontes, relogio,
-  // OTA, servidor web, Calibre e as configuracoes. Remendar um por um deixaria
-  // o proximo que alguem escrever quebrado de novo.
+  // This screen does not apply here, and the fix lives in it rather than in
+  // the nine callers: OPDS, KOReader sync, font downloads, the clock, OTA, the
+  // web server, Calibre and settings. Patching them one by one would leave the
+  // next one anybody writes broken again.
   //
-  // Quem associa e o sistema operacional. O scanNetworks() do shim devolve
-  // zero de proposito, porque varrer brigaria com o gerenciador do Android
-  // pela mesma radio, entao a lista abriria vazia e sem nada a fazer.
+  // The operating system owns association. The shim's scanNetworks() returns
+  // zero on purpose, because scanning would fight Android's own manager for the
+  // same radio, so the list would open empty with nothing to do.
   //
-  // Ja conectado: encerra com sucesso na hora e o chamador segue como se a
-  // tela tivesse aparecido e o usuario tivesse escolhido. Sem rede: encerra
-  // cancelado, e cada chamador ja sabe mostrar o proprio erro.
+  // Already connected: finish successfully at once and the caller proceeds as
+  // if the screen had appeared and the user had chosen. No network: finish
+  // cancelled, and every caller already knows how to show its own error.
   {
     const bool online = WiFi.status() == WL_CONNECTED && WiFi.localIP() != IPAddress(0, 0, 0, 0);
-    selectedSSID.clear();  // o nome da rede exigiria permissao de localizacao
+    selectedSSID.clear();  // the network name would need location permission
     connectedIP = online ? WiFi.localIP().toString().c_str() : "";
     onComplete(online);
     return;

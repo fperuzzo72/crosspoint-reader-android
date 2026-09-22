@@ -1,41 +1,40 @@
 #pragma once
 
-// Chamar a JVM a partir do C++, que e a direcao contraria da que o Jni.cpp faz.
+// Calling the JVM from C++, which is the opposite direction from Jni.cpp.
 //
-// Ate aqui a ponte era de mao unica: o Kotlin chamava funcoes nativas e o C++
-// obedecia. Cada uma dessas chamadas chega com um JNIEnv* pronto, valido
-// naquela thread e naquela chamada, e nada precisa ser guardado.
+// Until now the bridge was one-way: Kotlin called native functions and C++
+// obeyed. Each of those calls arrives with a ready JNIEnv*, valid on that
+// thread and for that call, and nothing needs to be kept.
 //
-// A rede inverte isso. O CrossPoint pede um GET de dentro do loop do leitor,
-// que roda numa std::thread criada por nos: uma thread NATIVA, que a JVM nao
-// conhece. Ela nao tem JNIEnv, e obter um exige se anexar primeiro.
+// Networking inverts that. CrossPoint asks for a GET from inside the reader
+// loop, which runs on a std::thread we created: a NATIVE thread the JVM has
+// never heard of. It has no JNIEnv, and getting one requires attaching first.
 //
-// Duas regras que este arquivo existe para nao deixar ninguem esquecer:
+// Two rules this file exists so nobody forgets:
 //
-//   - JNIEnv e POR THREAD e nunca pode ser guardado entre threads. O que se
-//     guarda e o JavaVM*, que e do processo inteiro.
-//   - jclass e jobject obtidos numa chamada sao referencias LOCAIS e morrem
-//     quando ela termina. O que sobrevive e uma referencia global explicita.
+//   - JNIEnv is PER THREAD and must never be cached across threads. What you
+//     cache is the JavaVM*, which belongs to the whole process.
+//   - A jclass or jobject obtained in a call is a LOCAL reference and dies when
+//     that call ends. What survives is an explicit global reference.
 
 #include <jni.h>
 
 namespace crosspoint::android {
 
-// Capturado no JNI_OnLoad; ver o .cpp para por que nao basta o FindClass.
+// Captured in JNI_OnLoad; see the .cpp for why FindClass alone is not enough.
 void captureClassLoader(JNIEnv* env);
 
-// Guardado no JNI_OnLoad. Unico ponto em que a JVM se apresenta sem que
-// alguem tenha de pedir.
+// Cached in JNI_OnLoad. The one point where the JVM introduces itself without
+// anyone having to ask.
 void setJavaVM(JavaVM* vm);
 JavaVM* javaVM();
 
-// Anexa a thread atual a JVM enquanto viver, e a desanexa ao sair SE foi este
-// objeto que a anexou.
+// Attaches the current thread to the JVM for its lifetime, and detaches on
+// scope exit IF this object is the one that attached it.
 //
-// A condicao importa: a thread do leitor faz muitas requisicoes, e anexar e
-// desanexar a cada uma custaria caro. Mas desanexar uma thread que a JVM ja
-// conhecia (a thread da UI, por exemplo) quebraria o chamador de cima. Entao
-// quem anexou e quem desanexa, e mais ninguem.
+// The condition matters: detaching a thread the JVM already knew (the UI
+// thread, say) would break the caller above us. So whoever attached is who
+// detaches, and nobody else.
 class JniAttach {
  public:
   JniAttach();
@@ -44,9 +43,9 @@ class JniAttach {
   JniAttach(const JniAttach&) = delete;
   JniAttach& operator=(const JniAttach&) = delete;
 
-  // nullptr quando a JVM nao esta disponivel ou o anexo falhou. Todo chamador
-  // tem de checar: uma requisicao de rede sem JVM e um erro normal aqui, nao
-  // uma condicao impossivel.
+  // nullptr when the JVM is unavailable or the attach failed. Every caller must
+  // check: a network request without a JVM is an ordinary error here, not an
+  // impossible condition.
   JNIEnv* env() const { return env_; }
   explicit operator bool() const { return env_ != nullptr; }
 
@@ -55,11 +54,11 @@ class JniAttach {
   bool attachedHere_ = false;
 };
 
-// Uma referencia global para a classe, resolvida uma vez e mantida viva.
-// Resolver por FindClass a cada chamada seria lento e, pior, FALHARIA na
-// thread do leitor: o class loader que o JNI oferece a uma thread anexada nao
-// enxerga as classes do aplicativo, so as do sistema. Por isso a resolucao
-// acontece no JNI_OnLoad, que roda na thread que carregou a biblioteca.
+// A global reference to the class, resolved once and kept alive. Resolving via
+// FindClass on every call would be slow and, worse, would FAIL on the reader
+// thread: the class loader JNI offers an attached thread cannot see the
+// application's classes, only the system's. Hence resolution happens in
+// JNI_OnLoad, which runs on the thread that loaded the library.
 jclass findAppClass(JNIEnv* env, const char* name);
 
 }  // namespace crosspoint::android

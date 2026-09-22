@@ -9,15 +9,16 @@ namespace crosspoint::android {
 namespace {
 JavaVM* g_vm = nullptr;
 
-// O class loader do aplicativo, capturado no JNI_OnLoad.
+// The application's class loader, captured in JNI_OnLoad.
 //
-// FindClass resolve contra o class loader ASSOCIADO A THREAD. Na thread que
-// carrega a biblioteca isso e o loader do aplicativo e tudo e encontrado; numa
-// thread nativa anexada depois, o JNI oferece o loader do SISTEMA, que so
-// conhece java.* e android.*. Uma classe nossa vira ClassNotFoundException.
+// FindClass resolves against the class loader ASSOCIATED WITH THE THREAD. On
+// the thread that loads the library that is the app's loader and everything is
+// found; on a native thread attached later, JNI offers the SYSTEM loader, which
+// only knows java.* and android.*. One of our classes becomes
+// ClassNotFoundException.
 //
-// A saida padrao e guardar o loader de quando dava certo e chamar loadClass
-// nele explicitamente.
+// The standard way out is to keep the loader from when it worked and call
+// loadClass on it explicitly.
 jobject g_classLoader = nullptr;
 jmethodID g_loadClass = nullptr;
 }  // namespace
@@ -31,7 +32,7 @@ JniAttach::JniAttach() {
   }
   const jint status = g_vm->GetEnv(reinterpret_cast<void**>(&env_), JNI_VERSION_1_6);
   if (status == JNI_OK) {
-    // A thread ja era conhecida; nao somos donos do anexo.
+    // The thread was already known; we do not own the attach.
     return;
   }
   if (status != JNI_EDETACHED) {
@@ -56,7 +57,7 @@ jclass findAppClass(JNIEnv* env, const char* name) {
   if (env == nullptr) {
     return nullptr;
   }
-  // Caminho rapido: funciona na thread que carregou a biblioteca.
+  // Fast path: works on the thread that loaded the library.
   if (jclass direct = env->FindClass(name); direct != nullptr) {
     return direct;
   }
@@ -64,7 +65,7 @@ jclass findAppClass(JNIEnv* env, const char* name) {
   if (g_classLoader == nullptr || g_loadClass == nullptr) {
     return nullptr;
   }
-  // loadClass espera nome com pontos, FindClass espera com barras.
+  // loadClass wants a dotted name, FindClass wants slashes.
   std::string dotted(name);
   for (char& c : dotted) {
     if (c == '/') c = '.';
@@ -83,7 +84,7 @@ void captureClassLoader(JNIEnv* env) {
   jclass anyAppClass = env->FindClass("org/crosspoint/hibreak/CrossPointNative");
   if (anyAppClass == nullptr) {
     env->ExceptionClear();
-    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "JNI_OnLoad: classe do app nao encontrada");
+    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "JNI_OnLoad: app class not found");
     return;
   }
   jclass classClass = env->GetObjectClass(anyAppClass);
@@ -99,9 +100,9 @@ void captureClassLoader(JNIEnv* env) {
 
 }  // namespace crosspoint::android
 
-// Chamado pela JVM quando o System.loadLibrary("crosspoint") termina, na
-// thread que o chamou, que e a da Activity. E a unica janela em que o class
-// loader do aplicativo esta acessivel sem truque.
+// Called by the JVM when System.loadLibrary("crosspoint") completes, on the
+// thread that called it, which is the Activity's. It is the only window where
+// the application's class loader is reachable without a trick.
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
   crosspoint::android::setJavaVM(vm);
   JNIEnv* env = nullptr;

@@ -246,11 +246,11 @@ void ActivityManager::goToUsbDrive() {
 void ActivityManager::goToSettings() { replaceActivity(std::make_unique<SettingsActivity>(renderer, mappedInput)); }
 
 void ActivityManager::goToFileBrowser(std::string path) {
-  // Caminho vazio ou a raiz querem dizer "a biblioteca", nao "o topo do
-  // armazenamento". Nos aparelhos de cartao SD os dois sao a mesma coisa; no
-  // HiBreak nao, porque o cache e as fontes moram ao lado dos livros.
-  // As chamadas que passam um caminho de arquivo de verdade (voltar para a
-  // pasta do livro que se estava lendo) passam por aqui intactas.
+  // An empty path or the root mean "the library", not "the top of storage". On
+  // SD card devices the two are the same; on the HiBreak they are not, because
+  // the cache and the fonts live alongside the books. Calls that pass a real
+  // file path (returning to the folder of the book you were reading) go through
+  // untouched.
   if (path.empty() || path == "/") {
     path = crosspoint::storage::LIBRARY_ROOT;
   }

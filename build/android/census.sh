@@ -1,16 +1,17 @@
 #!/bin/sh
-# Censo de portabilidade para Android (arm64-v8a).
-# Roda o clang do NDK com -fsyntax-only sobre cada .cpp da arvore e conta
-# quantos compilam. Nao linka, nao gera objeto. E a bussola do porte:
-# ataque a causa mais frequente, remeça, repita.
+# Portability census for Android (arm64-v8a).
 #
-# Herdado de build/kindle/census.sh do porte Kindle.
+# Runs the NDK clang with -fsyntax-only over every .cpp in the tree and counts
+# how many compile. It does not link and produces no objects. It is the port's
+# compass: attack whatever cause appears most often, re-measure, repeat.
+#
+# Inherited from build/kindle/census.sh in the Kindle port.
 set -u
 cd "$(dirname "$0")/../.." || exit 1
 ROOT=$(pwd)
 OUT=build/android
 
-# --- localizar o NDK -------------------------------------------------------
+# --- locate the NDK -------------------------------------------------------
 NDK="${ANDROID_NDK_HOME:-}"
 if [ -z "$NDK" ]; then
   for c in /opt/homebrew/share/android-ndk \
@@ -20,13 +21,13 @@ if [ -z "$NDK" ]; then
   done
 fi
 if [ -z "$NDK" ] || [ ! -d "$NDK" ]; then
-  echo "NDK nao encontrado. Defina ANDROID_NDK_HOME." >&2
+  echo "NDK not found. Set ANDROID_NDK_HOME." >&2
   exit 1
 fi
 API=${ANDROID_API:-28}
 CC="$NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android$API-clang++"
 if [ ! -x "$CC" ]; then
-  echo "clang++ nao encontrado em $CC" >&2
+  echo "clang++ not found at $CC" >&2
   ls "$NDK/toolchains/llvm/prebuilt/" 2>/dev/null >&2
   exit 1
 fi
@@ -44,10 +45,10 @@ INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/libunibreak"
 INC="$INC -Ifreeink-sdk/libs/book/FreeInkBook/third_party/tjpgd"
 VER=${CROSSPOINT_VERSION:-android-dev}
 DEF="-D${FREEINK_DEVICE:-FREEINK_DEVICE_HIBREAK}=1 -DANDROID=1"
-# O ArduinoJson so registra o conversor de String quando sabe que esta num
-# ambiente Arduino. Aqui o String vem do nosso shim, entao a deteccao
-# automatica dele (que olha por ARDUINO) nao dispara e ele cai no
-# std::string. A flag liga o conversor e faz ele incluir <WString.h>.
+# ArduinoJson only registers the String converter when it knows it is in an
+# Arduino environment. Here String comes from our shim, so its automatic
+# detection (which looks for ARDUINO) never fires and it falls back to
+# std::string. The flag turns the converter on and makes it include <WString.h>.
 mkdir -p build/android
 cat > build/android/defines.h <<DEFS
 #pragma once
@@ -71,9 +72,9 @@ for f in $(find src lib freeink-sdk/libs -name '*.cpp' 2>/dev/null \
   fi
 done
 total=$((ok+fail))
-[ "$total" -eq 0 ] && { echo "nenhum arquivo encontrado"; exit 1; }
-echo "CENSO: $ok de $total arquivos compilam ($(( ok * 100 / total ))%)"
+[ "$total" -eq 0 ] && { echo "no files found"; exit 1; }
+echo "CENSUS: $ok of $total files compile ($(( ok * 100 / total ))%)"
 echo
-echo "--- causas das falhas, por frequencia ---"
+echo "--- failure causes, by frequency ---"
 sed -E "s/'[^']*' file not found/HEADER/; s/([a-zA-Z0-9_\/.]+\.h): No such file.*/missing header: \1/" "$OUT/census-errors.txt" \
   | cut -c1-72 | sort | uniq -c | sort -rn | head -20

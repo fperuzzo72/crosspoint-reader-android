@@ -1,28 +1,28 @@
 #pragma once
 #include <cstdint>
 
-// Estado da rede pelo framework, e nao pelo getifaddrs.
+// Network state from the framework rather than from getifaddrs.
 //
-// O motivo NAO e o que este comentario dizia antes. Eu havia escrito que o
-// Android 11 fecha o acesso a NETLINK para aplicativo comum e que por isso o
-// getifaddrs deixava de enxergar as interfaces. Medido no aparelho, com as
-// duas respostas lado a lado no log, isso e falso: o getifaddrs funciona aqui.
+// The reason is NOT what this comment said before. It claimed Android 11 closes
+// NETLINK access to ordinary apps and that getifaddrs therefore stopped seeing
+// the interfaces. Measured on the device, with both answers side by side in the
+// log, that is false: getifaddrs works here.
 //
-// O motivo que sobra, e que e bom por si so: o ConnectivityManager distingue
-// "tem endereco" de "tem internet". Um portal cativo de hotel da a primeira e
-// nao a segunda, e NET_CAPABILITY_VALIDATED e a diferenca. O getifaddrs nao
-// tem como responder isso.
+// The reason that remains, and it is a good one on its own: ConnectivityManager
+// distinguishes "has an address" from "has internet". A hotel captive portal
+// gives the first and not the second, and NET_CAPABILITY_VALIDATED is the
+// difference. getifaddrs has no way to answer that.
 //
-// Fica registrado que a causa original do sintoma (a tela de escolha de rede
-// abrindo com Wi-Fi ligado) continua sem explicacao. O conserto funciona; o
-// diagnostico que eu dei para ele estava errado.
+// Recorded: the original cause of the symptom (the network picker opening with
+// Wi-Fi already on) remains unexplained. The fix works; the diagnosis first
+// given for it was wrong.
 
 namespace crosspoint::android {
 
-// true quando ha rede ativa E validada.
+// true when there is an active AND validated network.
 bool netIsOnline();
 
-// IPv4 local em ordem de rede, igual ao sin_addr. Zero quando nao ha.
+// Local IPv4 in network order, same as sin_addr. Zero when there is none.
 uint32_t netLocalIpV4();
 
 }  // namespace crosspoint::android

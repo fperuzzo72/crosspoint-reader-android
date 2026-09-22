@@ -23,7 +23,7 @@ bool ensure(JNIEnv* env) {
   }
   jclass local = findAppClass(env, "org/crosspoint/hibreak/CrossPointNet");
   if (local == nullptr) {
-    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointNet nao encontrada");
+    __android_log_print(ANDROID_LOG_ERROR, "CrossPoint", "CrossPointNet not found");
     return false;
   }
   g.cls = static_cast<jclass>(env->NewGlobalRef(local));

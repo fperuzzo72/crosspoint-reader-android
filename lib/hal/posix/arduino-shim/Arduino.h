@@ -165,7 +165,7 @@ inline void analogReadResolution(uint8_t) {}
 inline void configTzTime(const char*, const char*, const char* = nullptr, const char* = nullptr) {}
 inline void configTime(long, int, const char*, const char* = nullptr, const char* = nullptr) {}
 
-// Atenuacao do ADC do ESP32. Nao ha ADC aqui; o valor existe para o codigo de
-// bateria compilar e analogSetAttenuation e inerte, como analogRead.
+// ESP32 ADC attenuation. There is no ADC here; the value exists so the battery
+// code compiles, and analogSetAttenuation is inert, like analogRead.
 enum adc_attenuation_t { ADC_0db = 0, ADC_2_5db = 1, ADC_6db = 2, ADC_11db = 3 };
 inline void analogSetAttenuation(adc_attenuation_t) {}

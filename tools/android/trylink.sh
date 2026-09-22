@@ -1,19 +1,19 @@
 #!/bin/sh
-# O build Android LINKA?
+# Does the Android build LINK?
 #
-# build/android/census.sh responde "este arquivo compilaria", que e pergunta
-# mais fraca do que parece: uma arvore pode estar 100% valida sintaticamente e
-# nao ter nada para linkar, porque um arquivo que nao compila leva os simbolos
-# dele junto e todo chamador vira referencia indefinida.
+# build/android/census.sh answers "would this file compile", which is a weaker
+# question than it looks: a tree can be 100% syntactically valid and still have
+# nothing to link, because a file that fails to compile takes its symbols with
+# it and every caller shows up as an undefined reference.
 #
-# Entao aqui compila tudo que compila, linka, e agrupa as referencias
-# indefinidas por frequencia. O numero e a distancia honesta ate um binario.
-# Ele cai em degraus, porque cada queda e um ARQUIVO ou uma subarvore passando
-# a compilar, nao um simbolo de cada vez.
+# So this compiles everything that compiles, links it, and groups the undefined
+# references by frequency. The number is the honest distance to a binary. It
+# falls in steps, because each drop is a FILE or a subtree starting to compile,
+# not one symbol at a time.
 #
-# Adaptado de tools/kindle/trylink.sh. As licoes duras (wrappers de C,
-# arquivamento por biblioteca, invalidacao por header) vieram todas de la e
-# estao comentadas onde importam.
+# Adapted from tools/kindle/trylink.sh. The hard-won lessons (C wrappers,
+# archiving per library, invalidation on header change) all came from there and
+# are commented where they matter.
 set -u
 
 NDK="${ANDROID_NDK_HOME:-/opt/homebrew/share/android-ndk}"
@@ -24,7 +24,7 @@ CC="$TC/aarch64-linux-android$API-clang"
 AR="$TC/llvm-ar"
 OUT=build/android/link
 JOBS=$(sysctl -n hw.ncpu 2>/dev/null || echo 4)
-[ -x "$CXX" ] || { echo "NDK nao encontrado em $NDK" >&2; exit 1; }
+[ -x "$CXX" ] || { echo "NDK not found at $NDK" >&2; exit 1; }
 mkdir -p "$OUT"
 
 INC="-Ithird_party -Ilib/hal/posix/arduino-shim -Ilib/hal/posix -Ilib/hal/android -Ilib/hal"
@@ -43,17 +43,18 @@ cat > build/android/defines.h <<DEFS
 #define ARDUINOJSON_ENABLE_ARDUINO_STRING 1
 DEFS
 DEF="$DEF -include build/android/defines.h"
-# expat e configurado por defines, nao por header, e xmlparse.c recusa sem eles.
+# expat is configured by defines rather than a config header, and xmlparse.c
+# refuses to build without them.
 CDEFS="-DXML_GE=0 -DXML_CONTEXT_BYTES=1024"
 
-# Um objeto velho carregando uma constante velha e a pior forma que um erro de
-# build toma, porque nada falha. A regra de timestamp abaixo so olha o proprio
-# fonte, e nao diz nada sobre os headers que ele inclui. Entao: qualquer header
-# mais novo que o carimbo descarta TODOS os objetos.
+# A stale object carrying a stale constant is the worst shape a build error
+# takes, because nothing fails. The timestamp rule below only looks at the
+# source itself and says nothing about the headers it includes. So: any header
+# newer than the stamp discards ALL objects.
 NEWEST_HEADER=$(find lib src freeink-sdk third_party \
     \( -name '*.h' -o -name '*.hpp' \) -newer "$OUT/.stamp" 2>/dev/null | head -1)
 if [ ! -f "$OUT/.stamp" ] || [ -n "$NEWEST_HEADER" ]; then
-    echo "--- header mudou (${NEWEST_HEADER:-primeira rodada}); descartando objetos ---"
+    echo "--- a header changed (${NEWEST_HEADER:-first run}); discarding objects ---"
     rm -f "$OUT"/*.o
 fi
 touch "$OUT/.stamp"
@@ -67,15 +68,15 @@ case "\$f" in
   *.c) $CC -Os -ffunction-sections -fdata-sections -c $INC $CDEFS "\$f" -o "\$o" 2>/dev/null ;;
   *)   $CXX -std=c++20 -Os -ffunction-sections -fdata-sections -c $INC $DEF "\$f" -o "\$o" 2>/dev/null ;;
 esac
-# Um arquivo que nao compila nao deixa objeto, e o link reporta os simbolos
-# dele como indefinidos. Isso E a medicao, nao uma falha a tratar.
+# A file that does not compile leaves no object, and the link reports its
+# symbols as undefined. That IS the measurement, not a failure to handle.
 exit 0
 HELPER
 chmod +x "$OUT/cc-one.sh"
 
-# FreeInkDisplay/src e a pilha de driver de painel: os PanelDriver e o EpdBus.
-# Aqui nao ha painel cru; compilar isso so produz objeto referenciando um
-# barramento que nao existe.
+# FreeInkDisplay/src is the panel driver stack: the PanelDrivers and the
+# EpdBus. There is no raw panel here; compiling it only yields objects
+# referencing a bus that cannot exist.
 { find src lib freeink-sdk/libs -name '*.cpp' 2>/dev/null
   find third_party -name '*.cpp' 2>/dev/null
   echo tools/android/main_android.cpp
@@ -89,11 +90,12 @@ echo tools/android/main_android.cpp >> "$OUT/sources.txt"
   find third_party -name '*.c' 2>/dev/null
 } > "$OUT/csources.raw"
 
-# Alguns .c vendorizados nao sao autonomos: um wrapper aplica um prefixo de
-# simbolo e depois inclui o arquivo cru. Ha mais de uma copia de miniz nesta
-# arvore, cada uma com seu prefixo, e compilar tambem os fontes crus da a cada
-# simbolo duas definicoes. Em vez de fixar nomes, le os wrappers e exclui
-# exatamente o que eles incluem: continua correto se a vendorizacao mudar.
+# Some vendored .c files are not standalone: a wrapper applies a symbol prefix
+# and then includes the raw file. There is more than one copy of miniz in this
+# tree, each with its own prefix, and compiling the raw sources as well gives
+# every symbol two definitions. Rather than hardcoding names, read the wrappers
+# and exclude exactly what they include: that stays correct if the vendoring
+# changes.
 : > "$OUT/wrapped.txt"
 ROOT=$(pwd -P)
 for w in $(grep -rl '#include.*\.c"' lib freeink-sdk/libs --include='*.c' 2>/dev/null); do
@@ -104,21 +106,22 @@ for w in $(grep -rl '#include.*\.c"' lib freeink-sdk/libs --include='*.c' 2>/dev
 done
 if [ -s "$OUT/wrapped.txt" ]; then
     grep -vFf "$OUT/wrapped.txt" "$OUT/csources.raw" > "$OUT/csources.txt" || cp "$OUT/csources.raw" "$OUT/csources.txt"
-    echo "--- excluindo $(wc -l < "$OUT/wrapped.txt" | tr -d ' ') fontes C que um wrapper ja inclui ---"
+    echo "--- excluding $(wc -l < "$OUT/wrapped.txt" | tr -d ' ') C sources a wrapper already includes ---"
 else
     cp "$OUT/csources.raw" "$OUT/csources.txt"
 fi
 
-echo "--- compilando ($(wc -l < "$OUT/sources.txt" | tr -d ' ') C++, $(wc -l < "$OUT/csources.txt" | tr -d ' ') C, -j$JOBS, incremental) ---"
+echo "--- compiling ($(wc -l < "$OUT/sources.txt" | tr -d ' ') C++, $(wc -l < "$OUT/csources.txt" | tr -d ' ') C, -j$JOBS, incremental) ---"
 cat "$OUT/sources.txt" "$OUT/csources.txt" | xargs -P "$JOBS" -n1 "$OUT/cc-one.sh"
-echo "objetos: $(ls "$OUT"/*.o 2>/dev/null | wc -l | tr -d ' ')"
+echo "objects: $(ls "$OUT"/*.o 2>/dev/null | wc -l | tr -d ' ')"
 
-# Agrupar em arquivos .a por biblioteca, nao linkar objetos soltos. Isto nao e
-# cosmetico: ha mais de uma copia de miniz na arvore, cada uma com config que
-# prefixa so parte dos simbolos, e o resto colide. O PlatformIO nunca ve isso
-# porque arquiva cada biblioteca e o linker puxa um membro so quando ele
-# resolve algo ainda indefinido: duplicata entre arquivos e "o primeiro vence",
-# nao erro. Linkar solto forca toda definicao para dentro.
+# Group into .a archives per library rather than linking loose objects. This is
+# not cosmetic: there is more than one copy of miniz in the tree, each with a
+# config that prefixes only some of its symbols, and the rest collide.
+# PlatformIO never sees it because it archives each library and the linker then
+# pulls a member only when it resolves something still undefined: duplicates
+# across archives are "first wins", not an error. Linking loose forces every
+# definition in.
 rm -f "$OUT"/*.a
 for o in "$OUT"/*.o; do
     base=$(basename "$o")
@@ -132,33 +135,33 @@ for o in "$OUT"/*.o; do
     "$AR" rcs "$OUT/lib$lib.a" "$o" 2>/dev/null
 done
 
-# App e HAL entram soltos: definem main() e os globais que ninguem referencia
-# por nome, que um arquivo .a descartaria.
+# App and HAL go in loose: they define main() and the globals nothing
+# references by name, which an archive would drop.
 objs=$(ls "$OUT"/src_*.o "$OUT"/tools_*.o "$OUT"/lib_hal_*.o 2>/dev/null | tr '\n' ' ')
 archives=$(ls "$OUT"/*.a 2>/dev/null | grep -vE 'libapp\.a|libhal\.a' | tr '\n' ' ')
-echo "arquivos .a: $(echo $archives | wc -w | tr -d ' ')"
+echo "archives: $(echo $archives | wc -w | tr -d ' ')"
 
-echo "--- tentando linkar ---"
-# --gc-sections e o que o build de firmware usa, e nao e so tamanho: helpers
-# declarados e chamados mas nunca definidos no subconjunto vendorizado
-# aparecem como indefinidos sem ele, mesmo em codigo que nunca roda.
-# Arquivos por ultimo e repetidos (--start-group): as bibliotecas se
-# referenciam e uma passada so perderia simbolos puxados por membro posterior.
-# No Android nao existe -lrt: bionic poe tudo em libc. pthread idem.
+echo "--- attempting a link ---"
+# --gc-sections is what the firmware build uses, and it is not only about size:
+# helpers declared and called but never defined in the vendored subset show up
+# as undefined without it, even in code that never runs.
+# Archives last and repeated (--start-group): the libraries reference each other
+# and a single pass would miss symbols pulled in by a later member.
+# There is no -lrt on Android: bionic puts it all in libc. Same for pthread.
 "$CXX" -o "$OUT/crosspoint" $objs \
     -static-libstdc++ \
     -Wl,--gc-sections \
     -Wl,--start-group $archives -Wl,--end-group \
     -llog -lz -landroid 2>"$OUT/link.err"
-# -landroid: ANativeWindow_lock/unlockAndPost/release, que sao a metade de
-# baixo do AndroidPanel.
-# -lz: o PNGdec usa zlib, e o Android tem libz no sistema. No firmware ESP32
-# a inflacao vem do miniz vendorizado; aqui nao ha motivo para carregar uma
-# copia quando o bionic ja traz uma.
-echo "saida do link: $?"
+# -landroid: ANativeWindow_lock/unlockAndPost/release, the lower half of
+# AndroidPanel.
+# -lz: PNGdec uses zlib, e o Android tem libz no sistema. No firmware ESP32
+# inflation comes from the vendored miniz; here there is no reason to carry a
+# copy when bionic already ships one.
+echo "link exit: $?"
 echo
-echo "--- simbolos indefinidos, por frequencia ---"
+echo "--- undefined symbols, by frequency ---"
 grep -oE "undefined (reference to|symbol:) .?[^'\"]*" "$OUT/link.err" \
   | sed -E "s/undefined (reference to|symbol:) //" | sort | uniq -c | sort -rn | head -20
 echo
-echo "referencias indefinidas distintas: $(grep -oE "undefined (reference to|symbol:) .?[^'\"]*" "$OUT/link.err" | sort -u | wc -l | tr -d ' ')"
+echo "distinct undefined references: $(grep -oE "undefined (reference to|symbol:) .?[^'\"]*" "$OUT/link.err" | sort -u | wc -l | tr -d ' ')"

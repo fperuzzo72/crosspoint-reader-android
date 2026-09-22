@@ -86,10 +86,10 @@
 #ifndef FREEINK_DEVICE_KINDLE
 #define FREEINK_DEVICE_KINDLE 0
 #endif
-// Bigme HiBreak Pro: telefone Android com painel e-ink. Como o Kindle, e um
-// build hospedado, onde um SO e dono do hardware e o FreeInk e um processo.
-// Diferente do Kindle, nem o framebuffer e nosso: a superficie vem do
-// SurfaceFlinger e quem escolhe o waveform e o framework do fabricante.
+// Bigme HiBreak Pro: an Android phone with an e-ink panel. Like the Kindle, a
+// hosted build, where an OS owns the hardware and FreeInk is a process. Unlike
+// the Kindle, not even the framebuffer is ours: the surface comes from
+// SurfaceFlinger and the vendor's framework picks the waveform.
 #ifndef FREEINK_DEVICE_HIBREAK
 #define FREEINK_DEVICE_HIBREAK 0
 #endif
@@ -218,9 +218,9 @@
 // are physically landscape and the renderer's Orientation enum is written from
 // their point of view, so this tells it to shift the whole mapping a quarter
 // turn. A Kindle's 600x800 panel is portrait, and so is the HiBreak's
-// 824x1648 — it is a phone. (The HiBreak's panel is also installed at
-// ROTATION_270, but the Android framework resolves that before our surface
-// ever sees a pixel; it would only come back raw on the ION overlay path.)
+// 824x1648: it is a phone. (The HiBreak's panel is also installed at
+// ROTATION_270, but the Android framework resolves that before our surface ever
+// sees a pixel; it would only come back raw on the ION overlay path.)
 #ifndef FREEINK_PANEL_NATIVE_PORTRAIT
 #define FREEINK_PANEL_NATIVE_PORTRAIT (FREEINK_DEVICE_KINDLE || FREEINK_DEVICE_HIBREAK)
 #endif

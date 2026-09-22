@@ -94,8 +94,8 @@ WiFiClass WiFi;
 
 wl_status_t WiFiClass::status() {
 #if FREEINK_DEVICE_HIBREAK
-  // Pergunta ao framework. Ver NetAndroid.h para o porque, e para a hipotese
-  // errada que eu havia escrito aqui antes de medir.
+  // Ask the framework. See NetAndroid.h for why, and for the wrong hypothesis
+  // that stood here before anyone measured.
   const bool framework = crosspoint::android::netIsOnline();
   static bool said = false;
   if (!said) {

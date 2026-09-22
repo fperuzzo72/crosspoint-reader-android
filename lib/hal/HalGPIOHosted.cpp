@@ -1,4 +1,4 @@
-// HalGPIO para os alvos hospedados: Kindle e HiBreak.
+// HalGPIO for the hosted targets: Kindle and HiBreak.
 //
 // Two thirds of this interface describes hardware the KT3 does not have, and
 // saying so plainly is more useful than half-implementing it:

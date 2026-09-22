@@ -10,8 +10,8 @@ using esp_reset_reason_t = int;
 
 inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_UNKNOWN; }
 
-// esp_restart() e a forma livre do ESP-IDF, irma do ESP.restart() do core
-// Arduino. Reiniciar o firmware e reiniciar o aparelho sao o mesmo ato num
-// ESP32; aqui nao sao, entao isto re-executa o processo, como ArduinoShim.cpp
-// ja faz para ESP.restart(). Nao retorna.
+// esp_restart() is ESP-IDF's free-function form, sibling to the Arduino core's
+// ESP.restart(). Restarting the firmware and rebooting the device are the same
+// act on an ESP32; here they are not, so this re-execs the process, as
+// ArduinoPlatform.cpp already does for ESP.restart(). Does not return.
 [[noreturn]] void esp_restart();

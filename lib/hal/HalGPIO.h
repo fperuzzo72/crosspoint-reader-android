@@ -2,18 +2,18 @@
 
 #include <Arduino.h>
 
-// BoardConfig.h vem ANTES do #if, e isso nao e ordem de gosto.
-// FREEINK_MCU_HOSTED e DERIVADO la dentro; testa-lo antes de incluir o header
-// le zero, o ramo errado e escolhido, e o erro so aparece dezenas de linhas
-// depois como "undeclared identifier". Com FREEINK_DEVICE_KINDLE isso nao
-// acontecia porque aquele vem da linha de comando. Este arquivo ja tinha
-// levado uma versao do mesmo tombo com FREEINK_CAP_TOUCH.
+// BoardConfig.h comes BEFORE the #if, and that is not a matter of taste.
+// FREEINK_MCU_HOSTED is DERIVED inside it; testing it before including the
+// header reads zero, the wrong branch is taken, and the error only surfaces
+// dozens of lines later as "undeclared identifier". With FREEINK_DEVICE_KINDLE
+// that never happened because it comes from the command line. This file had
+// already taken a version of the same fall with FREEINK_CAP_TOUCH.
 #include <BoardConfig.h>
 
 #if FREEINK_MCU_HOSTED
-// Sem InputManager aqui: ele dirige uma escada de botoes por ADC e um
-// controlador de toque por I2C, e nenhum dos dois existe num alvo hospedado.
-// O toque chega do sistema operacional.
+// No InputManager here: it drives an ADC button ladder and an I2C touch
+// controller, and neither exists on a hosted target. Touch arrives from the
+// operating system.
 #include "hosted/HostedPanel.h"
 #else
 #include <InputManager.h>

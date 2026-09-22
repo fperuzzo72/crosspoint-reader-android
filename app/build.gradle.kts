@@ -10,9 +10,10 @@ android {
 
   defaultConfig {
     applicationId = "org.crosspoint.hibreak"
-    // O aparelho roda Android 14 (SDK 34). O minimo fica em 28 porque e o que
-    // o NDK build usa e nao ha razao para exigir mais: nada aqui depende de
-    // API nova. Se um dia depender, isto sobe junto com o ANDROID_PLATFORM.
+    // The device runs Android 14 (SDK 34). The minimum stays at 28 because that
+    // is what the NDK build uses and there is no reason to demand more: nothing
+    // here depends on a newer API. If something ever does, this rises together
+    // with ANDROID_PLATFORM.
     minSdk = 28
     targetSdk = 35
     versionCode = 1
@@ -24,9 +25,9 @@ android {
 
     externalNativeBuild {
       cmake {
-        // c++_static: um .so so no APK, sem depender de libc++_shared estar
-        // presente. O binario ja e grande e a STL estatica e a diferenca entre
-        // funcionar e falhar no carregamento num aparelho de fabricante.
+        // c++_static: one .so in the APK, with no dependency on libc++_shared
+        // being present. The binary is large already, and a static STL is the
+        // difference between loading and failing to load on a vendor device.
         arguments += listOf("-DANDROID_STL=c++_static")
         cppFlags += "-std=c++20"
       }

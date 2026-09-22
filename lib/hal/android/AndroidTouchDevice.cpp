@@ -14,9 +14,9 @@ AndroidTouchDevice& AndroidTouchDevice::instance() {
 }
 
 bool AndroidTouchDevice::begin(uint16_t, uint16_t, TouchTuning) {
-  // Nem geometria nem tuning se aplicam: o Kotlin entrega coordenadas ja
-  // normalizadas e os limiares sao os do sistema. Os parametros ficam na
-  // assinatura porque o HalGPIO hospedado chama os dois alvos igual.
+  // Neither geometry nor tuning apply: Kotlin delivers already-normalised
+  // coordinates and the thresholds are the system's. The parameters stay in the
+  // signature because the hosted HalGPIO calls both targets the same way.
   std::lock_guard<std::mutex> lock(mtx);
   open = true;
   return true;

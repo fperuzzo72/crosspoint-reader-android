@@ -17,12 +17,12 @@ import android.view.View
 import android.view.WindowManager
 
 /**
- * A Activity inteira do CrossPoint. Uma SurfaceView, um GestureDetector, e a
- * ponte.
+ * CrossPoint's entire Activity. One SurfaceView, one GestureDetector, and the
+ * bridge.
  *
- * Nao ha layout XML e nao ha view alguma alem da superficie. O CrossPoint
- * desenha a interface dele por conta propria, do zero, em 1bpp: qualquer
- * widget Android aqui seria uma segunda interface disputando a mesma tela.
+ * There is no XML layout and no view beyond the surface. CrossPoint draws its
+ * own interface from scratch in 1bpp: any Android widget here would be a second
+ * interface competing for the same screen.
  */
 class ReaderActivity : Activity(), SurfaceHolder.Callback {
 
@@ -30,9 +30,9 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
   private lateinit var gestures: GestureDetector
 
   /**
-   * Onde o dedo pousou no contato em andamento, em pixels. Guardado porque o
-   * swipe precisa do inicio e o [GestureDetector] so entrega o evento inicial
-   * em alguns callbacks, nao em todos.
+   * Where the finger landed in the contact in progress, in pixels. Kept because
+   * a swipe needs the start and [GestureDetector] only hands the initial event
+   * to some callbacks, not all.
    */
   private var downX = 0f
   private var downY = 0f
@@ -41,34 +41,34 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    // A tela nao apaga enquanto se le. Num e-ink isso custa quase nada,
-    // porque o painel so consome ao mudar, e uma tela que apaga no meio de uma
-    // pagina e o tipo de coisa que faz perder a linha.
+    // The screen does not sleep while reading. On e-ink that costs almost
+    // nothing, because the panel only draws power when it changes, and a screen
+    // that blanks mid-page is the kind of thing that loses your line.
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
     surfaceView = SurfaceView(this)
     surfaceView.holder.addCallback(this)
     setContentView(surfaceView)
 
-    // O notch come os 49px do topo (medido: Rect(375, 0 - 450, 49)). O
-    // CrossPoint desenha a propria barra de status exatamente ali, entao a
-    // tela vai inteira para baixo do recorte e o leitor nao precisa saber que
-    // ele existe. Se um dia quisermos os 49px de volta, a alternativa e
-    // LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES e ensinar o CrossPoint sobre
-    // o inset.
+    // The notch eats the top 49px (measured: Rect(375, 0 - 450, 49)).
+    // CrossPoint draws its own status bar exactly there, so the app goes
+    // fullscreen under the cutout and the reader never learns it exists.
+    // Reclaiming those pixels would mean
+    // LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES and teaching CrossPoint the
+    // inset.
     hideSystemBars()
 
     gestures = GestureDetector(this, GestureListener())
-    // O detector do Android nao entrega toque longo pelo caminho normal a
-    // menos que se peca; e queremos, porque e como o CrossPoint abre menu de
-    // contexto e apaga livro.
+    // Android's detector does not deliver long presses through the normal path
+    // unless asked; we want them, because that is how CrossPoint opens context
+    // menus and deletes books.
     gestures.setIsLongpressEnabled(true)
 
-    // Sem a permissao nao se comeca, e isto nao e rigor: a raiz e lida UMA
-    // vez, dentro do setup() do CrossPoint, e o nativeStart e idempotente.
-    // Subir com a pasta escondida e conceder a permissao depois deixaria o
-    // leitor presa nela ate o processo morrer, o que e pior do que nao subir,
-    // porque parece funcionar.
+    // Without the permission we do not start, and that is not strictness: the
+    // root is read ONCE, inside CrossPoint's setup(), and nativeStart is
+    // idempotent. Starting with the hidden folder and granting afterwards would
+    // leave the reader stuck on it until the process dies, which is worse than
+    // not starting because it looks like it worked.
     if (!Environment.isExternalStorageManager()) {
       Toast.makeText(this, R.string.needs_all_files, Toast.LENGTH_LONG).show()
       requestAllFilesAccess()
@@ -76,8 +76,9 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
       return
     }
 
-    // Antes da raiz e antes da thread: o C++ pergunta o estado da rede assim
-    // que alguem abre o OPDS, e sem contexto a resposta seria "sem rede".
+    // Before the root and before the thread: C++ asks for network state as
+    // soon as anyone opens OPDS, and without a context the answer would be
+    // "no network".
     CrossPointNet.init(this)
 
     val root = resolveStorageRoot()
@@ -87,29 +88,29 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
   }
 
   /**
-   * Onde os livros ficam.
+   * Where the books live.
    *
-   * Com acesso a todos os arquivos concedido: `/sdcard/CrossPoint`. E uma
-   * pasta comum, que voce enxerga em qualquer gerenciador de arquivos, copia
-   * EPUB para dentro por USB ou LocalSend, e que sobrevive a desinstalar o
-   * aplicativo.
+   * With All files access granted: `/sdcard/CrossPoint`. An ordinary folder you
+   * can see in any file manager, copy EPUBs into over USB or the network, and
+   * which survives uninstalling the app.
    *
-   * Sem a permissao: `getExternalFilesDir()`, que funciona mas fica em
-   * `Android/data/`, um caminho que o Android 11+ esconde de gerenciadores de
-   * arquivos. O leitor roda, a biblioteca fica vazia, e nao ha como pôr nada
-   * la sem cabo. Por isso a permissao e pedida, e nao apenas aceita se vier.
+   * Without the permission: `getExternalFilesDir()`, which works but sits in
+   * `Android/data/`, a path Android 11+ hides from file managers. The reader
+   * runs, the library stays empty, and there is no way to put anything there
+   * without a cable. That is why the permission is asked for rather than merely
+   * accepted if it happens to be there.
    */
   private fun resolveStorageRoot(): File {
     if (Environment.isExternalStorageManager()) {
       val dir = File(Environment.getExternalStorageDirectory(), "CrossPoint")
       if (dir.mkdirs() || dir.isDirectory) {
-        // O layout e criado aqui e nao pelo leitor porque uma pasta que ja
-        // existe e um convite: voce abre o gerenciador de arquivos, ve
-        // "books", e sabe onde soltar o EPUB. Uma pasta que so aparece depois
-        // que o leitor decide cria-la nao ensina nada.
+        // The layout is created here and not by the reader because a folder
+        // that already exists is an invitation: you open a file manager, see
+        // "books", and know where to drop the EPUB. A folder that only appears
+        // after the reader decides to create it teaches nothing.
         //
-        // .crosspoint nao esta aqui: o PersistableStore cria quando precisa, e
-        // uma pasta de cache vazia so confunde.
+        // .crosspoint is not here: PersistableStore creates it when needed, and
+        // an empty cache folder only confuses.
         File(dir, "books").mkdirs()
         File(dir, "fonts").mkdirs()
         return dir
@@ -121,11 +122,11 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
   }
 
   /**
-   * Abre a tela do sistema onde a permissao e concedida.
+   * Opens the system screen where the permission is granted.
    *
-   * Nao ha dialogo em linha para esta: o Android exige que o usuario va aos
-   * Ajustes e ligue explicitamente, que e o preco de uma permissao ampla. Se
-   * ele nao ligar, o leitor continua funcionando com a pasta escondida.
+   * There is no inline dialog for this one: Android requires the user to go to
+   * Settings and enable it explicitly, which is the price of a broad
+   * permission.
    */
   private fun requestAllFilesAccess() {
     if (Environment.isExternalStorageManager()) {
@@ -150,17 +151,17 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
   }
 
   override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-    // Reentregar e barato e cobre o caso em que o compositor trocou o buffer
-    // por baixo sem destruir a superficie.
+    // Re-handing it over is cheap and covers the case where the compositor
+    // swapped the buffer underneath without destroying the surface.
     CrossPointNative.nativeSetSurface(holder.surface)
   }
 
   override fun surfaceDestroyed(holder: SurfaceHolder) {
-    // Tem de ser SINCRONO. Depois que este metodo retorna a superficie deixa
-    // de ser valida, e a thread do leitor continua rodando: se ela ainda
-    // estiver segurando o ANativeWindow no proximo frame, escreve em memoria
-    // que nao e mais dela. O lado C++ toma o mesmo mutex da apresentacao, o
-    // que faz esta chamada esperar um paint em andamento terminar.
+    // Must be SYNCHRONOUS. After this method returns the surface stops being
+    // valid, and the reader thread keeps running: if it is still holding the
+    // ANativeWindow on the next frame it writes into memory that is no longer
+    // its own. The C++ side takes the same mutex as presentation, which makes
+    // this call wait for a paint in progress to finish.
     CrossPointNative.nativeSetSurface(null)
   }
 
@@ -187,15 +188,15 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
   private fun ny(y: Float) = (y / surfaceView.height.toFloat()).coerceIn(0f, 1f)
 
   /**
-   * A classificacao acontece aqui e nao em C++, e de proposito.
+   * Classification happens here and not in C++, on purpose.
    *
-   * No Kindle o backend le o stream evdev cru e decide sozinho o que e toque,
-   * toque longo e swipe, porque naquele aparelho ninguem mais vai fazer isso.
-   * Aqui essa peca ja existe e e melhor do que a que escreveriamos: o
-   * [GestureDetector] conhece o slop deste aparelho, o limiar de toque longo
-   * deste sistema e a velocidade de fling que o usuario percebe como
-   * intencional. Reimplementar isso em C++ seria trocar uma peca calibrada por
-   * uma com constantes chutadas.
+   * On the Kindle the backend reads the raw evdev stream and decides for itself
+   * what is a tap, a long press and a swipe, because on that device nothing
+   * else will. Here that piece already exists and is better than the one we
+   * would write: [GestureDetector] knows this device's slop, this system's
+   * long-press threshold, and the fling velocity the user perceives as
+   * deliberate. Reimplementing it in C++ would trade a calibrated part for one
+   * with guessed constants.
    */
   private inner class GestureListener : GestureDetector.SimpleOnGestureListener() {
 
@@ -211,9 +212,10 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
     }
 
     override fun onLongPress(e: MotionEvent) {
-      // Dispara com o dedo AINDA em baixo, que e o contrato que o CrossPoint
-      // espera. O lado C++ suprime o resto do contato, senao a soltura viraria
-      // um toque e fecharia o que o toque longo acabou de abrir.
+      // Fires with the finger STILL down, which is the contract CrossPoint
+      // expects. The C++ side suppresses the rest of the contact, or the
+      // release would read as a tap and dismiss whatever the long press just
+      // opened.
       CrossPointNative.nativeGesture(
         CrossPointNative.Gesture.LONG_PRESS.code,
         nx(e.x), ny(e.y), 0f, 0f,

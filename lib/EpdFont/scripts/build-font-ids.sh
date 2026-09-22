@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# Gera src/fontIds.h.
+# Generates src/fontIds.h.
 #
-# O ID de uma fonte e a soma dos SHA-256 dos cabecalhos que a compoem, dobrada
-# em 32 bits com sinal. Isso significa que o ID MUDA quando a fonte muda, que e
-# o ponto: um cache de layout gravado com a fonte antiga nao casa com a nova, e
-# o leitor reprocessa em vez de desenhar com metricas erradas.
+# A font's ID is the sum of the SHA-256 of the headers that make it up, folded
+# into a signed 32-bit value. That means the ID CHANGES when the font changes,
+# which is the point: a layout cache written with the old font does not match
+# the new one, and the reader reprocesses instead of drawing with wrong
+# metrics.
 #
-# Antes este arquivo tinha um bloco ruby copiado para cada tamanho. Virou laco
-# quando a lista de tamanhos passou de quatro para seis e a copia ficou maior
-# que a logica.
+# This file used to carry a ruby block copied per size. It became a loop when
+# the size list went from four to six and the copy grew larger than the logic.
 #
 #   bash build-font-ids.sh > ../../../src/fontIds.h
 
@@ -19,7 +19,7 @@ cd "$(dirname "$0")/../builtinFonts"
 READER_SIZES=(14 16 18 20)
 UI_SIZES=(10 12 14 16)
 
-# Soma os hashes dos arquivos dados e imprime o ID.
+# Sums the given files' hashes and prints the ID.
 font_id() {
   ruby -rdigest -e 'puts ARGV.map{|f| Digest::SHA256.hexdigest(File.read(f)).to_i(16) }.sum % (2 ** 32) - (2 ** 31)' "$@"
 }

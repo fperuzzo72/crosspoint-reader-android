@@ -1,8 +1,8 @@
 // HTTP/1.1 over sockets, shaped like ESP-IDF's esp_http_client.
 // See arduino-shim/esp_http_client.h for what TLS does and does not do here.
 //
-// No HiBreak este arquivo sai inteiro: o lib/hal/android/HttpAndroid.cpp leva
-// a requisicao para o Kotlin, onde TLS ja existe.
+// On the HiBreak this file drops out entirely: lib/hal/android/HttpAndroid.cpp
+// takes the request into Kotlin, where TLS already exists.
 #include <BoardConfig.h>
 
 #if !FREEINK_DEVICE_HIBREAK

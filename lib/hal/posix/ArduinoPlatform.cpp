@@ -74,6 +74,6 @@ void EspClass::restart() const {
   _exit(1);
 }
 
-// A forma livre do ESP-IDF. O RecoveryBoot e o MemoryManager do SDK chamam
-// esta, nao o ESP.restart() do core Arduino. Mesmo ato, mesmo caminho.
+// ESP-IDF's free-function form. The SDK's RecoveryBoot and MemoryManager call
+// this one, not the Arduino core's ESP.restart(). Same act, same path.
 [[noreturn]] void esp_restart() { ESP.restart(); }

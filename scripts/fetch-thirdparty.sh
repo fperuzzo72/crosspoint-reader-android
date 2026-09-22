@@ -1,10 +1,10 @@
 #!/bin/sh
-# Busca as dependencias de terceiros que o platformio.ini declara e que o
-# PlatformIO normalmente resolveria sozinho. Fora do PlatformIO, ninguem as
-# busca, e 83 das 91 falhas do primeiro censo eram exatamente isso.
+# Fetches the third-party dependencies platformio.ini declares and PlatformIO
+# would normally resolve on its own. Outside PlatformIO nobody fetches them, and
+# 83 of the 91 failures in the first census were exactly that.
 #
-# Tudo com versao presa. Nada de "ultima versao": o porte tem que ser
-# reproduzivel e as versoes sao as que o platformio.ini manda.
+# Everything is version-pinned. No "latest": the port has to be reproducible and
+# the versions are the ones platformio.ini names.
 set -eu
 cd "$(dirname "$0")/.." || exit 1
 DST=third_party
@@ -13,7 +13,7 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
 fetch() { # url destino
-  echo "  baixando $(basename "$2")"
+  echo "  fetching $(basename "$2")"
   curl -fsSL "$1" -o "$2"
 }
 
@@ -53,7 +53,7 @@ if [ ! -f "$DST/qrcode.h" ]; then
 fi
 
 # --- stb_truetype, dominio publico / MIT ----------------------------------
-# Nao vem do platformio.ini: e dependencia interna do FreeInkBook (TtfFont.cpp).
+# Not from platformio.ini: an internal FreeInkBook dependency (TtfFont.cpp).
 if [ ! -f "$DST/stb_truetype.h" ]; then
   echo "stb_truetype"
   fetch "https://raw.githubusercontent.com/nothings/stb/f0569113c93ad095470c54bf34a17b36646bbbb5/stb_truetype.h" \
@@ -61,7 +61,7 @@ if [ ! -f "$DST/stb_truetype.h" ]; then
 fi
 
 # --- pngle, MIT -----------------------------------------------------------
-# Idem: dependencia interna do FreeInkBook (ImageRenderer.cpp).
+# Same: an internal FreeInkBook dependency (ImageRenderer.cpp).
 if [ ! -f "$DST/pngle.h" ]; then
   echo "pngle"
   fetch "https://raw.githubusercontent.com/kikuchan/pngle/master/src/pngle.h" "$DST/pngle.h"
@@ -72,4 +72,4 @@ fi
 echo
 echo "--- third_party ---"
 ls -1 "$DST" | head -40
-echo "total: $(ls -1 "$DST" | wc -l | tr -d ' ') arquivos, $(du -sh "$DST" | cut -f1)"
+echo "total: $(ls -1 "$DST" | wc -l | tr -d ' ') files, $(du -sh "$DST" | cut -f1)"

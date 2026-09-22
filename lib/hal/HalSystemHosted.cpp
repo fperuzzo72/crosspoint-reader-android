@@ -1,4 +1,4 @@
-// HalSystem para os alvos hospedados: Kindle e HiBreak.
+// HalSystem for the hosted targets: Kindle and HiBreak.
 //
 // The whole of this interface is about surviving a crash: the ESP32 version
 // captures a stack walk into RTC_NOINIT memory, which survives a reset, then
@@ -26,8 +26,8 @@
 #include <cstdlib>
 #include <ctime>
 
-// O prefixo de log nomeia o aparelho. Dizer [kindle] num Bigme e pequeno,
-// mas e o tipo de mentira que faz alguem procurar no lugar errado.
+// The log prefix names the device. Saying [kindle] on a Bigme is a small lie,
+// but it is the kind that sends someone looking in the wrong place.
 #if FREEINK_DEVICE_HIBREAK
 #define HOSTED_TAG "hibreak"
 #else
@@ -106,16 +106,16 @@ bool clocksUsable = true;
 
 bool storageIsAttached() {
 #if FREEINK_DEVICE_HIBREAK
-  // Nao ha cartao para desmontar. O armazenamento do aplicativo faz parte do
-  // ciclo de vida dele: se este processo esta rodando, ele esta la.
+  // There is no card to unmount. The app's storage is part of its lifecycle:
+  // if this process is running, it is there.
   //
-  // Isto vira uma pergunta de verdade quando a pasta de ebooks sair do
-  // diretorio privado e passar pelo scoped storage, porque ai a resposta
-  // depende de uma permissao que o usuario pode revogar a qualquer momento.
+  // This becomes a real question if the books folder ever moves behind scoped
+  // storage, because then the answer depends on a permission the user can
+  // revoke at any moment.
   return true;
 #else
-  // O binario de onde este processo esta rodando. Nao pode faltar enquanto o
-  // sistema de arquivos esta montado, e nao pode estar la enquanto nao esta.
+  // The binary this process is running from. It cannot be absent while the
+  // filesystem is mounted, and cannot be present while it is not.
   return access("/mnt/us/crosspoint/crosspoint", F_OK) == 0;
 #endif
 }
@@ -173,12 +173,12 @@ int batteryPercent() {
     bool isCommand;
   };
 #if FREEINK_DEVICE_HIBREAK
-  // Caminhos do Android. Nao medidos no HiBreak ainda: sao os nomes que a
-  // maioria dos aparelhos usa, e o log diz qual respondeu para o chute parar.
+  // Android paths. Not yet measured on the HiBreak: these are the names most
+  // devices use, and the log says which answered so the guessing can stop.
   //
-  // O caminho robusto e outro: o BatteryManager do framework, empurrado pelo
-  // Kotlin. Sysfs e legivel por app comum em muitos aparelhos e em outros nao,
-  // e qual dos dois e este ainda nao foi verificado.
+  // The robust path is a different one: the framework's BatteryManager, pushed
+  // from Kotlin. sysfs is readable by an ordinary app on many devices and not
+  // on others, and which of the two this is has not been verified.
   static const Source sources[] = {
       {"/sys/class/power_supply/battery/capacity", false},
       {"/sys/class/power_supply/bms/capacity", false},

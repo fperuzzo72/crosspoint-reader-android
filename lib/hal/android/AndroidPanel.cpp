@@ -13,9 +13,9 @@ namespace {
 constexpr size_t STAGE_BYTES = static_cast<size_t>(HIBREAK_WIDTH) * HIBREAK_HEIGHT;
 }  // namespace
 
-// Definicao dos membros estaticos. Ver o comentario no header: o estado e do
-// processo, nao do objeto, porque o painel e um so e dois objetos apontando
-// para ele foi o que deu tela preta.
+// Definition of the static members. See the header: the state belongs to the
+// process, not the object, because there is one panel and two objects pointing
+// at it is what gave a black screen.
 std::mutex AndroidPanel::mtx;
 ANativeWindow* AndroidPanel::win = nullptr;
 uint8_t* AndroidPanel::stage = nullptr;
@@ -56,9 +56,9 @@ void AndroidPanel::end() {
 }
 
 bool AndroidPanel::reopen() {
-  // Nao ha conexao para reestabelecer: a superficie vai e volta por conta
-  // propria, pelo attachSurface. Isto existe para o HalDisplay hospedado
-  // poder chamar a mesma coisa nos dois alvos.
+  // There is no connection to re-establish: the surface comes and goes on its
+  // own through attachSurface. This exists so the hosted HalDisplay can call
+  // the same thing on both targets.
   std::lock_guard<std::mutex> lock(mtx);
   return stage != nullptr;
 }
@@ -73,14 +73,14 @@ void AndroidPanel::attachSurface(ANativeWindow* window) {
     return;
   }
   ANativeWindow_acquire(win);
-  // A geometria e fixada no tamanho do painel para o compositor nao escalar:
-  // uma pagina de texto em 1bpp reamostrada perde exatamente a nitidez que o
-  // e-ink existe para dar.
+  // The geometry is pinned to the panel size so the compositor does not scale:
+  // a page of 1bpp text resampled loses exactly the sharpness e-ink exists to
+  // give.
   const int32_t geo = ANativeWindow_setBuffersGeometry(win, HIBREAK_WIDTH, HIBREAK_HEIGHT, WINDOW_FORMAT_RGBX_8888);
   std::fprintf(stderr, "[panel] superficie anexada, geometria %dx%d -> %d\n", HIBREAK_WIDTH, HIBREAK_HEIGHT, geo);
   std::fflush(stderr);
-  // A superficie pode ter chegado depois do quadro. Reapresenta em vez de
-  // deixar o buffer novo com o que o compositor tiver posto nele.
+  // The surface may have arrived after the frame. Re-present rather than
+  // leaving the new buffer with whatever the compositor put in it.
   if (stageHasContent) {
     present();
   }
@@ -135,7 +135,7 @@ bool AndroidPanel::display(const uint8_t* frame, const Waveform waveform) {
 
 bool AndroidPanel::displayStart(const uint8_t* frame, const Waveform waveform) {
   display(frame, waveform);
-  // Nada em voo que valha esperar; ver o comentario da declaracao.
+  // Nothing in flight worth waiting for; see the declaration's comment.
   return false;
 }
 
@@ -148,8 +148,8 @@ uint8_t AndroidPanel::peekPixel(const uint16_t x, const uint16_t y) const {
 }
 
 bool AndroidPanel::present() {
-  // As primeiras apresentacoes sao as que dizem se o caminho de pixel esta
-  // fechado. Depois calam, senao uma virada de pagina enche o log.
+  // The first presentations are the ones that say whether the pixel path is
+  // closed. After that they go quiet, or a page turn fills the log.
   static int reported = 0;
   if (reported < 5) {
     ++reported;
@@ -158,28 +158,29 @@ bool AndroidPanel::present() {
     std::fflush(stderr);
   }
   if (win == nullptr || stage == nullptr) {
-    // Sem superficie nao e erro: a Activity pode estar pausada e o quadro
-    // fica guardado para quando ela voltar.
+    // No surface is not an error: the Activity may be paused, and the frame is
+    // kept for when it returns.
     return true;
   }
   ANativeWindow_Buffer buf;
   if (ANativeWindow_lock(win, &buf, nullptr) != 0) {
     return false;
   }
-  // Se o compositor devolveu geometria diferente da pedida, respeita a dele e
-  // pinta so a interseccao: escrever pelo tamanho que pedimos estouraria o
-  // buffer que ele deu.
+  // If the compositor handed back a different geometry than requested, honour
+  // its own and paint only the intersection: writing at the size we asked for
+  // would overrun the buffer it gave us.
   const int32_t w = buf.width < HIBREAK_WIDTH ? buf.width : HIBREAK_WIDTH;
   const int32_t h = buf.height < HIBREAK_HEIGHT ? buf.height : HIBREAK_HEIGHT;
   auto* pixels = static_cast<uint8_t*>(buf.bits);
   for (int32_t y = 0; y < h; ++y) {
     const uint8_t* src = stage + static_cast<size_t>(y) * HIBREAK_WIDTH;
-    // buf.stride e em PIXELS para os formatos de 32 bits, nao em bytes.
+    // buf.stride is in PIXELS for 32-bit formats, not bytes.
     uint32_t* out = reinterpret_cast<uint32_t*>(pixels + static_cast<size_t>(y) * buf.stride * 4);
     for (int32_t x = 0; x < w; ++x) {
       const uint32_t g = src[x];
-      // RGBX_8888 em little endian: R no byte baixo, X no alto. Cinza vai nos
-      // tres canais; o X e ignorado mas preenchido com 0xFF por higiene.
+      // RGBX_8888 little endian: R in the low byte, X in the high one. Gray
+      // goes into all three channels; X is ignored but filled with 0xFF for
+      // hygiene.
       out[x] = 0xFF000000u | (g << 16) | (g << 8) | g;
     }
   }

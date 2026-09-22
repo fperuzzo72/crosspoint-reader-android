@@ -8,33 +8,33 @@ import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * HTTP para o lado C++, e a razao de ele existir e uma so: TLS.
+ * HTTP for the C++ side, and there is one reason it exists: TLS.
  *
- * O shim POSIX herdado do porte Kindle fala HTTP sobre socket cru e RECUSA
- * https explicitamente, sem downgrade silencioso. A recusa esta certa (mandar
- * credencial de OPDS em claro seria pior que falhar), mas deixa de fora quase
- * todo catalogo real e a sincronizacao KOReader.
+ * The POSIX shim inherited from the Kindle port speaks HTTP over raw sockets
+ * and REFUSES https explicitly, with no silent downgrade. The refusal is right
+ * (sending OPDS credentials in the clear would be worse than failing), but it
+ * rules out almost every real catalogue and KOReader sync.
  *
- * As duas saidas eram embarcar mbedtls no C++ ou vir para ca. Aqui o TLS ja
- * existe, usa a loja de certificados do SISTEMA (que este aparelho mantem
- * atualizada sozinho, e que o C++ teria de carregar e envelhecer junto com o
- * binario), respeita proxy e VPN, e nao custa nenhuma dependencia nova.
+ * The two ways out were embedding mbedtls in C++ or coming here. Here TLS
+ * already exists, uses the SYSTEM trust store (which this device keeps current
+ * on its own, and which C++ would have to carry and let age along with the
+ * binary), honours proxies and VPNs, and costs no new dependency.
  *
- * O formato e de streaming e nao de "me devolve o corpo inteiro", porque e
- * assim que o chamador C++ e escrito: o esp_http_client abre, le em pedacos e
- * fecha. Um livro de 40MB nao deve passar pela memoria de uma vez so.
+ * The shape is streaming rather than "hand me the whole body", because that is
+ * how the C++ caller is written: esp_http_client opens, reads in pieces and
+ * closes. A 40MB book should not pass through memory all at once.
  *
- * Threading: chamado da thread do leitor, que e nativa e se anexa a JVM. O
- * mapa de conexoes e sincronizado porque nada garante que continuara sendo uma
- * thread so.
+ * Threading: called from the reader thread, which is native and attaches to the
+ * JVM. The connection map is synchronised because nothing guarantees it will
+ * stay a single thread.
  */
 object CrossPointHttp {
 
-    // Throwable e nao Exception em todo catch daqui, e a diferenca nao e
-    // pedantismo: OutOfMemoryError e StackOverflowError sao Error, nao
-    // Exception. Um Error escapando por uma funcao chamada do JNI atravessa a
-    // fronteira para um C++ que nao tem como trata-lo, e a runtime aborta o
-    // processo. Melhor devolver -1 e deixar o chamador reportar falha.
+    // Throwable rather than Exception in every catch here, and the difference
+    // is not pedantry: OutOfMemoryError and StackOverflowError are Error, not
+    // Exception. An Error escaping a function called from JNI crosses the
+    // boundary into a C++ that has no way to handle it, and the runtime aborts
+    // the process. Better to return -1 and let the caller report failure.
     private const val TAG = "CrossPointHttp"
 
     private class Conn(val http: HttpURLConnection) {
@@ -47,13 +47,13 @@ object CrossPointHttp {
     private val nextHandle = AtomicInteger(1)
 
     /**
-     * Abre a conexao e envia os cabecalhos. NAO le a resposta ainda: quem
-     * tiver corpo para mandar escreve antes de [finish].
+     * Opens the connection and sends the headers. Does NOT read the response
+     * yet: anyone with a body to send writes before [finish].
      *
-     * [headers] vem empacotado como linhas "Chave: Valor", que e como o lado
-     * C++ ja guarda e evita atravessar a fronteira com um mapa.
+     * [headers] arrives packed as "Key: Value" lines, which is how the C++ side
+     * already keeps them and avoids crossing the boundary with a map.
      *
-     * Retorna o handle, ou -1 em falha.
+     * Returns the handle, or -1 on failure.
      */
     @JvmStatic
     fun open(method: String, url: String, headers: String, hasBody: Boolean, timeoutMs: Int): Int {
@@ -62,9 +62,9 @@ object CrossPointHttp {
             http.requestMethod = method
             http.connectTimeout = timeoutMs
             http.readTimeout = timeoutMs
-            // Redirecionamento fica com o chamador: o CrossPoint tem a própria
-            // lógica em esp_http_client_set_redirection, e duas camadas
-            // seguindo o mesmo 302 perderiam os cabeçalhos da segunda.
+            // Redirects stay with the caller: CrossPoint has its own logic in
+            // esp_http_client_set_redirection, and two layers following the
+            // same 302 would lose the second one's headers.
             http.instanceFollowRedirects = false
             for (line in headers.lineSequence()) {
                 val i = line.indexOf(':')
@@ -82,12 +82,12 @@ object CrossPointHttp {
             synchronized(conns) { conns[handle] = conn }
             handle
         } catch (e: Throwable) {
-            Log.w(TAG, "open falhou: $url", e)
+            Log.w(TAG, "open failed: $url", e)
             -1
         }
     }
 
-    /** Escreve corpo da requisicao. Retorna bytes escritos, ou -1. */
+    /** Writes the request body. Returns bytes written, or -1. */
     @JvmStatic
     fun write(handle: Int, data: ByteArray, len: Int): Int {
         val conn = get(handle) ?: return -1
@@ -95,16 +95,16 @@ object CrossPointHttp {
             conn.out?.write(data, 0, len) ?: return -1
             len
         } catch (e: Throwable) {
-            Log.w(TAG, "write falhou", e); -1
+            Log.w(TAG, "write failed", e); -1
         }
     }
 
     /**
-     * Fecha o corpo da requisicao, le a linha de status e deixa o corpo da
-     * resposta pronto para [read]. Retorna o codigo HTTP, ou -1.
+     * Closes the request body, reads the status line and leaves the response
+     * body ready for [read]. Returns the HTTP code, or -1.
      *
-     * getErrorStream para 4xx e 5xx: o getInputStream lanca nesses casos, e o
-     * corpo do erro costuma dizer o que o servidor nao gostou.
+     * getErrorStream for 4xx and 5xx: getInputStream throws in those cases, and
+     * the error body usually says what the server disliked.
      */
     @JvmStatic
     fun finish(handle: Int): Int {
@@ -121,11 +121,11 @@ object CrossPointHttp {
             }
             conn.status
         } catch (e: Throwable) {
-            Log.w(TAG, "finish falhou", e); -1
+            Log.w(TAG, "finish failed", e); -1
         }
     }
 
-    /** Le ate buf.size bytes. Retorna quantos, 0 no fim, -1 em erro. */
+    /** Reads up to buf.size bytes. Returns how many, 0 at the end, -1 on error. */
     @JvmStatic
     fun read(handle: Int, buf: ByteArray): Int {
         val conn = get(handle) ?: return -1
@@ -134,15 +134,15 @@ object CrossPointHttp {
             val n = input.read(buf, 0, buf.size)
             if (n < 0) 0 else n
         } catch (e: Throwable) {
-            Log.w(TAG, "read falhou", e); -1
+            Log.w(TAG, "read failed", e); -1
         }
     }
 
-    /** Cabecalho da resposta, ou null. */
+    /** A response header, or null. */
     @JvmStatic
     fun header(handle: Int, name: String): String? = get(handle)?.http?.getHeaderField(name)
 
-    /** Tamanho anunciado pelo Content-Length, ou -1 quando nao ha. */
+    /** The size announced by Content-Length, or -1 when there is none. */
     @JvmStatic
     fun contentLength(handle: Int): Long = get(handle)?.http?.contentLengthLong ?: -1L
 

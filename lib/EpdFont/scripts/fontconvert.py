@@ -77,35 +77,34 @@ intervals = [
     # Needed for proper rendering of many extended Latin languages
     (0x0300, 0x036F),
     ### Greek & Coptic ###
-    # Fora: este porte e pessoal e le em portugues e ingles. Custava ~31KB por
-    # arquivo, medido no corpo 16, e as TTFs tem os glifos (Ubuntu 71,
-    # Noto 121), entao religar e descomentar uma linha.
+    # Out: this port reads Portuguese and English. It cost ~31KB per file,
+    # measured at size 16, and the TTFs do have the glyphs (Ubuntu 71,
+    # Noto 121), so turning it back on is uncommenting one line.
     # (0x0370, 0x03FF),
     ### Cyrillic ###
-    # Fora, mesmo motivo do grego. Russo, ucraniano, bulgaro.
+    # Out, same reason as Greek. Russian, Ukrainian, Bulgarian.
     # (0x0400, 0x04FF),
     ### Math Symbols (common subset) ###
     # Superscripts and Subscripts
     (0x2070, 0x209F),
     # General math operators.
     #
-    # Estreitado do bloco inteiro (256 glifos) para os que aparecem em texto
-    # corrido. Enquanto nenhuma fonte de origem tinha esses glifos, pedir o
-    # bloco todo custava zero; com a NotoSansMath na pilha ele passou a ser
-    # encontrado e a custar ~110KB por arquivo, quase tudo em simbolo que
-    # nenhum romance usa.
-    (0x2202, 0x2202),  # derivada parcial
-    (0x2205, 0x2206),  # conjunto vazio, incremento
-    (0x220F, 0x2211),  # produto, somatorio
-    (0x221A, 0x221A),  # raiz
-    (0x221E, 0x221E),  # infinito
-    (0x2248, 0x2248),  # aproximadamente
-    (0x2260, 0x2265),  # diferente, menor/maior ou igual
-    # Arrows: as quatro direcoes e as diagonais, nao o bloco de 112.
+    # Narrowed from the whole block (256 glyphs) to those that appear in
+    # running text. While no source font had these glyphs, asking for the whole
+    # block cost zero; with NotoSansMath in the stack it started being found and
+    # costing ~110KB per file, almost all of it symbols no novel uses.
+    (0x2202, 0x2202),  # partial derivative
+    (0x2205, 0x2206),  # empty set, increment
+    (0x220F, 0x2211),  # product, summation
+    (0x221A, 0x221A),  # square root
+    (0x221E, 0x221E),  # infinity
+    (0x2248, 0x2248),  # approximately
+    (0x2260, 0x2265),  # not equal, less/greater or equal
+    # Arrows: the four directions and the diagonals, not the block of 112.
     (0x2190, 0x2199),
-    # Formas geometricas usadas como marcador de lista em EPUB.
+    # Geometric shapes used as list bullets in EPUB.
     (0x25A0, 0x25CF),
-    # Estrelas e marcas de verificacao.
+    # Stars and check marks.
     (0x2605, 0x2606),
     (0x2713, 0x2718),
     ### CJK ###

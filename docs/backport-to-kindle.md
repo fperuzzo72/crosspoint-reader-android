@@ -244,61 +244,28 @@ again.
 It carried a leak with it: the bare `new` handed to `addHandler()` was never
 deleted, one `WebDAVHandler` per File Transfer session.
 
-### Owed to the Kindle: chunked responses
+### Arriving from the Kindle: chunked responses
 
 The file manager and the settings page both answered "failed to load", and the
-font list next to them worked. The difference is how each one sends: fonts
+font list beside them worked. The difference is how each one sends: fonts
 builds the whole JSON and sends it with a known length, the other two announce
-`CONTENT_LENGTH_UNKNOWN` and stream.
+`CONTENT_LENGTH_UNKNOWN` and stream. `send()` read that as "the caller
+announced nothing" and fell back to the length of the empty string it had been
+handed, so every list endpoint went out as `Content-Length: 0` and everything
+streamed afterwards landed on a socket nobody was reading.
 
-`CONTENT_LENGTH_UNKNOWN` **is** `SIZE_MAX`, and the shim used `SIZE_MAX` as its
-"nobody announced a length" marker as well. One field cannot tell those apart
-and they need opposite answers, so an announced-unknown response fell into the
-fallback, sent `Content-Length: 0`, and then wrote the body anyway. The browser
-reads zero bytes and `JSON.parse` gets an empty string.
+`CONTENT_LENGTH_UNKNOWN` and `CONTENT_LENGTH_NOT_SET` were **both already
+declared** in the shim, two lines apart. Only `send()` conflated them. One
+field with three states is the fix, and it is Arduino's own vocabulary.
 
-The shim speaks `Transfer-Encoding: chunked` now: each `sendContent()` is
-framed with its size in hex, `sendContent("")` emits the closing zero-length
-chunk, and the end of the request cycle emits it for a handler that forgot,
-because without it the browser waits for more after every byte has arrived.
-The three callers that announce a real length (file download, two in WebDAV)
-are untouched.
+Chunked rather than just closing the socket, which `Connection: close` would
+have made legal and was less work. Framing is what tells a complete body from a
+cut one, and this server hands out books. A handler that streams and never
+sends its empty piece is closed off at the end of the request.
 
-Pure POSIX, and the Kindle has the same shim and the same two pages.
-
-## What came back
-
-The ledger has run one way until now. Testing the multipart backport on the
-Kindle found two defects in the shared POSIX web server, and both were fixed
-there first and then applied here — `9557325` and `6c60f24`, which say so.
-
-- **Routes and handler objects need ONE registration order.** The browser got
-  "405 Method Not Allowed" instead of the file manager. `WebDAVHandler` claims
-  GET for every uri and answers 405 for a directory, and it was being asked
-  because the shim kept `on()` routes and `addHandler()` objects in two lists
-  and consulted the objects first. The Arduino WebServer keeps both in a single
-  chain, and the tree relies on it: `"/"` is registered near the top of setup
-  and WebDAV is added at the bottom. Two lists is the obvious shape, which is
-  exactly why both ports wrote it.
-
-- **`CONTENT_LENGTH_UNKNOWN` is `SIZE_MAX`, and so was the "nobody announced a
-  length" marker.** One field cannot hold both, and they need opposite answers:
-  announced-unknown means chunked, unannounced means the body is what `send()`
-  was handed. Conflated, every streamed endpoint went out as
-  `Content-Length: 0` and the browser read a complete, empty body. The Kindle
-  version separates the two with `CONTENT_LENGTH_NOT_SET`, which the shim
-  already declared and nothing used; this port uses a separate `lengthAnnounced`
-  flag. Same bug, same fix, two spellings.
-
-  Chunked rather than letting the body end at the closed socket, which
-  `Connection: close` would have made legal and was less work: framing is what
-  distinguishes a complete body from a cut one. Checked by building the exact
-  bytes and parsing them with a real HTTP client — a stream missing its
-  terminator raises `IncompleteRead`, while the same truncated bytes without
-  framing read back as a whole file. Both servers hand out books.
-
-Not shared: `bf847b2`, the listening port. That is an Android restriction; the
-Kindle binds what it asks for.
+Fixed on the Kindle first (`4937f2ed`), and this port's version was rewritten
+to match it function for function after being written differently here. The
+two shims are identical again in these two files.
 
 ## Counter-current
 

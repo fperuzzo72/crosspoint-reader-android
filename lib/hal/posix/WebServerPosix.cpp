@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #include <cstring>
 #include <iterator>
 
@@ -141,10 +142,25 @@ void WebServer::begin(const uint16_t port) {
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port = htons(port);
   if (bind(listenFd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) != 0 || listen(listenFd, 4) != 0) {
+    // Say why. A silent failure here looks exactly like a working server from
+    // the outside: the activity still shows an IP and a QR code, because those
+    // come from the network state rather than from a socket, and the only
+    // symptom is a browser that never connects.
+    //
+    // EACCES on a port below 1024 is the one worth recognising: that range is
+    // privileged on Linux, so it needs root or CAP_NET_BIND_SERVICE. It costs
+    // nothing on an ESP32 and nothing running as root, and it is fatal to an
+    // ordinary application.
+    std::fprintf(stderr, "[web] bind/listen on port %u failed: %s%s\n", static_cast<unsigned>(port),
+                 std::strerror(errno),
+                 (errno == EACCES && port < 1024) ? " (ports below 1024 are privileged)" : "");
+    std::fflush(stderr);
     ::close(listenFd);
     listenFd = -1;
     return;
   }
+  std::fprintf(stderr, "[web] listening on port %u\n", static_cast<unsigned>(port));
+  std::fflush(stderr);
   // Non-blocking accept: handleClient() is called from the UI loop and must
   // never stall it waiting for a browser that may never come.
   const int flags = fcntl(listenFd, F_GETFL, 0);

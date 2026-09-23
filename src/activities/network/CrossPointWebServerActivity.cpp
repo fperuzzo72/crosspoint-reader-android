@@ -456,7 +456,7 @@ void CrossPointWebServerActivity::renderServerRunning() const {
                       EpdFontFamily::BOLD);
     startY += height10 + metrics.verticalSpacing * 2;
 
-    std::string hostnameUrl = std::string("http://") + AP_HOSTNAME + ".local/";
+    std::string hostnameUrl = std::string("http://") + AP_HOSTNAME + ".local" + webServerPortSuffix() + "/";
     std::string ipUrl = tr(STR_OR_HTTP_PREFIX) + connectedIP + "/";
 
     // Show QR code for URL
@@ -478,8 +478,13 @@ void CrossPointWebServerActivity::renderServerRunning() const {
     renderer.drawCenteredText(UI_10_FONT_ID, startY, tr(STR_SCAN_QR_HINT), true, EpdFontFamily::BOLD);
     startY += height10 + metrics.verticalSpacing * 2;
 
-    // Show QR code for URL
-    std::string webInfo = "http://" + connectedIP + "/";
+    // Show QR code for URL.
+    //
+    // The port belongs in the URL whenever it is not 80, and on this target it
+    // is not: an ordinary Android app cannot bind a privileged port. A QR
+    // pointing at the bare IP would send the browser to 80 and to a server that
+    // is not there.
+    std::string webInfo = "http://" + connectedIP + webServerPortSuffix() + "/";
     const Rect qrBounds((pageWidth - QR_CODE_WIDTH) / 2, startY, QR_CODE_WIDTH, QR_CODE_HEIGHT);
     QrUtils::drawQrCode(renderer, qrBounds, webInfo);
     startY += QR_CODE_HEIGHT + metrics.verticalSpacing * 2;
@@ -489,7 +494,7 @@ void CrossPointWebServerActivity::renderServerRunning() const {
     startY += height10 + 5;
 
     // Also show hostname URL
-    std::string hostnameUrl = std::string(tr(STR_OR_HTTP_PREFIX)) + AP_HOSTNAME + ".local/";
+    std::string hostnameUrl = std::string(tr(STR_OR_HTTP_PREFIX)) + AP_HOSTNAME + ".local" + webServerPortSuffix() + "/";
     renderer.drawCenteredText(SMALL_FONT_ID, startY, hostnameUrl.c_str(), true);
   }
 

@@ -99,7 +99,7 @@ Each fix carries one of three marks:
 ## Done: multipart uploads
 
 Applied to `crosspoint-reader-kindle` on the `kindle-port` branch, commit
-`b187982d`, not yet pushed.
+`b187982d`, and since cross-built and pushed (`ed8a453f`).
 
 It was the cleanest backport this ledger has recorded, and the diff is why:
 `WebServerPosix.cpp` and `arduino-shim/WebServer.h` had diverged between the two
@@ -114,9 +114,58 @@ What did NOT come with it: the `LIBRARY_ROOT` default for the upload
 destination. On a Kindle the card root *is* the library, so `"/"` was already
 right and changing it would have been a difference for its own sake.
 
-Not verified there: the cross-build (no toolchain on the machine that did the
-work) and the end-to-end path. The Kindle README says so in a section of its
-own rather than alongside what was watched working on the device.
+It cross-builds: 230 sources, zero undefined references, and both
+`crosspoint::multipart::parse` and `WebServer::readMultipart` are in the ARM
+binary. The refusal text is gone from it entirely. The host test passes there
+too.
+
+Two things the build turned up. The header-watching rule added to
+`trylink.sh` the week before earned itself back immediately: `WebServer.h`
+changed, every object was discarded, and the binary that came out was whole —
+under the old source-mtime rule the objects that merely include it would have
+been kept. And `cmake/kindle/CMakeLists.txt` enumerated the platform sources
+and had gone stale unnoticed: `HttpClientPosix.cpp` and `WebSocketsPosix.cpp`
+had been written and never added, and `MultipartParser.cpp` would have been the
+third. It globs now, which is what `trylink.sh` — the thing that actually
+builds that port — always did.
+
+Still not verified there: the end-to-end path. Nobody has pushed a book over
+the network to a Kindle. The Kindle README says so in a section of its own
+rather than alongside what was watched working on the device.
+
+## Done: stepping past the network picker
+
+Applied to `crosspoint-reader-kindle`, commit `ab1be153`, pushed.
+
+Found by testing the multipart work above: File Transfer opened and went
+straight back to the home menu. Both of its modes build a network before
+serving, and neither can on a Kindle for the same reason as here — Create
+Hotspot calls `WiFi.softAP()`, which the shim fails on purpose, and Join
+Network opens a picker over `scanNetworks()`, which returns zero on purpose,
+because scanning would fight the system for the same radio. The list opened
+empty, the user cancelled the only thing on screen, and the caller went home.
+
+So the `#if FREEINK_DEVICE_HIBREAK` short-circuit in
+`WifiSelectionActivity::onEnter()` travelled, guarded as `FREEINK_DEVICE_KINDLE`
+there because that tree still builds the ESP32 targets, which need the real
+screen. **Its placement is the transferable part**: the fix belongs in the
+screen, not in the nine activities that open it (OPDS, KOReader sync, font
+downloads, the clock, OTA, the web server, Calibre, settings), because patching
+those one at a time leaves the next one anybody writes broken again.
+
+One deliberate divergence, and it runs counter to the usual direction. This
+port clears the SSID because reading it needs a location permission. The Kindle
+shim asks the interface through `SIOCGIWESSID` and that 3.x kernel still
+carries wireless extensions, so the name is genuinely available and the caller
+can say which network it is serving on. The Kindle version fills it in.
+
+Checked there and deliberately left alone, worth knowing here because the code
+is shared: leaving the web server calls `silentRestart()` whenever
+`WiFi.getMode()` is not `WIFI_MODE_NULL`, and both shims always answer
+`WIFI_STA`. On the Kindle it does not restart, because `silentRestart()` returns
+early on a touch device and that target inherits the X4 profile, which has
+touch. That is worth re-checking on this port rather than assuming, since
+`ESP.restart()` means something different in each — see Counter-current below.
 
 ## Counter-current
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <BoardConfig.h>
+
 #include <HalStorage.h>
 #include <NetworkUdp.h>
 #include <WebServer.h>
@@ -73,7 +75,21 @@ class CrossPointWebServer {
   std::unique_ptr<WebSocketsServer> wsServer = nullptr;
   bool running = false;
   bool apMode = false;  // true when running in AP mode, false for STA mode
-  uint16_t port = 80;
+  // Ports below 1024 are privileged on Linux: binding one needs root or
+  // CAP_NET_BIND_SERVICE. An ESP32 has no such concept and CrossPoint runs as
+  // root on a jailbroken Kindle, so 80 was always fine there. An ordinary
+  // Android app is neither, and bind() simply fails.
+  //
+  // 8080 is the conventional unprivileged alternative. It has to be visible to
+  // the activity as well, because the URL and the QR code have to carry it:
+  // a QR pointing at the bare IP sends the browser to port 80 and back to the
+  // same silence.
+#if FREEINK_DEVICE_HIBREAK
+  static constexpr uint16_t DEFAULT_PORT = 8080;
+#else
+  static constexpr uint16_t DEFAULT_PORT = 80;
+#endif
+  uint16_t port = DEFAULT_PORT;
   uint16_t wsPort = 81;  // WebSocket port
   NetworkUDP udp;
   bool udpActive = false;

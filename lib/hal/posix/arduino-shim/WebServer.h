@@ -144,12 +144,7 @@ class WebServer {
   void send(int code, const char* contentType = "text/plain", const String& content = String());
   void send(int code, const String& contentType, const String& content);
   void sendHeader(const String& name, const String& value, bool first = false);
-  // CONTENT_LENGTH_UNKNOWN here means "chunked", not "no length": the body
-  // arrives through later sendContent() calls and its size is not known yet.
-  void setContentLength(size_t length) {
-    plannedLength = length;
-    lengthAnnounced = true;
-  }
+  void setContentLength(size_t length) { plannedLength = length; }
   // The _P variants send from program memory on AVR. There is no separate
   // address space here, so they are the ordinary sends.
   void send_P(int code, const char* contentType, const char* content);
@@ -184,9 +179,6 @@ class WebServer {
     THandlerFunction uploadFn;
   };
 
-  void writeBody(const char* content, size_t length);
-  void endChunkedBody();
-
   bool readRequest();
   void parseQuery(const std::string& query);
   void dispatch();
@@ -217,13 +209,7 @@ class WebServer {
 
   std::vector<std::pair<String, String>> pendingHeaders;
   size_t requestContentLength = 0;
-  size_t plannedLength = 0;
-  // Separate from plannedLength because CONTENT_LENGTH_UNKNOWN *is* SIZE_MAX:
-  // one field cannot tell "nobody announced a length" from "announced as
-  // unknown", and the two need opposite responses.
-  bool lengthAnnounced = false;
-  bool chunked = false;          // announced as CONTENT_LENGTH_UNKNOWN
-  bool chunkTerminated = false;  // the closing zero-length chunk went out
+  size_t plannedLength = SIZE_MAX;  // SIZE_MAX = "not announced"
   bool headersSent = false;
 
   HTTPUpload currentUpload;

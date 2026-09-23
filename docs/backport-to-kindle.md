@@ -129,9 +129,13 @@ had been written and never added, and `MultipartParser.cpp` would have been the
 third. It globs now, which is what `trylink.sh` — the thing that actually
 builds that port — always did.
 
-Still not verified there: the end-to-end path. Nobody has pushed a book over
-the network to a Kindle. The Kindle README says so in a section of its own
-rather than alongside what was watched working on the device.
+**Verified end to end on the device**: the file list loads, an upload lands on
+the card and a delete removes it. The Kindle README now carries it in the list
+that opens "All of this has been watched working on the device".
+
+Two bugs stood between the backport and that, and neither was in the upload
+work. They are recorded under "What came back" below, because both of them
+turned out to be here too.
 
 ## Done: stepping past the network picker
 
@@ -261,6 +265,40 @@ The three callers that announce a real length (file download, two in WebDAV)
 are untouched.
 
 Pure POSIX, and the Kindle has the same shim and the same two pages.
+
+## What came back
+
+The ledger has run one way until now. Testing the multipart backport on the
+Kindle found two defects in the shared POSIX web server, and both were fixed
+there first and then applied here — `9557325` and `6c60f24`, which say so.
+
+- **Routes and handler objects need ONE registration order.** The browser got
+  "405 Method Not Allowed" instead of the file manager. `WebDAVHandler` claims
+  GET for every uri and answers 405 for a directory, and it was being asked
+  because the shim kept `on()` routes and `addHandler()` objects in two lists
+  and consulted the objects first. The Arduino WebServer keeps both in a single
+  chain, and the tree relies on it: `"/"` is registered near the top of setup
+  and WebDAV is added at the bottom. Two lists is the obvious shape, which is
+  exactly why both ports wrote it.
+
+- **`CONTENT_LENGTH_UNKNOWN` is `SIZE_MAX`, and so was the "nobody announced a
+  length" marker.** One field cannot hold both, and they need opposite answers:
+  announced-unknown means chunked, unannounced means the body is what `send()`
+  was handed. Conflated, every streamed endpoint went out as
+  `Content-Length: 0` and the browser read a complete, empty body. The Kindle
+  version separates the two with `CONTENT_LENGTH_NOT_SET`, which the shim
+  already declared and nothing used; this port uses a separate `lengthAnnounced`
+  flag. Same bug, same fix, two spellings.
+
+  Chunked rather than letting the body end at the closed socket, which
+  `Connection: close` would have made legal and was less work: framing is what
+  distinguishes a complete body from a cut one. Checked by building the exact
+  bytes and parsing them with a real HTTP client — a stream missing its
+  terminator raises `IncompleteRead`, while the same truncated bytes without
+  framing read back as a whole file. Both servers hand out books.
+
+Not shared: `bf847b2`, the listening port. That is an Android restriction; the
+Kindle binds what it asks for.
 
 ## Counter-current
 

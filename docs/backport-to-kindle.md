@@ -96,6 +96,28 @@ Each fix carries one of three marks:
 | **Upstream** | `FirmwareBoardTag.cpp` has an `#error` for an unknown device, so every new target needs an entry. Correct, and worth recording that it is deliberate. |
 | **Upstream** | `build-font-ids.sh` had a ruby block copied per size. It became a loop when the list went from four sizes to six and the copy grew larger than the logic. |
 
+## Done: multipart uploads
+
+Applied to `crosspoint-reader-kindle` on the `kindle-port` branch, commit
+`b187982d`, not yet pushed.
+
+It was the cleanest backport this ledger has recorded, and the diff is why:
+`WebServerPosix.cpp` and `arduino-shim/WebServer.h` had diverged between the two
+repositories **in the upload work and nothing else**, so the port was those two
+files plus `MultipartParser.{h,cpp}`, which has zero Android dependencies.
+
+What came with it: the host test, which passes there, and the removal of the
+`#if !FREEINK_DEVICE_KINDLE` that hid the File Transfer menu entry. The entry was
+hidden because it could only ever have opened a server that refuses to run.
+
+What did NOT come with it: the `LIBRARY_ROOT` default for the upload
+destination. On a Kindle the card root *is* the library, so `"/"` was already
+right and changing it would have been a difference for its own sake.
+
+Not verified there: the cross-build (no toolchain on the machine that did the
+work) and the end-to-end path. The Kindle README says so in a section of its
+own rather than alongside what was watched working on the device.
+
 ## Counter-current
 
 Things the Kindle solved that need rethinking here, not copying:

@@ -134,11 +134,12 @@ The second direction is the delicate one: C++ calls into the JVM from inside the
 reader loop, which runs on a native thread. See `lib/hal/android/JniBridge.h`
 for the two rules that imposes.
 
-### What should go back to the Kindle port
+### What travels between the two hosted ports
 
-In [docs/backport-to-kindle.md](docs/backport-to-kindle.md), each finding marked
-POSIX (applies to both), Android (stays here) or upstream (it is a CrossPoint
-bug).
+This port and the Kindle one share `lib/hal/posix/`, and fixes cross in both
+directions. [docs/backport-to-kindle.md](docs/backport-to-kindle.md) is the
+ledger: each finding is marked POSIX (applies to both), Android (stays here) or
+upstream (it is a CrossPoint bug), and the entries record which way it went.
 
 ---
 

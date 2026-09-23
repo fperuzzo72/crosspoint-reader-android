@@ -1,9 +1,22 @@
-# What should go back to the Kindle port
+# What travels between the two hosted ports
 
 This repository was born as a copy of `crosspoint-reader-kindle` at `f002274b`.
 That port paid the cost of taking CrossPoint off the ESP32; this one inherits
-the work. When something fixed here belongs to the POSIX layer rather than to
-Android, it belongs to both, and this is the ledger.
+the work. They share `lib/hal/posix/`, so a fix that belongs to the POSIX layer
+rather than to one device belongs to both, and this is the ledger.
+
+It started out named for one direction, on the assumption that the newer port
+would be the one finding things. In practice the traffic runs both ways: the
+multipart upload work went from here to the Kindle, and the two bugs that made
+it usable came back from there: WebDAV answering for `"/"`, and streamed
+responses going out as `Content-Length: 0`. Whichever port is being exercised
+at the time finds the bug, and both have the file it lives in.
+
+What makes that cheap is keeping the shared files literally identical. The 405
+patch and the chunked patch each crossed without a line of adjustment, and the
+one time this port wrote its own version of a fix the Kindle had already made,
+it was rewritten to match rather than left as a second spelling of the same
+thing.
 
 ## When to guard by device, and when not
 
@@ -266,6 +279,14 @@ sends its empty piece is closed off at the end of the request.
 Fixed on the Kindle first (`4937f2ed`), and this port's version was rewritten
 to match it function for function after being written differently here. The
 two shims are identical again in these two files.
+
+### Verified on the HiBreak Pro
+
+With both of those in, File Transfer works end to end here: the file list
+loads, an upload lands in the library and a delete removes it. The settings
+page renders its values, and the fonts page lists what is installed. Sending
+and deleting a font is the one part of the web UI nobody has exercised on
+either port.
 
 ## Counter-current
 

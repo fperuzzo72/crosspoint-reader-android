@@ -27,6 +27,23 @@
 
 namespace crosspoint::multipart {
 
+// Caps on the parts that are NOT streamed.
+//
+// A file part costs nothing to be large: it goes out chunk by chunk and never
+// accumulates. An ordinary field does accumulate, because a caller wants it
+// whole, so it needs a ceiling or a client that posts a gigabyte without a
+// filename makes the reader allocate a gigabyte.
+//
+// The same reasoning caps the part headers: they are read line by line into a
+// string before the blank line that ends them, and a peer that never sends that
+// blank line would otherwise be an unbounded read.
+//
+// Values chosen to be far above anything CrossPoint's own pages send (the
+// largest is a font family name) and far below anything that hurts.
+inline constexpr size_t MAX_FIELD_BYTES = 64u * 1024u;
+inline constexpr size_t MAX_HEADER_LINE = 8u * 1024u;
+inline constexpr size_t MAX_PARTS = 64;
+
 struct PartInfo {
   std::string name;
   std::string filename;  // empty for an ordinary form field

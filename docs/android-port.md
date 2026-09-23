@@ -348,6 +348,37 @@ Ordinary form fields become args, so a handler reads them through `arg()`
 without caring the form was multipart. CrossPoint's font upload depends on that:
 it posts the family name alongside the file.
 
+### Why this was written rather than taken
+
+The obvious objection is that CrossPoint already uploads files on the ESP32, so
+why write a parser at all. The answer is that **CrossPoint does not implement
+this**. Its `CrossPointWebServer.cpp` has only the handlers, which this port
+reuses unchanged; the multipart parsing lives in the Arduino-ESP32 core's
+`WebServer` library, which arrives through the framework and was never in the
+repository.
+
+Adopting that instead would have meant three things:
+
+- It is **LGPL-2.1-or-later** (Ivan Grokhotkov, 2015), and this repository is
+  MIT. Vendoring it changes the licensing story of a public project.
+- It is not a standalone parser. `_parseForm` is a private method of their
+  `WebServer`, reaching into `_currentUpload`, `_postArgs` and `_currentHandler`,
+  and it includes `NetworkClient`, `esp32-hal-log.h`, `PROGMEM` and `delay()`.
+  Taking the parser means taking the class.
+- That class sits on ESP32 networking, and the Kindle port had already ported a
+  web server to POSIX sockets. Swapping it in would discard working code that
+  already serves every other page this port uses, and redo the socket porting.
+
+Reading theirs was still worth it, and it paid for itself. Their approach is a
+byte-at-a-time state machine that flushes partial matches on a mismatch; this
+one searches a sliding window, which handles overlapping false starts by
+construction and touches each byte once instead of dispatching per byte. Both
+are correct. But theirs carries `WEBSERVER_MAX_POST_ARGS` and
+`WEBSERVER_MAX_POST_ARG_LEN`, and this one had no ceilings at all: a client
+posting a gigabyte without a filename would have made the reader allocate a
+gigabyte. The caps in `MultipartParser.h` come from that reading, and the tests
+for them come with it.
+
 ## Still open
 
 - Scoped storage. The app currently uses All files access with a real folder,

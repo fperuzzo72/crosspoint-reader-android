@@ -9,13 +9,13 @@
 // the same bodies run through several chunk sizes, down to one byte at a time,
 // which puts the delimiter across a read boundary at every possible offset.
 
-#include "MultipartParser.h"
-
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <string>
 #include <vector>
+
+#include "MultipartParser.h"
 
 namespace {
 
@@ -24,7 +24,7 @@ using crosspoint::multipart::PartInfo;
 
 struct Result {
   std::vector<PartInfo> starts;
-  std::vector<std::string> files;   // bytes per file part, in order
+  std::vector<std::string> files;  // bytes per file part, in order
   std::vector<bool> completes;
   std::vector<size_t> totals;
   std::vector<std::pair<std::string, std::string>> fields;
@@ -49,9 +49,7 @@ Result run(const std::string& boundary, const std::string& body, const size_t ch
     r.starts.push_back(i);
     r.files.emplace_back();
   };
-  cb.onFileData = [&](const uint8_t* d, const size_t n) {
-    r.files.back().append(reinterpret_cast<const char*>(d), n);
-  };
+  cb.onFileData = [&](const uint8_t* d, const size_t n) { r.files.back().append(reinterpret_cast<const char*>(d), n); };
   cb.onFileEnd = [&](const bool complete, const size_t total) {
     r.completes.push_back(complete);
     r.totals.push_back(total);
@@ -145,6 +143,24 @@ int main() {
     check(!r.ok, "a truncated body must not report success", 4);
     check(!r.completes.empty() && !r.completes[0], "a truncated part must be reported incomplete", 4);
   }
+
+  // A file part of any size is fine: it streams out and never accumulates.
+  // A field is not, because the caller wants it whole, so it has a ceiling.
+  {
+    const std::string boundary = "----b";
+    std::string body = "--" + boundary + "\r\n";
+    body += "Content-Disposition: form-data; name=\"huge\"\r\n\r\n";
+    body += std::string(crosspoint::multipart::MAX_FIELD_BYTES + 1024, 'x');
+    body += "\r\n--" + boundary + "--\r\n";
+    const Result r = run(boundary, body, 512);
+    std::printf("oversized field\n");
+    check(!r.ok, "an oversized field must be refused rather than buffered", 512);
+    check(r.fields.empty(), "an oversized field must not be delivered", 512);
+  }
+
+  // The same body as a FILE part must go through untouched, which is the whole
+  // point of the distinction.
+  testPayload("file larger than the field cap", std::string(crosspoint::multipart::MAX_FIELD_BYTES + 1024, 'y'), false);
 
   if (failures == 0) {
     std::printf("\nall multipart parser checks passed\n");

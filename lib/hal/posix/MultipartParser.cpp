@@ -57,6 +57,10 @@ bool parse(const std::string& boundary, const Callbacks& cb) {
         win.erase(0, nl + 2);
         return true;
       }
+      // A peer that never sends the CRLF would otherwise be an unbounded read.
+      if (win.size() > MAX_HEADER_LINE) {
+        return false;
+      }
       if (!fill()) {
         return false;
       }
@@ -69,7 +73,11 @@ bool parse(const std::string& boundary, const Callbacks& cb) {
     return false;
   }
 
+  size_t parts = 0;
   for (;;) {
+    if (++parts > MAX_PARTS) {
+      return false;
+    }
     PartInfo info;
     for (;;) {
       std::string line;
@@ -110,6 +118,8 @@ bool parse(const std::string& boundary, const Callbacks& cb) {
             if (cb.onFileData) {
               cb.onFileData(reinterpret_cast<const uint8_t*>(win.data()), at);
             }
+          } else if (fieldValue.size() + at > MAX_FIELD_BYTES) {
+            return false;
           } else {
             fieldValue.append(win, 0, at);
           }
@@ -128,6 +138,10 @@ bool parse(const std::string& boundary, const Callbacks& cb) {
           if (cb.onFileData) {
             cb.onFileData(reinterpret_cast<const uint8_t*>(win.data()), emit);
           }
+        } else if (fieldValue.size() + emit > MAX_FIELD_BYTES) {
+          // Only a field can grow here: a file part streams out and never
+          // accumulates, which is why the cap applies to one and not the other.
+          return false;
         } else {
           fieldValue.append(win, 0, emit);
         }

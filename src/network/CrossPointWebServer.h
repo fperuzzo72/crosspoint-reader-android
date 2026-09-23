@@ -1,7 +1,6 @@
 #pragma once
 
 #include <BoardConfig.h>
-
 #include <HalStorage.h>
 #include <NetworkUdp.h>
 #include <WebServer.h>
@@ -67,14 +66,6 @@ class CrossPointWebServer {
 
   WsUploadStatus getWsUploadStatus() const;
 
-  // Get the port number
-  uint16_t getPort() const { return port; }
-
- private:
-  std::unique_ptr<WebServer> server = nullptr;
-  std::unique_ptr<WebSocketsServer> wsServer = nullptr;
-  bool running = false;
-  bool apMode = false;  // true when running in AP mode, false for STA mode
   // Ports below 1024 are privileged on Linux: binding one needs root or
   // CAP_NET_BIND_SERVICE. An ESP32 has no such concept and CrossPoint runs as
   // root on a jailbroken Kindle, so 80 was always fine there. An ordinary
@@ -89,6 +80,15 @@ class CrossPointWebServer {
 #else
   static constexpr uint16_t DEFAULT_PORT = 80;
 #endif
+
+  // Get the port number
+  uint16_t getPort() const { return port; }
+
+ private:
+  std::unique_ptr<WebServer> server = nullptr;
+  std::unique_ptr<WebSocketsServer> wsServer = nullptr;
+  bool running = false;
+  bool apMode = false;  // true when running in AP mode, false for STA mode
   uint16_t port = DEFAULT_PORT;
   uint16_t wsPort = 81;  // WebSocket port
   NetworkUDP udp;

@@ -197,6 +197,31 @@ hosted target has an ESP32's heap to defragment. That is the shape the Kindle's
 `FREEINK_DEVICE_KINDLE` guard should take when this goes back, and it is one
 more instance of the rename already recorded in "The structural item".
 
+## Done: the web server had nothing to serve on
+
+The first real test of the upload work failed one step earlier than the upload:
+the screen showed an IP and a QR code and no browser could reach them.
+
+`CrossPointWebServer` binds port 80. That range is privileged on Linux, so it
+needs root or `CAP_NET_BIND_SERVICE`. An ESP32 has no such concept and the
+Kindle runs as root, so 80 was right on both, and an ordinary Android app is
+neither. `DEFAULT_PORT` is 8080 here and 80 everywhere else, which is a genuine
+per-device value and stays guarded.
+
+**The part that is owed, and is not the port number:** `bind()` and `listen()`
+failed in complete silence. `WebServerPosix.cpp` closed the descriptor, set
+`listenFd = -1` and returned, and from the outside that is indistinguishable
+from a working server, because the IP and the QR come from the network state
+rather than from a socket. It logs the failure now, with `strerror(errno)` and
+a note when `EACCES` meets a port below 1024. That holds on any POSIX target
+and the Kindle should have it: running as root is a reason the bind succeeds,
+not a reason a failure should be quiet.
+
+And the port had to reach the URL. It is built in three places in
+`CrossPointWebServerActivity`, so a `webServerPortSuffix()` helper appends
+`:8080` when the server is not on 80 and nothing when it is, which leaves the
+other targets' URLs character for character as they were.
+
 ## Counter-current
 
 Things the Kindle solved that need rethinking here, not copying:

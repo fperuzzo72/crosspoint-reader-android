@@ -5,6 +5,10 @@ plugins {
 
 android {
   namespace = "org.crosspoint.hibreak"
+  // Otherwise the output is "app-debug.apk", which says nothing sitting in a
+  // phone's download folder next to every other app-debug.apk. These are
+  // installed by hand.
+  base.archivesName = "crosspoint-hibreak"
   compileSdk = 35
   ndkVersion = "30.0.16248370"
 

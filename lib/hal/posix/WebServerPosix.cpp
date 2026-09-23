@@ -237,7 +237,10 @@ void WebServer::handleClient() {
   reqHeaders.clear();
   requestContentLength = 0;
   pendingHeaders.clear();
-  plannedLength = SIZE_MAX;
+  plannedLength = 0;
+  lengthAnnounced = false;
+  chunked = false;
+  chunkTerminated = false;
   headersSent = false;
 
   if (readRequest()) {
@@ -247,6 +250,9 @@ void WebServer::handleClient() {
     // A handler that sent nothing still owes the browser a response.
     send(500, "text/plain", String("handler produced no response"));
   }
+  // A handler that streamed but did not call sendContent("") still owes the
+  // closing chunk, and the browser hangs on the fetch without it.
+  endChunkedBody();
   activeClient.stop();
 }
 
@@ -533,16 +539,46 @@ void WebServer::send(const int code, const String& contentType, const String& co
   writeStatusLine(code, contentType);
 
   // setContentLength() announces a body that arrives through later
-  // sendContent() calls; without it the body is what is passed here.
-  char lenLine[64];
-  const size_t length = plannedLength != SIZE_MAX ? plannedLength : content.length();
-  std::snprintf(lenLine, sizeof(lenLine), "Content-Length: %zu\r\n\r\n", length);
-  activeClient.write(lenLine);
+  // sendContent() calls; without it the body is what is passed here. Announced
+  // as CONTENT_LENGTH_UNKNOWN it means the size is not known yet, which on the
+  // wire is Transfer-Encoding: chunked. Answering that with Content-Length: 0
+  // and then writing the body anyway hands the browser an empty response.
+  chunked = lengthAnnounced && plannedLength == CONTENT_LENGTH_UNKNOWN;
+  if (chunked) {
+    activeClient.write("Transfer-Encoding: chunked\r\n\r\n");
+  } else {
+    char lenLine[64];
+    const size_t length = lengthAnnounced ? plannedLength : content.length();
+    std::snprintf(lenLine, sizeof(lenLine), "Content-Length: %zu\r\n\r\n", length);
+    activeClient.write(lenLine);
+  }
   headersSent = true;
 
   if (!content.isEmpty()) {
-    activeClient.write(reinterpret_cast<const uint8_t*>(content.c_str()), content.length());
+    writeBody(content.c_str(), content.length());
   }
+}
+
+// One chunk, or a plain write when the response is not chunked. A chunk is its
+// own size in hex, the bytes, and a CRLF.
+void WebServer::writeBody(const char* content, const size_t length) {
+  if (!chunked) {
+    activeClient.write(reinterpret_cast<const uint8_t*>(content), length);
+    return;
+  }
+  char sizeLine[32];
+  std::snprintf(sizeLine, sizeof(sizeLine), "%zx\r\n", length);
+  activeClient.write(sizeLine);
+  activeClient.write(reinterpret_cast<const uint8_t*>(content), length);
+  activeClient.write("\r\n");
+}
+
+// The zero-length chunk that ends a chunked body. Without it the browser waits
+// for more and the fetch fails even though every byte already arrived.
+void WebServer::endChunkedBody() {
+  if (!chunked || chunkTerminated) return;
+  activeClient.write("0\r\n\r\n");
+  chunkTerminated = true;
 }
 
 void WebServer::send_P(const int code, const char* contentType, const char* content) {
@@ -557,13 +593,16 @@ void WebServer::send_P(const int code, const char* contentType, const char* cont
 void WebServer::sendContent(const String& content) { sendContent(content.c_str(), content.length()); }
 
 void WebServer::sendContent(const char* content, const size_t length) {
-  if (content == nullptr || length == 0) {
-    return;
-  }
   if (!headersSent) {
     // Streaming without a status line first: emit a bare 200 rather than
     // sending a naked body the browser cannot interpret.
     send(200, "text/plain", String());
   }
-  activeClient.write(reinterpret_cast<const uint8_t*>(content), length);
+  if (content == nullptr || length == 0) {
+    // Callers end a streamed response with sendContent(""), which is how the
+    // closing chunk is asked for. It is nothing at all on an unchunked one.
+    endChunkedBody();
+    return;
+  }
+  writeBody(content, length);
 }

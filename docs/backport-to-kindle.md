@@ -240,6 +240,28 @@ again.
 It carried a leak with it: the bare `new` handed to `addHandler()` was never
 deleted, one `WebDAVHandler` per File Transfer session.
 
+### Owed to the Kindle: chunked responses
+
+The file manager and the settings page both answered "failed to load", and the
+font list next to them worked. The difference is how each one sends: fonts
+builds the whole JSON and sends it with a known length, the other two announce
+`CONTENT_LENGTH_UNKNOWN` and stream.
+
+`CONTENT_LENGTH_UNKNOWN` **is** `SIZE_MAX`, and the shim used `SIZE_MAX` as its
+"nobody announced a length" marker as well. One field cannot tell those apart
+and they need opposite answers, so an announced-unknown response fell into the
+fallback, sent `Content-Length: 0`, and then wrote the body anyway. The browser
+reads zero bytes and `JSON.parse` gets an empty string.
+
+The shim speaks `Transfer-Encoding: chunked` now: each `sendContent()` is
+framed with its size in hex, `sendContent("")` emits the closing zero-length
+chunk, and the end of the request cycle emits it for a handler that forgot,
+because without it the browser waits for more after every byte has arrived.
+The three callers that announce a real length (file download, two in WebDAV)
+are untouched.
+
+Pure POSIX, and the Kindle has the same shim and the same two pages.
+
 ## Counter-current
 
 Things the Kindle solved that need rethinking here, not copying:

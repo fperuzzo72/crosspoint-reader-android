@@ -159,13 +159,31 @@ shim asks the interface through `SIOCGIWESSID` and that 3.x kernel still
 carries wireless extensions, so the name is genuinely available and the caller
 can say which network it is serving on. The Kindle version fills it in.
 
-Checked there and deliberately left alone, worth knowing here because the code
-is shared: leaving the web server calls `silentRestart()` whenever
-`WiFi.getMode()` is not `WIFI_MODE_NULL`, and both shims always answer
-`WIFI_STA`. On the Kindle it does not restart, because `silentRestart()` returns
-early on a touch device and that target inherits the X4 profile, which has
-touch. That is worth re-checking on this port rather than assuming, since
-`ESP.restart()` means something different in each — see Counter-current below.
+### And the trap under it, which this port almost certainly shares
+
+Leaving the web server calls `silentRestart()` whenever `WiFi.getMode()` is not
+`WIFI_MODE_NULL`, and both shims always answer `WIFI_STA`. It was recorded here
+that the Kindle was safe from this "because `silentRestart()` returns early on a
+touch device and that target inherits the X4 profile, which has touch". **That
+was wrong, asserted without opening the profile.** `XTEINK_X4` is `NO_TOUCH`.
+
+The device said so: one launcher run carried three "suspend detection armed"
+lines, and that line prints once per process. The reader was re-execing twice
+while the web server was being tested.
+
+The mechanism to watch for here: `BoardConfig::ACTIVE` falls through to a
+profile that describes hardware the target does not have, so
+`BoardConfig::hasTouch()` answers about that profile rather than about the
+device. A touchscreen declared through `FREEINK_CAP_TOUCH`, a compile-time
+capability, does not make that runtime query true. Reading one for the other is
+easy and silent.
+
+Fixed on the Kindle in `bc183a22` by refusing all three silent restarts there.
+They exist because bringing the radio up, or handing storage to a USB host,
+fragments an ESP32's heap badly enough that a reset is the cheapest cure —
+which is worth asking whether it still holds on a phone, where the reboot
+target also lives in a global that would not survive whatever "restart" ends up
+meaning. See Counter-current below.
 
 ## Counter-current
 

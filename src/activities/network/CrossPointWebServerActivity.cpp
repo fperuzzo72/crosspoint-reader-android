@@ -20,6 +20,17 @@
 #include "util/TaskWatchdog.h"
 
 namespace {
+
+// ":8080" when the server does not listen on 80, and empty when it does, so a
+// URL reads the way a person expects on the targets where nothing changed.
+std::string webServerPortSuffix() {
+  return CrossPointWebServer::DEFAULT_PORT == 80 ? std::string()
+                                                 : ":" + std::to_string(CrossPointWebServer::DEFAULT_PORT);
+}
+
+}  // namespace
+
+namespace {
 // AP Mode configuration
 constexpr const char* AP_SSID = "CrossPoint-Reader";
 constexpr const char* AP_PASSWORD = nullptr;  // Open network for ease of use

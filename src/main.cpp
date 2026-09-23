@@ -202,8 +202,32 @@ static bool finishWifiSessionWithoutRestart() {
 }
 #endif
 
+#if FREEINK_MCU_HOSTED
+// Every silent restart below exists for one ESP32 reason: bringing the radio up,
+// or handing the storage to a USB host, fragments the heap badly enough that a
+// reset is the cheapest cure. No hosted target has that problem, and here the
+// cure is far worse than on the Kindle: ESP.restart() re-execs /proc/self/exe,
+// which inside an Android app is /system/bin/app_process64, not this reader.
+// Exec replaces the whole process image, so the JVM, the Activity and the
+// Surface go with it and nothing comes back. The reboot target would not have
+// survived either: it lives in a global that exec discards.
+//
+// finishWifiSessionWithoutRestart() looks like it already covers this, and does
+// not. It returns false unless BoardConfig::hasTouch(), and BoardConfig::ACTIVE
+// falls through to the X4 profile on both hosted targets, which is NO_TOUCH.
+// The touchscreen here is described by FREEINK_CAP_TOUCH, a compile-time
+// capability, not by that runtime profile.
+static bool refuseRestart(const char* what) {
+  LOG_DBG("MAIN", "%s refused: re-execing fixes nothing this process has", what);
+  return true;
+}
+#endif
+
 void silentRestart() {
   if (deepSleepInProgress) return;  // sleeping supersedes the heap-defrag reboot
+#if FREEINK_MCU_HOSTED
+  if (refuseRestart("silent restart")) return;
+#endif
 #if FREEINK_CAP_TOUCH
   if (finishWifiSessionWithoutRestart()) return;
 #endif
@@ -221,6 +245,9 @@ void silentRestart() {
 
 void silentRestartToReader() {
   if (deepSleepInProgress) return;  // sleeping supersedes the heap-defrag reboot
+#if FREEINK_MCU_HOSTED
+  if (refuseRestart("silent restart to reader")) return;
+#endif
 #if FREEINK_CAP_TOUCH
   if (finishWifiSessionWithoutRestart()) return;
 #endif
@@ -234,6 +261,9 @@ void silentRestartToReader() {
 
 void restartToHomeAfterStorageHandoff() {
   if (deepSleepInProgress) return;  // sleeping supersedes the storage handoff reboot
+#if FREEINK_MCU_HOSTED
+  if (refuseRestart("restart after storage handoff")) return;
+#endif
   silentRebootTarget = SILENT_REBOOT_TARGET_HOME;
   silentRebootMagic = SILENT_REBOOT_MAGIC;
   LOG_DBG("MAIN", "Restart after storage handoff (target=home)");

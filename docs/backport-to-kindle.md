@@ -180,10 +180,22 @@ easy and silent.
 
 Fixed on the Kindle in `bc183a22` by refusing all three silent restarts there.
 They exist because bringing the radio up, or handing storage to a USB host,
-fragments an ESP32's heap badly enough that a reset is the cheapest cure —
-which is worth asking whether it still holds on a phone, where the reboot
-target also lives in a global that would not survive whatever "restart" ends up
-meaning. See Counter-current below.
+fragments an ESP32's heap badly enough that a reset is the cheapest cure.
+
+**Checked here rather than assumed, and it is worse here.** Every condition
+holds: `WiFi.getMode()` returns `WIFI_STA` unconditionally in the shim, nothing
+calls `selectDevice()`, so `BoardConfig::ACTIVE` is the X4 profile and
+`hasTouch()` is false, and `finishWifiSessionWithoutRestart()` declines. The
+difference is where `ESP.restart()` lands: it re-execs `/proc/self/exe`, which
+inside an Android app is `/system/bin/app_process64`, not this reader. Exec
+replaces the process image, so the JVM, the Activity and the Surface go with
+it. On the Kindle the reader came back at Home; here nothing comes back.
+
+Refused here too, and **guarded as `FREEINK_MCU_HOSTED` rather than by device**,
+because the argument is about the family and not about either machine: no
+hosted target has an ESP32's heap to defragment. That is the shape the Kindle's
+`FREEINK_DEVICE_KINDLE` guard should take when this goes back, and it is one
+more instance of the rename already recorded in "The structural item".
 
 ## Counter-current
 

@@ -174,6 +174,13 @@ int32_t WiFiClass::RSSI() {
   return dbm;
 }
 
+void WiFiClass::BSSID(uint8_t* out) {
+  if (out == nullptr) return;
+  std::memset(out, 0, 6);
+}
+
+int32_t WiFiClass::channel() { return 0; }
+
 String WiFiClass::SSID() {
   char name[IFNAMSIZ] = {0};
   if (!firstInetInterface(name, sizeof(name), nullptr)) {

@@ -79,6 +79,15 @@ class WiFiClass {
   String SSID();
   String getHostname();
 
+  // The association's BSSID and channel. Both are inert: reading them needs the
+  // same privilege the SSID does, which this port does not ask for, and the
+  // Kindle's wireless-extensions path does not expose them either. They exist
+  // because CrossPoint logs them, and a macro that expands to nothing never
+  // type-checks what is inside it -- these two went unnoticed until logging was
+  // turned on for the first time.
+  void BSSID(uint8_t* out);
+  int32_t channel();
+
   // --- not ours: fail rather than pretend ---------------------------------
   // The system owns association. Returns WL_CONNECT_FAILED without touching
   // anything; a caller that treated a fake success as real would block on a

@@ -284,9 +284,10 @@ two shims are identical again in these two files.
 
 With both of those in, File Transfer works end to end here: the file list
 loads, an upload lands in the library and a delete removes it. The settings
-page renders its values, and the fonts page lists what is installed. Sending
-and deleting a font is the one part of the web UI nobody has exercised on
-either port.
+page renders its values, and the fonts page lists what is installed. A font
+family uploads through the browser: five `.cpfont` files picked as a directory,
+all five arriving, and the family selectable and rendering afterwards. Deleting
+one is the remaining untested corner of the web UI on either port.
 
 ## Counter-current
 

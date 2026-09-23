@@ -102,6 +102,20 @@ target_compile_definitions(cp_common INTERFACE
   XML_CONTEXT_BYTES=1024
 )
 
+# This port has never produced a single LOG_ line. Logging.h wraps LOG_ERR,
+# LOG_INF and LOG_DBG in one #ifdef ENABLE_SERIAL_LOG, and without it all three
+# expand to nothing -- errors included, not just debug. Everything the log file
+# has ever carried came from fprintf(stderr) written by hand, which is why the
+# crash handler and the panel report and nothing else does.
+#
+# Both are set, and only for Debug. The output lands on stderr through
+# MySerialImpl, which is already redirected into the log file, and the log
+# already rotates. LOG_LEVEL alone would have changed nothing.
+target_compile_definitions(cp_common INTERFACE
+  $<$<CONFIG:Debug>:ENABLE_SERIAL_LOG>
+  $<$<CONFIG:Debug>:LOG_LEVEL=2>
+)
+
 # --- one static library per library ---------------------------------
 # This is not tidiness, it is necessity. There are three copies of miniz in this
 # tree (CrossPoint's, FreeInkBook's, ContentProtection's), each with a config

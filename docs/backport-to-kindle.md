@@ -222,6 +222,24 @@ And the port had to reach the URL. It is built in three places in
 `:8080` when the server is not on 80 and nothing when it is, which leaves the
 other targets' URLs character for character as they were.
 
+### Arriving from the Kindle: one registration order
+
+The first thing the browser got on 8080 was `405 Method Not Allowed`,
+identical to what the Kindle showed. Fixed there first (`52dfaa65`) and the
+patch applied here unchanged, which is the direction this ledger does not
+usually run.
+
+The shim kept `on()` routes and `addHandler()` objects in two lists and
+consulted the handler objects first. The Arduino `WebServer` it stands in for
+keeps both in a single chain, so registration order decides, and the tree
+relies on it: `CrossPointWebServer` registers `"/"` near the top of setup and
+adds `WebDAVHandler` at the bottom, and WebDAV claims GET for every URI and
+answers 405 for a directory. One list in registration order, and `"/"` wins
+again.
+
+It carried a leak with it: the bare `new` handed to `addHandler()` was never
+deleted, one `WebDAVHandler` per File Transfer session.
+
 ## Counter-current
 
 Things the Kindle solved that need rethinking here, not copying:

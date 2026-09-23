@@ -2,19 +2,18 @@
 // one thing deliberately left unimplemented.
 
 #include <arpa/inet.h>
-#include <netinet/in.h>
 #include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
-#include <cerrno>
 #include <cstring>
 #include <iterator>
 
 #include "MultipartParser.h"
-
 #include "arduino-shim/WebServer.h"
 
 namespace detail {
@@ -76,20 +75,34 @@ HTTPMethod methodFromToken(const std::string& token) {
 
 const char* reasonPhrase(const int code) {
   switch (code) {
-    case 200: return "OK";
-    case 201: return "Created";
-    case 204: return "No Content";
-    case 301: return "Moved Permanently";
-    case 302: return "Found";
-    case 304: return "Not Modified";
-    case 400: return "Bad Request";
-    case 401: return "Unauthorized";
-    case 403: return "Forbidden";
-    case 404: return "Not Found";
-    case 405: return "Method Not Allowed";
-    case 500: return "Internal Server Error";
-    case 501: return "Not Implemented";
-    default: return "";
+    case 200:
+      return "OK";
+    case 201:
+      return "Created";
+    case 204:
+      return "No Content";
+    case 301:
+      return "Moved Permanently";
+    case 302:
+      return "Found";
+    case 304:
+      return "Not Modified";
+    case 400:
+      return "Bad Request";
+    case 401:
+      return "Unauthorized";
+    case 403:
+      return "Forbidden";
+    case 404:
+      return "Not Found";
+    case 405:
+      return "Method Not Allowed";
+    case 500:
+      return "Internal Server Error";
+    case 501:
+      return "Not Implemented";
+    default:
+      return "";
   }
 }
 
@@ -121,14 +134,24 @@ bool readLine(WiFiClient& c, std::string* out) {
 // otherwise hide it and recurse.
 using namespace detail;
 
-WebServer::~WebServer() { stop(); }
+WebServer::~WebServer() {
+  stop();
+  // The caller hands over a bare `new`: CrossPointWebServer's addHandler call
+  // says in a comment that the server deletes it. Not in stop(), because
+  // begin() calls stop() first and would then free a handler registered before
+  // it; the server object is reset per session, so here is the same moment in
+  // practice.
+  for (Registration& r : registrations) {
+    delete r.handler;
+    r.handler = nullptr;
+  }
+}
 
 void WebServer::begin() { begin(listenPort); }
 
 void WebServer::begin(const uint16_t port) {
   stop();
   listenPort = port;
-
 
   listenFd = socket(AF_INET, SOCK_STREAM, 0);
   if (listenFd < 0) {
@@ -152,8 +175,7 @@ void WebServer::begin(const uint16_t port) {
     // nothing on an ESP32 and nothing running as root, and it is fatal to an
     // ordinary application.
     std::fprintf(stderr, "[web] bind/listen on port %u failed: %s%s\n", static_cast<unsigned>(port),
-                 std::strerror(errno),
-                 (errno == EACCES && port < 1024) ? " (ports below 1024 are privileged)" : "");
+                 std::strerror(errno), (errno == EACCES && port < 1024) ? " (ports below 1024 are privileged)" : "");
     std::fflush(stderr);
     ::close(listenFd);
     listenFd = -1;
@@ -178,11 +200,20 @@ void WebServer::stop() {
 void WebServer::on(const String& u, THandlerFunction handler) { on(u, HTTP_ANY, handler); }
 
 void WebServer::on(const String& u, const HTTPMethod m, THandlerFunction handler) {
-  routes.push_back(Route{u, m, handler, nullptr});
+  Registration r;
+  r.uri = u;
+  r.method = m;
+  r.fn = handler;
+  registrations.push_back(std::move(r));
 }
 
 void WebServer::on(const String& u, const HTTPMethod m, THandlerFunction handler, THandlerFunction uploadHandler) {
-  routes.push_back(Route{u, m, handler, uploadHandler});
+  Registration r;
+  r.uri = u;
+  r.method = m;
+  r.fn = handler;
+  r.uploadFn = uploadHandler;
+  registrations.push_back(std::move(r));
 }
 
 void WebServer::collectHeaders(const char* headerKeys[], const size_t count) {
@@ -272,7 +303,8 @@ bool WebServer::readRequest() {
             bound = bound.substr(0, semi);
           }
           while (!bound.empty() && (bound.front() == '"' || bound.front() == ' ')) bound.erase(bound.begin());
-          while (!bound.empty() && (bound.back() == '"' || bound.back() == ' ' || bound.back() == '\r')) bound.pop_back();
+          while (!bound.empty() && (bound.back() == '"' || bound.back() == ' ' || bound.back() == '\r'))
+            bound.pop_back();
           multipartBoundary = bound;
         }
       }
@@ -379,20 +411,28 @@ String WebServer::urlDecode(const String& encoded) {
 
 void WebServer::addHandler(RequestHandler* handler) {
   if (handler != nullptr) {
-    handlers.push_back(handler);
+    Registration r;
+    r.handler = handler;
+    registrations.push_back(std::move(r));
   }
 }
 
 void WebServer::dispatch() {
-  // Handler objects first, in registration order: they claim whole subtrees
-  // (WebDAV does), which an exact-match route cannot express.
-  for (RequestHandler* h : handlers) {
-    if (h->canHandle(*this, reqMethod, reqUri) && h->handle(*this, reqMethod, reqUri)) {
-      return;
+  // One pass, in registration order, mixing routes and handler objects. The
+  // order is the contract: the Arduino WebServer keeps both in a single chain,
+  // and the tree registers "/" near the top of setup while adding WebDAV at the
+  // bottom. WebDAV claims GET for every uri, so consulting handler objects
+  // first handed "/" to it and the browser got "405 Method Not Allowed" for a
+  // directory instead of the file manager.
+  for (const Registration& r : registrations) {
+    if (r.handler != nullptr) {
+      // A handler that declines, either by not claiming or by returning false,
+      // leaves the request to whatever was registered after it.
+      if (r.handler->canHandle(*this, reqMethod, reqUri) && r.handler->handle(*this, reqMethod, reqUri)) {
+        return;
+      }
+      continue;
     }
-  }
-
-  for (const Route& r : routes) {
     if (r.uri != reqUri) {
       continue;
     }
@@ -402,11 +442,11 @@ void WebServer::dispatch() {
     // The upload handler runs while the body is still on the wire; the route's
     // main handler runs afterwards and sends the response. That order is the
     // Arduino original's, and CrossPoint's handlers read the finished state.
-    if (!multipartBoundary.empty() && r.uploadHandler) {
-      readMultipart(r.uploadHandler);
+    if (!multipartBoundary.empty() && r.uploadFn) {
+      readMultipart(r.uploadFn);
     }
-    if (r.handler) {
-      r.handler();
+    if (r.fn) {
+      r.fn();
       return;
     }
   }
@@ -506,8 +546,7 @@ void WebServer::send(const int code, const String& contentType, const String& co
 }
 
 void WebServer::send_P(const int code, const char* contentType, const char* content) {
-  send(code, String(contentType != nullptr ? contentType : "text/plain"),
-       String(content != nullptr ? content : ""));
+  send(code, String(contentType != nullptr ? contentType : "text/plain"), String(content != nullptr ? content : ""));
 }
 
 void WebServer::send_P(const int code, const char* contentType, const char* content, const size_t length) {
@@ -515,9 +554,7 @@ void WebServer::send_P(const int code, const char* contentType, const char* cont
        String(std::string(content != nullptr ? content : "", length)));
 }
 
-void WebServer::sendContent(const String& content) {
-  sendContent(content.c_str(), content.length());
-}
+void WebServer::sendContent(const String& content) { sendContent(content.c_str(), content.length()); }
 
 void WebServer::sendContent(const char* content, const size_t length) {
   if (content == nullptr || length == 0) {

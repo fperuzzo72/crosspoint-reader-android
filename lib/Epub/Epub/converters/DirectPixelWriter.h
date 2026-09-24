@@ -179,7 +179,17 @@ struct DirectPixelWriter {
     const int sy = phyY - originY;
     if (static_cast<unsigned>(sy) >= static_cast<unsigned>(clipRows)) return;
 
-    const uint16_t byteIndex = static_cast<uint16_t>(sy * displayWidthBytes + (phyX >> 3));
+    // 32 bits, not 16. A uint16_t index caps the reachable framebuffer at 64 KB,
+    // which is every pixel of an 800x480 panel (48,000 B) and still covers a
+    // 600x800 one (60,000 B), so the truncation was invisible for as long as
+    // those were the only targets. An 824x1648 panel needs 169,744 B: every row
+    // past ~636 wraps, and because the stride does not divide 65,536 the wraps
+    // land at a different offset each time. The image arrives scattered across
+    // the page in pieces, over whatever was already drawn there.
+    //
+    // Only images reach this writer. Text goes through GfxRenderer, which is why
+    // a page would look fine except for its illustration.
+    const uint32_t byteIndex = static_cast<uint32_t>(sy) * displayWidthBytes + static_cast<uint32_t>(phyX >> 3);
     const uint8_t bitMask = 1 << (7 - (phyX & 7));
 
     if (state) {

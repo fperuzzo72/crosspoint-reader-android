@@ -363,7 +363,7 @@ void EpubReaderActivity::loop() {
             auto scope = fcm->createPrewarmScope();
             p->render(renderer, SETTINGS.getReaderFontId(), 0, 0);
             scope.endScanAndPrewarm();
-            LOG_DBG("ERS", "Idle prewarm: page %d in %lums", nextPage, millis() - t0);
+            LOG_DBG("ERS", "Idle prewarm: page %d in %ums", nextPage, millis() - t0);
           }
         }
       }
@@ -1652,8 +1652,8 @@ void EpubReaderActivity::renderContents(std::unique_ptr<Page> page, const int or
       const auto tEnd = millis();
 
       LOG_DBG("ERS",
-              "Page render (tiled async): prewarm=%lums bw_render=%lums display=%lums gray_render=%lums "
-              "wait=%lums gray_write=%lums gray_display=%lums cleanup=%lums total=%lums (planes buffered: %d)",
+              "Page render (tiled async): prewarm=%ums bw_render=%ums display=%ums gray_render=%ums "
+              "wait=%ums gray_write=%ums gray_display=%ums cleanup=%ums total=%ums (planes buffered: %d)",
               tPrewarm - t0, tBwRender - tPrewarm, tDisplay - tBwRender, tGrayRender - tDisplay, tWait - tGrayRender,
               tGrayWrite - tWait, tGrayDisplay - tGrayWrite, tEnd - tGrayDisplay, tEnd - t0, msbPlaneBuf ? 2 : 1);
     } else {
@@ -1702,8 +1702,8 @@ void EpubReaderActivity::renderContents(std::unique_ptr<Page> page, const int or
 
         const auto tEnd = millis();
         LOG_DBG("ERS",
-                "Page render (tiled): prewarm=%lums bw_render=%lums display=%lums gray_lsb=%lums "
-                "gray_msb=%lums gray_display=%lums cleanup=%lums total=%lums",
+                "Page render (tiled): prewarm=%ums bw_render=%ums display=%ums gray_lsb=%ums "
+                "gray_msb=%ums gray_display=%ums cleanup=%ums total=%ums",
                 tPrewarm - t0, tBwRender - tPrewarm, tDisplay - tBwRender, tGrayLsb - tDisplay, tGrayMsb - tGrayLsb,
                 tGrayDisplay - tGrayMsb, tCleanup - tGrayDisplay, tEnd - t0);
       }
@@ -1737,13 +1737,13 @@ void EpubReaderActivity::renderContents(std::unique_ptr<Page> page, const int or
 
       const auto tEnd = millis();
       LOG_DBG("ERS",
-              "Page render: prewarm=%lums bw_render=%lums display=%lums bw_store=%lums "
-              "gray_lsb=%lums gray_msb=%lums gray_display=%lums bw_restore=%lums total=%lums",
+              "Page render: prewarm=%ums bw_render=%ums display=%ums bw_store=%ums "
+              "gray_lsb=%ums gray_msb=%ums gray_display=%ums bw_restore=%ums total=%ums",
               tPrewarm - t0, tBwRender - tPrewarm, tDisplay - tBwRender, tBwStore - tDisplay, tGrayLsb - tBwStore,
               tGrayMsb - tGrayLsb, tGrayDisplay - tGrayMsb, tBwRestore - tGrayDisplay, tEnd - t0);
     } else {
       const auto tEnd = millis();
-      LOG_DBG("ERS", "Page render: prewarm=%lums bw_render=%lums display=%lums total=%lums", tPrewarm - t0,
+      LOG_DBG("ERS", "Page render: prewarm=%ums bw_render=%ums display=%ums total=%ums", tPrewarm - t0,
               tBwRender - tPrewarm, tDisplay - tBwRender, tEnd - t0);
     }
   }

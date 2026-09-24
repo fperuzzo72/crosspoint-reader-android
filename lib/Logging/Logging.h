@@ -39,7 +39,12 @@ static HardwareSerial& logSerial = Serial;
 #define LOG_SERIAL_HAS_TX_TIMEOUT 0
 #endif
 
-void logPrintf(const char* level, const char* origin, const char* format, ...);
+// The format attribute is what lets the compiler check every LOG_ call site.
+// Without it a wrong specifier is invisible, and 48 of them were: %lu against a
+// uint32_t is correct on a 32-bit target and silently wrong on a 64-bit one,
+// where the first five variadic values ride in registers and survive while
+// everything after them is read from the stack at the wrong width.
+void logPrintf(const char* level, const char* origin, const char* format, ...) __attribute__((format(printf, 3, 4)));
 
 #ifdef ENABLE_SERIAL_LOG
 #if LOG_LEVEL >= 0

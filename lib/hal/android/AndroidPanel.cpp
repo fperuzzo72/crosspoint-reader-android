@@ -73,11 +73,23 @@ void AndroidPanel::attachSurface(ANativeWindow* window) {
     return;
   }
   ANativeWindow_acquire(win);
-  // The geometry is pinned to the panel size so the compositor does not scale:
-  // a page of 1bpp text resampled loses exactly the sharpness e-ink exists to
+  // Asked for the panel's own size, not the composition frame's. They differ
+  // whenever the panel width is not a multiple of 8, and asking for the rounded
+  // width makes the compositor resample the whole frame to fit the window: a
+  // page of 1bpp text resampled loses exactly the sharpness e-ink exists to
   // give.
-  const int32_t geo = ANativeWindow_setBuffersGeometry(win, HIBREAK_WIDTH, HIBREAK_HEIGHT, WINDOW_FORMAT_RGBX_8888);
-  std::fprintf(stderr, "[panel] superficie anexada, geometria %dx%d -> %d\n", HIBREAK_WIDTH, HIBREAK_HEIGHT, geo);
+  //
+  // The native size is read first and logged beside what is requested, so a
+  // panel this build was not sized for says so in one line instead of looking
+  // subtly soft.
+  const int32_t nativeW = ANativeWindow_getWidth(win);
+  const int32_t nativeH = ANativeWindow_getHeight(win);
+  const int32_t geo =
+      ANativeWindow_setBuffersGeometry(win, PANEL_NATIVE_WIDTH, PANEL_NATIVE_HEIGHT, WINDOW_FORMAT_RGBX_8888);
+  std::fprintf(
+      stderr, "[panel] janela %dx%d, pedida %dx%d, frame %dx%d -> %d%s\n", nativeW, nativeH, PANEL_NATIVE_WIDTH,
+      PANEL_NATIVE_HEIGHT, HIBREAK_WIDTH, HIBREAK_HEIGHT, geo,
+      (nativeW != PANEL_NATIVE_WIDTH || nativeH != PANEL_NATIVE_HEIGHT) ? "  [NAO CONFERE: sera escalado]" : "");
   std::fflush(stderr);
   // The surface may have arrived after the frame. Re-present rather than
   // leaving the new buffer with whatever the compositor put in it.

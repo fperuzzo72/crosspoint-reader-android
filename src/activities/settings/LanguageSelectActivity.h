@@ -17,7 +17,7 @@ class LanguageSelectActivity final : public UiListActivity {
   void onEnter() override;
 
  private:
-  int listCount() const override { return totalItems; }
+  int listCount() const override { return visibleCount; }
   void buildScreen(UiScreen& screen) override;
   void activateIndex(int index) override;
   const char* headerTitle() const override;
@@ -30,4 +30,10 @@ class LanguageSelectActivity final : public UiListActivity {
   // selection, so buildScreen() never needs to see a different "Selected"
   // row within one visit.
   freeink::ui::ListItem rowItems[totalItems]{};
+
+  // Only the languages whose own name the UI font can draw are offered, so the
+  // array is sized for the worst case and filled to visibleCount. Row i shows
+  // the language visibleIndices[i].
+  uint8_t visibleIndices[totalItems]{};
+  int visibleCount = 0;
 };

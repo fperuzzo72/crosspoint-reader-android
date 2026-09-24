@@ -44,6 +44,20 @@ void drawBookmarkStatusIcon(const GfxRenderer& renderer, const int x, const int 
 
 }  // namespace
 
+namespace {
+
+// The metrics as the theme actually publishes them, not the raw table.
+//
+// Drawing used to read BaseMetrics::values while hit testing read
+// getMetrics(), and the two agreed only because getMetrics() adjusted nothing
+// but the button hints. The first adjustment that touched a row height moved
+// the drawing and left the touch target behind, which reads as a menu that
+// ignores the finger where the label is. One accessor, so they cannot drift
+// apart again.
+const ThemeMetrics& metricsNow() { return UITheme::getInstance().getMetrics(); }
+
+}  // namespace
+
 void BaseTheme::drawBatteryOutline(const GfxRenderer& renderer, int x, int y, int battWidth, int rectHeight) {
   // Top line
   renderer.drawLine(x + 1, y, x + battWidth - 3, y);
@@ -177,9 +191,9 @@ void BaseTheme::drawButtonHints(GfxRenderer& renderer, const char* btn1, const c
 
   const int pageHeight = renderer.getScreenHeight();
   constexpr int buttonWidth = 106;
-  constexpr int buttonHeight = BaseMetrics::values.buttonHintsHeight;
-  constexpr int buttonY = BaseMetrics::values.buttonHintsHeight;  // Distance from bottom
-  constexpr int textYOffset = 7;                                  // Distance from top of button to text baseline
+  const int buttonHeight = metricsNow().buttonHintsHeight;
+  const int buttonY = metricsNow().buttonHintsHeight;  // Distance from bottom
+  constexpr int textYOffset = 7;                       // Distance from top of button to text baseline
   // Keyed to the portrait panel width: the 528-wide X3 gets more spacing than
   // the 480-wide boards (X4, X4 Pro, and the other 800x480 panels).
   constexpr int narrowButtonPositions[] = {25, 130, 245, 350};
@@ -210,8 +224,8 @@ void BaseTheme::drawSideButtonHints(const GfxRenderer& renderer, const char* top
   }
 
   const int screenWidth = renderer.getScreenWidth();
-  constexpr int buttonWidth = BaseMetrics::values.sideButtonHintsWidth;  // Width on screen (height when rotated)
-  constexpr int buttonHeight = 80;                                       // Height on screen (width when rotated)
+  const int buttonWidth = metricsNow().sideButtonHintsWidth;  // Width on screen (height when rotated)
+  constexpr int buttonHeight = 80;                            // Height on screen (width when rotated)
   constexpr int buttonMargin = 4;
 
   if (gpio.hasEdgeSideButtons()) {
@@ -387,21 +401,21 @@ void BaseTheme::drawHeader(const GfxRenderer& renderer, Rect rect, const char* t
 
 void BaseTheme::drawSubHeader(const GfxRenderer& renderer, Rect rect, const char* label, const char* rightLabel) const {
   constexpr int labelGap = 10;
-  const int contentWidth = std::max(0, rect.width - BaseMetrics::values.contentSidePadding * 2);
+  const int contentWidth = std::max(0, rect.width - metricsNow().contentSidePadding * 2);
 
   int labelWidth = contentWidth;
   if (rightLabel) {
     auto truncatedRightLabel = renderer.truncatedText(SMALL_FONT_ID, rightLabel, contentWidth, EpdFontFamily::REGULAR);
     const int rightLabelWidth = renderer.getTextWidth(SMALL_FONT_ID, truncatedRightLabel.c_str());
-    renderer.drawText(SMALL_FONT_ID, rect.x + rect.width - BaseMetrics::values.contentSidePadding - rightLabelWidth,
+    renderer.drawText(SMALL_FONT_ID, rect.x + rect.width - metricsNow().contentSidePadding - rightLabelWidth,
                       rect.y + 7, truncatedRightLabel.c_str());
     labelWidth = std::max(0, contentWidth - rightLabelWidth - labelGap);
   }
 
   if (labelWidth > 0) {
     auto truncatedLabel = renderer.truncatedText(UI_12_FONT_ID, label, labelWidth, EpdFontFamily::REGULAR);
-    renderer.drawText(UI_12_FONT_ID, rect.x + BaseMetrics::values.contentSidePadding, rect.y, truncatedLabel.c_str(),
-                      true, EpdFontFamily::REGULAR);
+    renderer.drawText(UI_12_FONT_ID, rect.x + metricsNow().contentSidePadding, rect.y, truncatedLabel.c_str(), true,
+                      EpdFontFamily::REGULAR);
   }
 }
 
@@ -424,7 +438,7 @@ void BaseTheme::drawRecentBookCover(GfxRenderer& renderer, Rect rect, const std:
   if (hasContinueReading && !recentBooks[0].coverBmpPath.empty()) {
     // Try to get actual image dimensions from BMP header
     const std::string coverBmpPath =
-        UITheme::getCoverThumbPath(recentBooks[0].coverBmpPath, BaseMetrics::values.homeCoverHeight);
+        UITheme::getCoverThumbPath(recentBooks[0].coverBmpPath, metricsNow().homeCoverHeight);
 
     HalFile file;
     if (Storage.openFileForRead("HOME", coverBmpPath, file)) {
@@ -473,7 +487,7 @@ void BaseTheme::drawRecentBookCover(GfxRenderer& renderer, Rect rect, const std:
 
     if (hasContinueReading && !recentBooks[0].coverBmpPath.empty() && !coverRendered) {
       const std::string coverBmpPath =
-          UITheme::getCoverThumbPath(recentBooks[0].coverBmpPath, BaseMetrics::values.homeCoverHeight);
+          UITheme::getCoverThumbPath(recentBooks[0].coverBmpPath, metricsNow().homeCoverHeight);
 
       // First time: load cover from SD and render
       HalFile file;
@@ -641,17 +655,17 @@ void BaseTheme::drawButtonMenu(GfxRenderer& renderer, Rect rect, int buttonCount
                                const std::function<std::string(int index)>& buttonLabel,
                                const std::function<UIIcon(int index)>& rowIcon) const {
   for (int i = 0; i < buttonCount; ++i) {
-    const int tileY = BaseMetrics::values.verticalSpacing + rect.y +
-                      static_cast<int>(i) * (BaseMetrics::values.menuRowHeight + BaseMetrics::values.menuSpacing);
+    const int tileY = metricsNow().verticalSpacing + rect.y +
+                      static_cast<int>(i) * (metricsNow().menuRowHeight + metricsNow().menuSpacing);
 
     const bool selected = selectedIndex == i;
 
     if (selected) {
-      renderer.fillRect(rect.x + BaseMetrics::values.contentSidePadding, tileY,
-                        rect.width - BaseMetrics::values.contentSidePadding * 2, BaseMetrics::values.menuRowHeight);
+      renderer.fillRect(rect.x + metricsNow().contentSidePadding, tileY,
+                        rect.width - metricsNow().contentSidePadding * 2, metricsNow().menuRowHeight);
     } else {
-      renderer.drawRect(rect.x + BaseMetrics::values.contentSidePadding, tileY,
-                        rect.width - BaseMetrics::values.contentSidePadding * 2, BaseMetrics::values.menuRowHeight);
+      renderer.drawRect(rect.x + metricsNow().contentSidePadding, tileY,
+                        rect.width - metricsNow().contentSidePadding * 2, metricsNow().menuRowHeight);
     }
 
     std::string labelStr = buttonLabel(i);
@@ -660,7 +674,7 @@ void BaseTheme::drawButtonMenu(GfxRenderer& renderer, Rect rect, int buttonCount
     const int textX = rect.x + (rect.width - textWidth) / 2;
     const int lineHeight = renderer.getLineHeight(UI_10_FONT_ID);
     const int textY =
-        tileY + (BaseMetrics::values.menuRowHeight - lineHeight) / 2;  // vertically centered assuming y is top of text
+        tileY + (metricsNow().menuRowHeight - lineHeight) / 2;  // vertically centered assuming y is top of text
     // Invert text when the tile is selected, to contrast with the filled background
     renderer.drawText(UI_10_FONT_ID, textX, textY, label, selectedIndex != i);
   }

@@ -10,6 +10,7 @@
 
 #include "MappedInputManager.h"
 #include "RecentBooksStore.h"
+#include "UIScale.h"
 #include "components/themes/BaseTheme.h"
 #include "components/themes/lyra/Lyra3CoversTheme.h"
 #include "components/themes/lyra/LyraTheme.h"
@@ -53,12 +54,87 @@ void UITheme::setTheme(CrossPointSettings::UI_THEME type) {
   metricsValid = false;
 }
 
+namespace {
+
+// The theme metrics are the 12 point body font's proportions written out in
+// pixels: a 45-pixel header, a 30-pixel row, a 20-pixel margin. They are not
+// independent numbers, which is why they have to move when that font does.
+//
+// FreeInkUI already works this way, deriving rows, header and touch targets
+// from the body font's line height. Scaling these by the same ratio is what
+// makes the two halves of the interface one interface again, instead of a
+// screen drawn by one rule and touched by another.
+//
+// Only lengths scale. Percentages, counts, style enums, ratios and booleans
+// mean the same thing at any size.
+int scaledLength(const int base, const int num, const int den) {
+  if (num == den || den <= 0) return base;
+  // Rounded, and never below one: truncation eats exactly the thin rules that
+  // are already hardest to see on e-ink.
+  const long v = (static_cast<long>(base) * num + den / 2) / den;
+  if (base > 0 && v < 1) return 1;
+  return static_cast<int>(v);
+}
+
+void scaleMetricsToBodyFont(ThemeMetrics& m, const int bodyPointSize) {
+  const int den = REFERENCE_BODY_POINT_SIZE;
+  if (bodyPointSize == den) return;
+  int* const lengths[] = {&m.batteryWidth,
+                          &m.batteryHeight,
+                          &m.topPadding,
+                          &m.batteryBarHeight,
+                          &m.headerHeight,
+                          &m.verticalSpacing,
+                          &m.previewPadding,
+                          &m.contentSidePadding,
+                          &m.listRowHeight,
+                          &m.listWithSubtitleRowHeight,
+                          &m.listRowGap,
+                          &m.listRowRadius,
+                          &m.listInset,
+                          &m.listSidePadding,
+                          &m.listScrollWidth,
+                          &m.headerSidePadding,
+                          &m.headerUnderlineSize,
+                          &m.menuRowHeight,
+                          &m.menuSpacing,
+                          &m.tabSpacing,
+                          &m.tabBarHeight,
+                          &m.scrollBarWidth,
+                          &m.scrollBarRightOffset,
+                          &m.homeTopPadding,
+                          &m.homeCoverHeight,
+                          &m.homeCoverTileHeight,
+                          &m.homeMenuTopOffset,
+                          &m.buttonHintsHeight,
+                          &m.sideButtonHintsWidth,
+                          &m.progressBarHeight,
+                          &m.progressBarMarginTop,
+                          &m.statusBarHorizontalMargin,
+                          &m.statusBarVerticalMargin,
+                          &m.keyboardKeyHeight,
+                          &m.keyboardKeySpacing,
+                          &m.keyboardVerticalOffset,
+                          &m.popupMarginX,
+                          &m.popupMarginY,
+                          &m.popupFrameThickness,
+                          &m.popupCornerRadius,
+                          &m.popupTextBaselineOffsetY,
+                          &m.popupProgressBarHeight};
+  for (int* const field : lengths) {
+    *field = scaledLength(*field, bodyPointSize, den);
+  }
+}
+
+}  // namespace
+
 const ThemeMetrics& UITheme::getMetrics() const {
   // hasTouch() can flip once touch init completes after static construction, so the
   // cached copy is refreshed when the flag differs instead of copying the struct per call.
   const bool touch = gpio.hasTouch();
   if (!metricsValid || touch != metricsForTouch) {
     adjustedMetrics = *currentMetrics;
+    scaleMetricsToBodyFont(adjustedMetrics, uiScaleSpec().bodyPointSize);
     if (touch) {
       adjustedMetrics.buttonHintsHeight = 0;
     }

@@ -460,6 +460,28 @@ Things the Kindle solved that need rethinking here, not copying:
   JPEGDEC from a host harness the way the reader does, `EIGHT_BIT_GRAYSCALE`
   at `JPEG_SCALE_EIGHTH`, on any progressive image. Unpatched exits 139.
 
+- **Two numbers for one measurement, agreeing by accident.** The themes drew
+  the home menu from their raw metric tables (`LyraMetrics::values` and
+  friends) while hit testing answered from `UITheme::getMetrics()`. Identical
+  values, so identical results, for as long as `getMetrics()` adjusted nothing
+  but the button hints. The first adjustment that touched a row height moved
+  the drawing and left the touch target behind: tapping Settings opened File
+  Transfer, a whole row off.
+
+  63 raw reads across three theme files, plus 22 hardcoded `UI_12_FONT_ID` and
+  `UI_10_FONT_ID` in the same draw paths, which is why the labels stayed at 12
+  point while every box around them scaled.
+
+  Same family as the traps above: the defect was in the tree the whole time and
+  nothing exercised it. A value read from two places is a bug already, not a
+  bug once the two disagree, and "they are equal today" is not a defence.
+
+  Related: `constexpr` over a value that became a measurement stops compiling,
+  which is the compiler doing the search for you. The one to watch is the
+  opposite case, a file-scope constant initialised from a runtime accessor: it
+  compiles, runs at library load before anything has reported the device, and
+  captures the default silently.
+
 - **A quoted `-D` does not survive being written into a generated script.** The
   inner shell eats the quotes and the macro becomes an identifier. Defines go in
   a header via `-include`.

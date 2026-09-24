@@ -73,3 +73,8 @@ add_subdirectory(kindle_touch)
 
 add_subdirectory(kindle_crypto)
 add_subdirectory(multipart)
+# Needs third_party/ present (scripts/fetch-thirdparty.sh); guards the JPEGDEC
+# patch step, not this tree.
+if(EXISTS ${REPO_ROOT}/third_party/JPEGDEC.cpp)
+  add_subdirectory(jpeg_progressive)
+endif()

@@ -64,6 +64,14 @@ for root, _, files in os.walk(SRC_DIR):
             # mtime=0 keeps the output reproducible across builds
             # IMPORTANT: we don't use brotli because Firefox doesn't support brotli with insecured context (only supported on HTTPS)
             compressed = gzip.compress(processed.encode('utf-8'), compresslevel=9, mtime=0)
+            # mtime=0 above is not enough: byte 9 of the gzip header is the OS
+            # field, and CPython fills it from the platform, so the same input
+            # produces different bytes under different interpreters. That flips
+            # the ETag too, since it is a hash of these bytes, and the build
+            # calls this script, so an unpinned python would dirty the tree on
+            # every configure. 0xFF is "unknown", which is the honest value and
+            # the one already committed.
+            compressed = compressed[:9] + b'\xff' + compressed[10:]
 
             # Create valid C identifier from filename
             # Use appropriate suffix based on file type

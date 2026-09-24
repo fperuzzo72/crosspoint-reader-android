@@ -88,6 +88,33 @@ endforeach()
 file(GLOB SDK_INCLUDES CONFIGURE_DEPENDS ${REPO_ROOT}/freeink-sdk/libs/*/*/include)
 target_include_directories(cp_common INTERFACE ${SDK_INCLUDES})
 
+# --- geradores que o PlatformIO rodava, e este build tambem precisa ---------
+#
+# build_html.py e gen_i18n.py sao pre-build do PlatformIO. Aqui nao ha
+# PlatformIO, e os arquivos gerados estao versionados, o que funciona ate
+# alguem editar um .html ou um .yaml e esquecer de gerar: a fonte fica certa e
+# o binario nao recebe. Mesma familia do patch do JPEGDEC, que embarcou um
+# ponteiro selvagem por meses exatamente assim.
+#
+# Rodam na configuracao, nao na compilacao, porque sao rapidos e idempotentes:
+# sem mudanca na fonte, nao reescrevem nada. Sem python3 o build segue com um
+# aviso, em vez de quebrar por causa de uma ferramenta de conveniencia.
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND)
+  execute_process(COMMAND ${Python3_EXECUTABLE} scripts/build_html.py
+                  WORKING_DIRECTORY ${REPO_ROOT} RESULT_VARIABLE html_rc OUTPUT_QUIET ERROR_QUIET)
+  execute_process(COMMAND ${Python3_EXECUTABLE} scripts/gen_i18n.py lib/I18n/translations lib/I18n/
+                  WORKING_DIRECTORY ${REPO_ROOT} RESULT_VARIABLE i18n_rc OUTPUT_QUIET ERROR_QUIET)
+  if(NOT html_rc EQUAL 0)
+    message(WARNING "build_html.py falhou (${html_rc}); as paginas web podem estar desatualizadas")
+  endif()
+  if(NOT i18n_rc EQUAL 0)
+    message(WARNING "gen_i18n.py falhou (${i18n_rc}); as tabelas de traducao podem estar desatualizadas")
+  endif()
+else()
+  message(WARNING "python3 nao encontrado: html e i18n nao serao regerados a partir das fontes")
+endif()
+
 target_compile_definitions(cp_common INTERFACE
   FREEINK_DEVICE_HIBREAK=1
   ANDROID=1

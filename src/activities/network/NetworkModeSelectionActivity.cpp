@@ -10,30 +10,8 @@
 namespace fui = freeink::ui;
 
 namespace {
-#if FREEINK_MCU_HOSTED
-// A hosted target does not own its radio: the system is already on a network,
-// or already hosting one, and CrossPoint only serves on the address it has.
-// "Join a Network" and "Create Hotspot" therefore reach the same place, and
-// the join half is a screen that cannot offer a choice -- scanning is refused
-// on purpose, so the picker opened empty and the user cancelled the only thing
-// on screen. One entry, under the name the person recognises for "make this
-// reachable from my computer".
-constexpr StrId menuItems[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
-    StrId::STR_CREATE_HOTSPOT,
-    StrId::STR_CALIBRE_WIRELESS,
-};
-constexpr StrId menuDescs[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
-    StrId::STR_HOTSPOT_DESC,
-    StrId::STR_CALIBRE_DESC,
-};
-constexpr UIIcon menuIcons[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
-    UIIcon::Hotspot,
-    UIIcon::Library,
-};
-#else
 constexpr StrId menuItems[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
     StrId::STR_JOIN_NETWORK,
-    StrId::STR_CALIBRE_WIRELESS,
     StrId::STR_CREATE_HOTSPOT,
 #if FREEINK_CAP_USB_MSC
     StrId::STR_USB_DRIVE,
@@ -41,7 +19,6 @@ constexpr StrId menuItems[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
 };
 constexpr StrId menuDescs[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
     StrId::STR_JOIN_DESC,
-    StrId::STR_CALIBRE_DESC,
     StrId::STR_HOTSPOT_DESC,
 #if FREEINK_CAP_USB_MSC
     StrId::STR_USB_DRIVE_DESC,
@@ -49,31 +26,20 @@ constexpr StrId menuDescs[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
 };
 constexpr UIIcon menuIcons[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
     UIIcon::Wifi,
-    UIIcon::Library,
     UIIcon::Hotspot,
 #if FREEINK_CAP_USB_MSC
     UIIcon::Usb,
 #endif
 };
-#endif
 
 // Which mode each row selects. Explicit rather than casting the row index to
-// NetworkMode: that cast made the menu order and the enum order one fact, and
-// a build that shows a different set of rows silently starts the wrong one.
+// NetworkMode: that cast made the menu order and the enum order one fact, and a
+// build that shows a different set of rows silently starts the wrong one.
 constexpr NetworkMode menuModes[NetworkModeSelectionActivity::MENU_ITEM_COUNT] = {
-#if FREEINK_MCU_HOSTED
-    // The hotspot row runs the join path, which is the one that serves on a
-    // network the system already has. Creating an access point is what this
-    // target cannot do.
     NetworkMode::JOIN_NETWORK,
-    NetworkMode::CONNECT_CALIBRE,
-#else
-    NetworkMode::JOIN_NETWORK,
-    NetworkMode::CONNECT_CALIBRE,
     NetworkMode::CREATE_HOTSPOT,
 #if FREEINK_CAP_USB_MSC
     NetworkMode::USB_DRIVE,
-#endif
 #endif
 };
 }  // namespace

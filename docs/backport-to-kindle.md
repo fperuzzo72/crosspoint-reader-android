@@ -313,6 +313,34 @@ and a 16-bit index is wrong on the merits.
 The `freeink-sdk` copy of `SDCardManager.cpp` has nine of the same specifier
 bugs. Left alone: it is a separate repository.
 
+### Removed here, on purpose: Calibre wireless and the mode menu
+
+Two deliberate divergences, both the owner's call rather than a fix.
+
+**Calibre wireless device transfers are gone from this tree.** Not broken here
+in some port-specific way: the plugin converts for the X3 and X4 specifically
+and does not work properly. `CalibreConnectActivity` is deleted,
+`NetworkMode::CONNECT_CALIBRE` with it, and the row is out of the menu for
+every target this tree builds, not only the hosted one. The Calibre **content
+server** is untouched and still works: that is OPDS, a different thing, and
+`STR_CALIBRE_URL_HINT` in the OPDS settings is the one Calibre reference left
+in the code.
+
+**File Transfer opens the server directly on a hosted target.** With Calibre
+gone and "Join a Network" and "Create Hotspot" being the same act where the
+system owns the radio, the menu had one row left, which is a keypress asking
+permission to do the only possible thing. `FREEINK_MCU_HOSTED` in
+`CrossPointWebServerActivity::onEnter()` calls `onNetworkModeSelected` straight
+away. The screen still exists and still opens on the ESP32 targets.
+
+The Kindle would want the menu skip for the same reason and does not have to
+take the Calibre removal; they are independent. Note that
+`CrossPointWebServerActivity.cpp` has now diverged in a second place, so the
+next patch crossing through it will not apply as cleanly as the last two did.
+
+The unused `STR_CALIBRE_WIRELESS` and friends are still in the translation
+tables. Pruning them regenerates every language for a few kilobytes.
+
 ## Counter-current
 
 Things the Kindle solved that need rethinking here, not copying:

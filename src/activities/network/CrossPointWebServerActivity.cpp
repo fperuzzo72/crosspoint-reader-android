@@ -13,7 +13,6 @@
 #include "NetworkModeSelectionActivity.h"
 #include "SilentRestart.h"
 #include "WifiSelectionActivity.h"
-#include "activities/network/CalibreConnectActivity.h"
 #include "components/UITheme.h"
 #include "fontIds.h"
 #include "util/QrUtils.h"
@@ -96,6 +95,16 @@ void CrossPointWebServerActivity::onEnter() {
   lastHandleClientTime = 0;
   requestUpdate();
 
+#if FREEINK_MCU_HOSTED
+  // No menu: there is one thing to choose from. A hosted target does not own
+  // its radio, so the system is already on a network or already hosting one and
+  // CrossPoint only serves on the address it has. Creating an access point is
+  // refused by the shim, and joining one opens a picker over a scan that
+  // returns nothing on purpose. A screen offering a single row is a keypress
+  // asking permission to do the only possible thing.
+  LOG_DBG("WEBACT", "Hosted target: serving on the system's network, no mode menu");
+  onNetworkModeSelected(NetworkMode::JOIN_NETWORK);
+#else
   // Launch network mode selection subactivity
   LOG_DBG("WEBACT", "Launching NetworkModeSelectionActivity...");
   startActivityForResult(std::make_unique<NetworkModeSelectionActivity>(renderer, mappedInput),
@@ -106,6 +115,7 @@ void CrossPointWebServerActivity::onEnter() {
                              onNetworkModeSelected(std::get<NetworkModeResult>(result.data).mode);
                            }
                          });
+#endif
 }
 
 void CrossPointWebServerActivity::onExit() {
@@ -133,9 +143,7 @@ void CrossPointWebServerActivity::onExit() {
 
 void CrossPointWebServerActivity::onNetworkModeSelected(const NetworkMode mode) {
   const char* modeName = "Join Network";
-  if (mode == NetworkMode::CONNECT_CALIBRE) {
-    modeName = "Connect to Calibre";
-  } else if (mode == NetworkMode::CREATE_HOTSPOT) {
+  if (mode == NetworkMode::CREATE_HOTSPOT) {
     modeName = "Create Hotspot";
 #if FREEINK_CAP_USB_MSC
   } else if (mode == NetworkMode::USB_DRIVE) {
@@ -153,23 +161,6 @@ void CrossPointWebServerActivity::onNetworkModeSelected(const NetworkMode mode) 
 
   networkMode = mode;
   isApMode = (mode == NetworkMode::CREATE_HOTSPOT);
-
-  if (mode == NetworkMode::CONNECT_CALIBRE) {
-    startActivityForResult(
-        std::make_unique<CalibreConnectActivity>(renderer, mappedInput), [this](const ActivityResult& result) {
-          state = WebServerActivityState::MODE_SELECTION;
-
-          startActivityForResult(std::make_unique<NetworkModeSelectionActivity>(renderer, mappedInput),
-                                 [this](const ActivityResult& result) {
-                                   if (result.isCancelled) {
-                                     onGoHome();
-                                   } else {
-                                     onNetworkModeSelected(std::get<NetworkModeResult>(result.data).mode);
-                                   }
-                                 });
-        });
-    return;
-  }
 
   if (mode == NetworkMode::JOIN_NETWORK) {
     // STA mode - launch WiFi selection
@@ -505,7 +496,8 @@ void CrossPointWebServerActivity::renderServerRunning() const {
     startY += height10 + 5;
 
     // Also show hostname URL
-    std::string hostnameUrl = std::string(tr(STR_OR_HTTP_PREFIX)) + AP_HOSTNAME + ".local" + webServerPortSuffix() + "/";
+    std::string hostnameUrl =
+        std::string(tr(STR_OR_HTTP_PREFIX)) + AP_HOSTNAME + ".local" + webServerPortSuffix() + "/";
     renderer.drawCenteredText(SMALL_FONT_ID, startY, hostnameUrl.c_str(), true);
   }
 

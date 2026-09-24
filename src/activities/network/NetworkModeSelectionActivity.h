@@ -4,12 +4,11 @@
 
 #include "activities/UiListActivity.h"
 
-enum class NetworkMode { JOIN_NETWORK, CONNECT_CALIBRE, CREATE_HOTSPOT, USB_DRIVE };
+enum class NetworkMode { JOIN_NETWORK, CREATE_HOTSPOT, USB_DRIVE };
 
 /**
  * NetworkModeSelectionActivity presents the user with a choice:
  * - "Join a Network" - Connect to an existing WiFi network (STA mode)
- * - "Connect to Calibre" - Use Calibre wireless device transfers
  * - "Create Hotspot" - Create an Access Point that others can connect to (AP mode)
  *
  * The onModeSelected callback is called with the user's choice.
@@ -21,14 +20,12 @@ class NetworkModeSelectionActivity final : public UiListActivity {
  public:
   explicit NetworkModeSelectionActivity(GfxRenderer& renderer, MappedInputManager& mappedInput);
 
-#if FREEINK_MCU_HOSTED
-  // Two, not three: "Join a Network" and "Create Hotspot" do the same thing on
-  // a target whose radio belongs to the operating system. See the .cpp.
-  static constexpr int MENU_ITEM_COUNT = 2;
-#elif FREEINK_CAP_USB_MSC
-  static constexpr int MENU_ITEM_COUNT = 4;
-#else
+  // This screen never opens on a hosted target: there the radio belongs to the
+  // system and File Transfer goes straight to the server.
+#if FREEINK_CAP_USB_MSC
   static constexpr int MENU_ITEM_COUNT = 3;
+#else
+  static constexpr int MENU_ITEM_COUNT = 2;
 #endif
 
   void onModeSelected(NetworkMode mode);

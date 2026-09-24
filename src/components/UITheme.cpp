@@ -4,6 +4,7 @@
 #include <GfxRenderer.h>
 #include <HalGPIO.h>
 #include <Logging.h>
+#include <hal/android/DisplayInfo.h>
 
 #include <algorithm>
 #include <memory>
@@ -53,12 +54,88 @@ void UITheme::setTheme(CrossPointSettings::UI_THEME type) {
   metricsValid = false;
 }
 
+namespace {
+
+// The metrics are written in pixels for a panel of about 160 dpi, which is what
+// the X4 is and what Android calls a dp. Every number in them, a 45-pixel
+// header, a 30-pixel row, a 20-pixel margin, describes a PHYSICAL size that
+// happens to have been measured there. Carry those pixels to a 300 dpi panel
+// unchanged and the whole interface shrinks to a little under half, which is
+// exactly what it did: a header that took 9 percent of an X4 screen took 2.7 on
+// a HiBreak and 2.4 on a Boox.
+//
+// So they are treated as dp and multiplied by the density the system reports.
+// Sizes that are not lengths are left alone: percentages, counts, style enums,
+// ratios and booleans mean the same thing at any density.
+constexpr int BASE_DPI = 160;
+
+int scaled(const int dp, const int dpi) {
+  if (dpi <= 0 || dpi == BASE_DPI) return dp;
+  // Rounded rather than truncated: a 1-pixel rule must not vanish, and a
+  // truncating scale eats exactly the thin things that are already hardest to
+  // see on e-ink.
+  const long v = (static_cast<long>(dp) * dpi + BASE_DPI / 2) / BASE_DPI;
+  if (dp > 0 && v < 1) return 1;
+  return static_cast<int>(v);
+}
+
+void scaleMetrics(ThemeMetrics& m, const int dpi) {
+  int* const lengths[] = {&m.batteryWidth,
+                          &m.batteryHeight,
+                          &m.topPadding,
+                          &m.batteryBarHeight,
+                          &m.headerHeight,
+                          &m.verticalSpacing,
+                          &m.previewPadding,
+                          &m.contentSidePadding,
+                          &m.listRowHeight,
+                          &m.listWithSubtitleRowHeight,
+                          &m.listRowGap,
+                          &m.listRowRadius,
+                          &m.listInset,
+                          &m.listSidePadding,
+                          &m.listScrollWidth,
+                          &m.headerSidePadding,
+                          &m.headerUnderlineSize,
+                          &m.menuRowHeight,
+                          &m.menuSpacing,
+                          &m.tabSpacing,
+                          &m.tabBarHeight,
+                          &m.scrollBarWidth,
+                          &m.scrollBarRightOffset,
+                          &m.homeTopPadding,
+                          &m.homeCoverHeight,
+                          &m.homeCoverTileHeight,
+                          &m.homeMenuTopOffset,
+                          &m.buttonHintsHeight,
+                          &m.sideButtonHintsWidth,
+                          &m.progressBarHeight,
+                          &m.progressBarMarginTop,
+                          &m.statusBarHorizontalMargin,
+                          &m.statusBarVerticalMargin,
+                          &m.keyboardKeyHeight,
+                          &m.keyboardKeySpacing,
+                          &m.keyboardVerticalOffset,
+                          &m.popupMarginX,
+                          &m.popupMarginY,
+                          &m.popupFrameThickness,
+                          &m.popupCornerRadius,
+                          &m.popupTextBaselineOffsetY,
+                          &m.popupProgressBarHeight};
+  for (int* const field : lengths) {
+    *field = scaled(*field, dpi);
+  }
+}
+
+}  // namespace
+
 const ThemeMetrics& UITheme::getMetrics() const {
   // hasTouch() can flip once touch init completes after static construction, so the
   // cached copy is refreshed when the flag differs instead of copying the struct per call.
   const bool touch = gpio.hasTouch();
   if (!metricsValid || touch != metricsForTouch) {
     adjustedMetrics = *currentMetrics;
+    scaleMetrics(adjustedMetrics, crosspoint::android::displayInfo().densityDpi);
     if (touch) {
       adjustedMetrics.buttonHintsHeight = 0;
     }

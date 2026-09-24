@@ -220,7 +220,10 @@ void CrossPointWebServer::begin() {
   LOG_DBG("WEB", "Web server started on port %d", port);
   // Show the correct IP based on network mode
   const String ipAddr = apMode ? WiFi.softAPIP().toString() : WiFi.localIP().toString();
-  LOG_DBG("WEB", "Access at http://%s/", ipAddr.c_str());
+  // The port belongs in the URL, the same way the screen and the QR code carry
+  // it. A log that says http://<ip>/ sends whoever reads it six months from now
+  // to port 80, which is the one this process cannot bind.
+  LOG_DBG("WEB", "Access at http://%s:%u/", ipAddr.c_str(), static_cast<unsigned>(port));
   LOG_DBG("WEB", "WebSocket at ws://%s:%d/", ipAddr.c_str(), wsPort);
   LOG_DBG("WEB", "[MEM] Free heap after server.begin(): %d bytes", ESP.getFreeHeap());
 }

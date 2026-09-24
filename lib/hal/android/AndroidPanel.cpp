@@ -84,12 +84,11 @@ void AndroidPanel::attachSurface(ANativeWindow* window) {
   // subtly soft.
   const int32_t nativeW = ANativeWindow_getWidth(win);
   const int32_t nativeH = ANativeWindow_getHeight(win);
-  const int32_t geo =
-      ANativeWindow_setBuffersGeometry(win, PANEL_NATIVE_WIDTH, PANEL_NATIVE_HEIGHT, WINDOW_FORMAT_RGBX_8888);
-  std::fprintf(
-      stderr, "[panel] janela %dx%d, pedida %dx%d, frame %dx%d -> %d%s\n", nativeW, nativeH, PANEL_NATIVE_WIDTH,
-      PANEL_NATIVE_HEIGHT, HIBREAK_WIDTH, HIBREAK_HEIGHT, geo,
-      (nativeW != PANEL_NATIVE_WIDTH || nativeH != PANEL_NATIVE_HEIGHT) ? "  [NAO CONFERE: sera escalado]" : "");
+  const auto& info = displayInfo();
+  const int32_t geo = ANativeWindow_setBuffersGeometry(win, info.panelWidth, info.panelHeight, WINDOW_FORMAT_RGBX_8888);
+  std::fprintf(stderr, "[panel] janela %dx%d, pedida %ux%u, stride %u B -> %d%s\n", nativeW, nativeH, info.panelWidth,
+               info.panelHeight, info.frameWidthBytes, geo,
+               (nativeW != info.panelWidth || nativeH != info.panelHeight) ? "  [NAO CONFERE: sera escalado]" : "");
   std::fflush(stderr);
   // The surface may have arrived after the frame. Re-present rather than
   // leaving the new buffer with whatever the compositor put in it.
@@ -110,7 +109,8 @@ bool AndroidPanel::stageFrameLocked(const uint8_t* frame) {
   if (frame == nullptr || stage == nullptr) {
     return false;
   }
-  hosted::expand1bppToGray8(frame, stage, HIBREAK_WIDTH, HIBREAK_HEIGHT, HIBREAK_WIDTH_BYTES, HIBREAK_WIDTH);
+  hosted::expand1bppToGray8(frame, stage, displayInfo().panelWidth, displayInfo().panelHeight, HIBREAK_WIDTH_BYTES,
+                            HIBREAK_WIDTH);
   stageHasContent = true;
   return true;
 }
@@ -125,8 +125,8 @@ bool AndroidPanel::stageGrayOverlay(const uint8_t* lsbPlane, const uint8_t* msbP
   if (stage == nullptr) {
     return false;
   }
-  hosted::overlayGrayPlanesOnGray8(lsbPlane, msbPlane, stage, HIBREAK_WIDTH, HIBREAK_HEIGHT, HIBREAK_WIDTH_BYTES,
-                                   HIBREAK_WIDTH);
+  hosted::overlayGrayPlanesOnGray8(lsbPlane, msbPlane, stage, displayInfo().panelWidth, displayInfo().panelHeight,
+                                   HIBREAK_WIDTH_BYTES, HIBREAK_WIDTH);
   return true;
 }
 
@@ -181,8 +181,9 @@ bool AndroidPanel::present() {
   // If the compositor handed back a different geometry than requested, honour
   // its own and paint only the intersection: writing at the size we asked for
   // would overrun the buffer it gave us.
-  const int32_t w = buf.width < HIBREAK_WIDTH ? buf.width : HIBREAK_WIDTH;
-  const int32_t h = buf.height < HIBREAK_HEIGHT ? buf.height : HIBREAK_HEIGHT;
+  const auto& info = displayInfo();
+  const int32_t w = buf.width < info.panelWidth ? buf.width : info.panelWidth;
+  const int32_t h = buf.height < info.panelHeight ? buf.height : info.panelHeight;
   auto* pixels = static_cast<uint8_t*>(buf.bits);
   for (int32_t y = 0; y < h; ++y) {
     const uint8_t* src = stage + static_cast<size_t>(y) * HIBREAK_WIDTH;

@@ -23,6 +23,7 @@
 
 #include "HalDisplay.h"  // panel geometry, for the touch classifier's normalisation
 #include "HalGPIO.h"
+#include "android/DisplayInfo.h"
 
 #if FREEINK_MCU_HOSTED
 
@@ -43,7 +44,8 @@ bool HalGPIO::isXteinkDevice() const { return false; }
 bool HalGPIO::hasEdgeSideButtons() const { return false; }
 
 void HalGPIO::begin() {
-  touchOpen = touchDevice.begin(HalDisplay::DISPLAY_WIDTH, HalDisplay::DISPLAY_HEIGHT);
+  touchOpen =
+      touchDevice.begin(crosspoint::android::displayInfo().panelWidth, crosspoint::android::displayInfo().panelHeight);
   if (!touchOpen) {
     // Worth a line: with no touch and no buttons, the reader is unreachable,
     // and silence here would look like a frozen UI rather than a missing input

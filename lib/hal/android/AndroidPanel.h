@@ -18,35 +18,27 @@
 #include <cstdint>
 #include <mutex>
 
+#include "DisplayInfo.h"
 #include "hosted/HostedGray.h"
 
 struct ANativeWindow;
 
 namespace crosspoint::android {
 
-// Two widths, and conflating them costs sharpness on any panel whose width is
-// not a multiple of 8.
+// The frame is allocated once, before any Activity has said how big the panel
+// is, so these are the CEILING rather than the panel: 1408x1872 covers a
+// 1404-wide Boox and every phone panel under it. The stride stays at this
+// maximum for the life of the process, which is what lets one binary paint two
+// different panels without reallocating anything.
 //
-// PANEL_NATIVE_* is the window's own size, and it is what the compositor must
-// be asked for: request anything else and it resamples the whole frame to fit,
-// which is exactly the loss e-ink exists to avoid. Measured on the device
-// rather than assumed, through ANativeWindow_getWidth before any geometry is
-// set.
-//
-// HIBREAK_WIDTH is the composition frame, and it must be a multiple of 8
-// because the frame is 1bpp and every index in this file divides by 8. It is
-// the panel width rounded up, so the last few columns exist in the buffer and
-// never reach the panel: present() paints the intersection.
-//
-// On this device the two are equal (824 / 8 = 103 exactly), which is why the
-// distinction stayed invisible until a 1404-wide panel turned up.
-inline constexpr uint16_t PANEL_NATIVE_WIDTH = 824;
-inline constexpr uint16_t PANEL_NATIVE_HEIGHT = 1648;
-
-inline constexpr uint16_t HIBREAK_WIDTH = static_cast<uint16_t>(((PANEL_NATIVE_WIDTH + 7) / 8) * 8);
-inline constexpr uint16_t HIBREAK_HEIGHT = PANEL_NATIVE_HEIGHT;
-inline constexpr uint16_t HIBREAK_WIDTH_BYTES = HIBREAK_WIDTH / 8;
-inline constexpr uint32_t HIBREAK_BUFFER_SIZE = static_cast<uint32_t>(HIBREAK_WIDTH_BYTES) * HIBREAK_HEIGHT;
+// What the panel actually measures lives in displayInfo(), and only the
+// VISIBLE width and height come from there. Keeping the stride fixed and the
+// visible area variable is the whole trick: every byte index in the paint path
+// stays valid, and the columns past the panel simply never reach the glass.
+inline constexpr uint16_t HIBREAK_WIDTH = MAX_FRAME_WIDTH;
+inline constexpr uint16_t HIBREAK_HEIGHT = MAX_FRAME_HEIGHT;
+inline constexpr uint16_t HIBREAK_WIDTH_BYTES = MAX_FRAME_WIDTH / 8;
+inline constexpr uint32_t HIBREAK_BUFFER_SIZE = MAX_FRAME_BYTES;
 
 // Mirrors HalDisplay::RefreshMode so the hosted HalDisplay can forward its
 // argument straight through. In v1 the value is recorded and unused: the path
@@ -70,8 +62,8 @@ class AndroidPanel {
   void end();
   bool isOpen() const { return stage != nullptr; }
 
-  uint16_t width() const { return HIBREAK_WIDTH; }
-  uint16_t height() const { return HIBREAK_HEIGHT; }
+  uint16_t width() const { return displayInfo().panelWidth; }
+  uint16_t height() const { return displayInfo().panelHeight; }
 
   bool display(const uint8_t* frame, Waveform waveform);
   // There is no completion marker on the Android side: the post is async but

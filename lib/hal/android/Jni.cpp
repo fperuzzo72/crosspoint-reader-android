@@ -32,6 +32,7 @@ void setRoot(const char* path);
 
 #include "AndroidPanel.h"
 #include "AndroidTouchDevice.h"
+#include "DisplayInfo.h"
 
 // Defined in src/main.cpp, shared with every other target.
 void setup();
@@ -266,6 +267,17 @@ JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetSto
     logLine("[jni] storage root: %s", utf);
     env->ReleaseStringUTFChars(path, utf);
   }
+}
+
+// The panel's real size and density. Must be called BEFORE nativeStart(), for
+// the same reason as the storage root: setup() allocates the frame and lays out
+// the first screen, and a wrong size at that moment is a page composed for a
+// panel that is not there.
+//
+// Kotlin decides, because only the framework knows the display.
+JNIEXPORT void JNICALL Java_org_crosspoint_hibreak_CrossPointNative_nativeSetDisplay(JNIEnv*, jclass, jint width,
+                                                                                     jint height, jint densityDpi) {
+  crosspoint::android::setDisplayInfo(width, height, densityDpi);
 }
 
 // Starts CrossPoint's thread. Idempotent: the Activity can be recreated

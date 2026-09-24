@@ -217,8 +217,11 @@ void HalDisplay::returnFrameBufferStorage() {
 
 // --- geometry ----------------------------------------------------------------
 
-uint16_t HalDisplay::getDisplayWidth() const { return DISPLAY_WIDTH; }
-uint16_t HalDisplay::getDisplayHeight() const { return DISPLAY_HEIGHT; }
+// The panel, not the ceiling. DISPLAY_WIDTH and BUFFER_SIZE stay compile-time
+// because they size an allocation made before the Activity speaks; what the
+// renderer lays out for has to be the glass in front of the reader.
+uint16_t HalDisplay::getDisplayWidth() const { return panel.width(); }
+uint16_t HalDisplay::getDisplayHeight() const { return panel.height(); }
 uint16_t HalDisplay::getDisplayWidthBytes() const { return DISPLAY_WIDTH_BYTES; }
 uint32_t HalDisplay::getBufferSize() const { return BUFFER_SIZE; }
 

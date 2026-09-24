@@ -67,6 +67,17 @@ object CrossPointNative {
    * recreated (rotation, configuration change) without the process dying, and
    * restarting CrossPoint would lose the reading position.
    */
+  /**
+   * The panel's real size in pixels and its density.
+   *
+   * Must be called BEFORE [nativeStart], for the same reason as
+   * [nativeSetStorageRoot]: `setup()` allocates the composition frame and lays
+   * out the first screen, and a wrong size at that moment is a page composed
+   * for a panel that is not there. Without this call the reader falls back to
+   * the size it was built for.
+   */
+  @JvmStatic external fun nativeSetDisplay(width: Int, height: Int, densityDpi: Int)
+
   @JvmStatic external fun nativeStart()
 
   // Mirrors crosspoint::hosted::Gesture. A Kotlin enum with explicit values

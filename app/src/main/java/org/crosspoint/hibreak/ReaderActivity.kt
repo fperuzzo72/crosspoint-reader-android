@@ -84,6 +84,13 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
     val root = resolveStorageRoot()
     CrossPointNative.nativeSetStorageRoot(root.absolutePath)
 
+    // The panel, measured rather than compiled in. Same rule as the storage
+    // root: before nativeStart(), because setup() allocates the frame and lays
+    // out the first screen. Taken from the window rather than the display, so
+    // it is the area this Activity actually owns.
+    val metrics = resources.displayMetrics
+    CrossPointNative.nativeSetDisplay(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi)
+
     CrossPointNative.nativeStart()
   }
 

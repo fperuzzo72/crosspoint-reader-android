@@ -1,5 +1,6 @@
 #pragma once
 
+#include <BoardConfig.h>
 #include <FreeInkUI.h>
 #include <I18n.h>
 
@@ -14,16 +15,17 @@ struct LayoutInfo {
 
 // Table position is the persisted bit assignment. Keep existing rows in place
 // and append new layouts so SDK enum changes cannot reinterpret saved masks.
+//
+// The Cyrillic and Hebrew rows are dropped on the HiBreak, where the fonts are
+// built Latin-only by choice. The row label comes from getLanguageName(), so
+// those five drew as an ON/OFF with nothing beside it, and the keyboards they
+// switched to could not have rendered a single key. Removing them from the end
+// keeps every remaining bit at the position a saved mask expects.
 inline constexpr LayoutInfo ALL[] = {
     {freeink::ui::KeyboardLayoutId::QwertyEn, Language::EN},
     {freeink::ui::KeyboardLayoutId::AzertyFr, Language::FR},
     {freeink::ui::KeyboardLayoutId::QwertzDe, Language::DE},
     {freeink::ui::KeyboardLayoutId::SpanishEs, Language::ES},
-    {freeink::ui::KeyboardLayoutId::CyrillicRu, Language::RU},
-    {freeink::ui::KeyboardLayoutId::CyrillicUk, Language::UK},
-    {freeink::ui::KeyboardLayoutId::CyrillicBe, Language::BE},
-    {freeink::ui::KeyboardLayoutId::CyrillicKk, Language::KK},
-    {freeink::ui::KeyboardLayoutId::HebrewIl, Language::HE},
 };
 inline constexpr uint8_t COUNT = sizeof(ALL) / sizeof(ALL[0]);
 static_assert(COUNT <= 16, "keyboard layout mask is uint16_t");

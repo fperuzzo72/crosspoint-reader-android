@@ -12,6 +12,7 @@
 #include <I18n.h>
 #include <Logging.h>
 #include <Memory.h>
+#include <StorageLayout.h>
 #include <esp_system.h>
 
 #include <algorithm>
@@ -68,10 +69,16 @@ int clampPercent(int percent) {
   return percent;
 }
 
-constexpr char READ_FOLDER[] = "/read";
+// Inside the library, not beside it. On a card device LIBRARY_ROOT is "/" and
+// this is the same "/read" it always was; where the library is a subfolder,
+// moving a finished book to the storage root takes it out of the browser's
+// view entirely, which looks like the book was deleted.
+const std::string READ_FOLDER = std::string(crosspoint::storage::LIBRARY_ROOT) == "/"
+                                    ? std::string("/read")
+                                    : std::string(crosspoint::storage::LIBRARY_ROOT) + "/read";
 
 bool isInReadFolder(const std::string& path) {
-  constexpr size_t n = sizeof(READ_FOLDER) - 1;
+  const size_t n = READ_FOLDER.size();
   return path.size() > n && path.compare(0, n, READ_FOLDER) == 0 && path[n] == '/';
 }
 
@@ -109,8 +116,8 @@ std::string buildReadFolderDestination(const std::string& srcPath) {
   const size_t lastSlash = srcPath.rfind('/');
   const std::string filename = (lastSlash != std::string::npos) ? srcPath.substr(lastSlash + 1) : srcPath;
 
-  Storage.mkdir(READ_FOLDER);
-  std::string dstPath = std::string(READ_FOLDER) + "/" + filename;
+  Storage.mkdir(READ_FOLDER.c_str());
+  std::string dstPath = READ_FOLDER + "/" + filename;
   if (!Storage.exists(dstPath.c_str())) {
     return dstPath;
   }
@@ -120,7 +127,7 @@ std::string buildReadFolderDestination(const std::string& srcPath) {
   const std::string ext = (dotPos != std::string::npos) ? filename.substr(dotPos) : "";
   int suffix = 2;
   do {
-    dstPath = std::string(READ_FOLDER) + "/" + base + " (" + std::to_string(suffix) + ")" + ext;
+    dstPath = READ_FOLDER + "/" + base + " (" + std::to_string(suffix) + ")" + ext;
     suffix++;
   } while (Storage.exists(dstPath.c_str()) && suffix < 100);
   return dstPath;

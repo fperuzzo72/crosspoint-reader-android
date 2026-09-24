@@ -248,7 +248,9 @@ CrossPointSettings::StatusBarSpec CrossPointSettings::statusBarSpec() const {
   spec.showChapterPageCount = statusBarChapterPageCount != 0;
   spec.showBookProgressPercent = statusBarBookProgressPercentage != 0;
   spec.titleMode = statusBarTitle;
-  spec.showBattery = statusBarBattery != 0;
+  // The gauge belongs to Android. CrossPoint has no way to read it, so the
+  // indicator drew an empty shell next to the page number.
+  spec.showBattery = false;
   spec.showBatteryPercent = hideBatteryPercentage == HIDE_NEVER;
   spec.clockMode = statusBarClock;
   spec.clock12h = clockFormat == 1;
@@ -322,10 +324,11 @@ float CrossPointSettings::getReaderLineCompression() const {
 }
 
 unsigned long CrossPointSettings::getSleepTimeoutMs() const {
-  if (sleepTimeoutMinutes >= SLEEP_TIMEOUT_NEVER_MINUTES) return 0UL;
-  const uint8_t minutes =
-      std::clamp(sleepTimeoutMinutes, MIN_SLEEP_TIMEOUT_MINUTES, static_cast<uint8_t>(SLEEP_TIMEOUT_NEVER_MINUTES - 1));
-  return static_cast<unsigned long>(minutes) * 60UL * 1000UL;
+  // Never, and not as a default the user could change back. CrossPoint's sleep
+  // is an ESP32 deep sleep that a button wakes; here it paints its own sleep
+  // screen over an application the system will not wake, and the only way out
+  // is to kill the process. The phone already has a screen timeout of its own.
+  return 0UL;
 }
 
 int CrossPointSettings::getRefreshFrequency() const {

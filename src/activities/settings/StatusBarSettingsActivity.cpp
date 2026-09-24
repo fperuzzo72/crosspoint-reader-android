@@ -25,8 +25,6 @@ enum MenuItem {
   ITEM_PROGRESS_BAR,
   ITEM_PROGRESS_BAR_THICKNESS,
   ITEM_TITLE,
-  ITEM_BATTERY,
-  ITEM_XTC_STATUS_BAR,
   ITEM_CLOCK,             // X3 only
   ITEM_CLOCK_FORMAT,      // X3 only
   ITEM_CLOCK_UTC_OFFSET,  // X3 only, launches ClockOffsetActivity
@@ -45,8 +43,6 @@ const StrId menuNames[FULL_MENU_ITEMS] = {
     StrId::STR_PROGRESS_BAR,
     StrId::STR_PROGRESS_BAR_THICKNESS,
     StrId::STR_TITLE,
-    StrId::STR_BATTERY,
-    StrId::STR_XTC_STATUS_BAR,
     StrId::STR_CLOCK,
     StrId::STR_CLOCK_FORMAT,
     StrId::STR_CLOCK_UTC_OFFSET,
@@ -174,16 +170,6 @@ void StatusBarSettingsActivity::handleSelection() {
         SETTINGS.saveToFile();
       });
       return;
-    case ITEM_BATTERY:
-      SETTINGS.statusBarBattery = (SETTINGS.statusBarBattery + 1) % 2;
-      break;
-    case ITEM_XTC_STATUS_BAR:
-      optionPopup.show(StrId::STR_XTC_STATUS_BAR, xtcStatusBarNames, XTC_STATUS_BAR_ITEMS, SETTINGS.xtcStatusBarMode,
-                       [this](int idx) {
-                         SETTINGS.xtcStatusBarMode = idx;
-                         SETTINGS.saveToFile();
-                       });
-      return;
     case ITEM_CLOCK:
       SETTINGS.statusBarClock = (SETTINGS.statusBarClock + 1) % STATUS_BAR_CLOCK_ITEMS;
       break;
@@ -215,10 +201,6 @@ std::string StatusBarSettingsActivity::rowValueText(const int index) {
       return I18N.get(progressBarThicknessNames[SETTINGS.statusBarProgressBarThickness]);
     case ITEM_TITLE:
       return I18N.get(titleNames[SETTINGS.statusBarTitle]);
-    case ITEM_BATTERY:
-      return SETTINGS.statusBarBattery ? tr(STR_SHOW) : tr(STR_HIDE);
-    case ITEM_XTC_STATUS_BAR:
-      return I18N.get(xtcStatusBarNames[SETTINGS.xtcStatusBarMode]);
     case ITEM_CLOCK:
       return I18N.get(statusBarClockNames[SETTINGS.statusBarClock]);
     case ITEM_CLOCK_FORMAT: {

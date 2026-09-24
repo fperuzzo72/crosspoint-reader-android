@@ -35,19 +35,23 @@ inline UIScaleSpec uiScaleSpec() {
   // exceed it, so 300 dpi lands on 20 and a denser panel would reach 24.
   const int dpi = crosspoint::android::displayInfo().densityDpi;
   const int ideal = dpi > 0 ? (REFERENCE_BODY_POINT_SIZE * dpi + 80) / 160 : REFERENCE_BODY_POINT_SIZE;
-  if (ideal >= 24) {
+
+  // Nearest rung, not the biggest one under the ideal. Flooring cost a whole
+  // step where it hurts most: at 300 dpi the ideal is 23, which floored to 20
+  // and left the interface a step short on a panel that had room for it.
+  if (ideal >= 22) {
     spec.smallFontId = UI_16_FONT_ID;
     spec.bodyFontId = UI_24_FONT_ID;
     spec.bodyPointSize = 24;
-  } else if (ideal >= 20) {
+  } else if (ideal >= 18) {
     spec.smallFontId = UI_14_FONT_ID;
     spec.bodyFontId = UI_20_FONT_ID;
     spec.bodyPointSize = 20;
-  } else if (ideal >= 16) {
+  } else if (ideal >= 15) {
     spec.smallFontId = UI_12_FONT_ID;
     spec.bodyFontId = UI_16_FONT_ID;
     spec.bodyPointSize = 16;
-  } else if (ideal >= 14) {
+  } else if (ideal >= 13) {
     spec.smallFontId = UI_10_FONT_ID;
     spec.bodyFontId = UI_14_FONT_ID;
     spec.bodyPointSize = 14;

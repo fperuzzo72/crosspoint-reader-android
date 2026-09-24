@@ -370,6 +370,29 @@ Things the Kindle solved that need rethinking here, not copying:
     at the first it cannot parse, and `SecureClient` does not check its return.
     One bad certificate silently discards every one after it. Loading them one
     at a time is the fix.
+  - Six of the 121 CAs are then still rejected, and the reported
+    `RSA_KEY_SIZE_E` / `ECC_KEY_SIZE_E` is not why. The bundle disproves the
+    size reading on its own: it holds 21 RSA-2048 certificates and only four
+    fail, and no size bound discriminates within one key size. The real check is
+    in `wolfcrypt/src/asn.c` (5.7.2-stable): a serial number of zero is
+    non-conforming under RFC 5280 section 4.1.2.2, so strict parsing returns
+    `ASN_PARSE_E`. The six certificates with serial 0 are exactly the six
+    rejected, and the size error is applied afterwards and on top. **In this
+    library that error name is not evidence about key size.**
+
+  The switch is `WOLFSSL_NO_ASN_STRICT`, and the Kindle has not taken it: it
+  relaxes seventeen conformance checks that apply to every certificate parsed,
+  including the ones a server presents, which is a poor trade in a build that
+  verifies certificates precisely so it does not have to trust whatever
+  answers. The cost is written into that README instead: Go Daddy Root G2, both
+  Starfield roots and a Hellenic Academic pair are unusable there, and a
+  catalogue chaining to them fails.
+
+  **None of that applies here, and the contrast is the point of this section.**
+  This port never links wolfSSL: TLS crosses into Kotlin and Android's own
+  trust store, which accepts those six roots like any other client. The same
+  OPDS catalogue that fails on the Kindle works on this device, without a
+  conformance trade being made on anyone's behalf.
 - **`ESP.restart()`** re-execs the process on the Kindle. On Android restarting
   a process is not the same as restarting the Activity, and the right semantics
   are still undecided.

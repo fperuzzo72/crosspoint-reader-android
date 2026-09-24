@@ -152,6 +152,14 @@ EpdFont ui16RegularFont(&ubuntu_16_regular);
 EpdFont ui16BoldFont(&ubuntu_16_bold);
 EpdFontFamily ui16FontFamily(&ui16RegularFont, &ui16BoldFont);
 
+EpdFont ui20RegularFont(&ubuntu_20_regular);
+EpdFont ui20BoldFont(&ubuntu_20_bold);
+EpdFontFamily ui20FontFamily(&ui20RegularFont, &ui20BoldFont);
+
+EpdFont ui24RegularFont(&ubuntu_24_regular);
+EpdFont ui24BoldFont(&ubuntu_24_bold);
+EpdFontFamily ui24FontFamily(&ui24RegularFont, &ui24BoldFont);
+
 // Definitions for SilentRestart.h. RTC_NOINIT survives ESP.restart() but not power loss.
 RTC_NOINIT_ATTR uint32_t silentRebootMagic;
 RTC_NOINIT_ATTR uint32_t silentRebootTarget;
@@ -478,6 +486,11 @@ void setupDisplayAndFonts(bool seamless = false) {
 #endif
   renderer.insertFont(UI_14_FONT_ID, ui14FontFamily);
   renderer.insertFont(UI_16_FONT_ID, ui16FontFamily);
+  // The tiers the density ladder can reach. Unlike UI_12 above, these keys
+  // deliver what their name says: the remap exists for the IDs the tree asks
+  // for by hand, and the ladder asks for these by measurement.
+  renderer.insertFont(UI_20_FONT_ID, ui20FontFamily);
+  renderer.insertFont(UI_24_FONT_ID, ui24FontFamily);
 #if FREEINK_DEVICE_HIBREAK
   // The status bar draws with SMALL_FONT_ID twelve times against UI_10's
   // three, so raising the other two never touched it. SMALL is notosans_8, the

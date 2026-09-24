@@ -41,3 +41,7 @@
 #include <builtinFonts/ubuntu_14_regular.h>
 #include <builtinFonts/ubuntu_16_bold.h>
 #include <builtinFonts/ubuntu_16_regular.h>
+#include <builtinFonts/ubuntu_20_bold.h>
+#include <builtinFonts/ubuntu_20_regular.h>
+#include <builtinFonts/ubuntu_24_bold.h>
+#include <builtinFonts/ubuntu_24_regular.h>

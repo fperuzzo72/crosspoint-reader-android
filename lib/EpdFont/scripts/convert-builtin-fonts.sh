@@ -58,7 +58,13 @@ done
 
 fi  # UI_ONLY
 
-UI_FONT_SIZES=(10 12 14 16)
+# 20 and 24 exist for the panels this port meets. The metrics scale off the
+# body font's point size, so the interface follows whichever tier a device
+# picks, and at 300 dpi the ideal against the X4's 12 is 22: without these two
+# the ladder topped out at 16 and the interface stayed a third of the way
+# there. Two styles each, around 350 KB a size, which is a tenth of what a
+# reader size costs.
+UI_FONT_SIZES=(10 12 14 16 20 24)
 UI_FONT_STYLES=("Regular" "Bold")
 
 # Arabic glyphs for UI text (menus, file browser titles). The built-in fonts

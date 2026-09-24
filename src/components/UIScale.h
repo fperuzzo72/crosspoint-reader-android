@@ -31,12 +31,19 @@ inline UIScaleSpec uiScaleSpec() {
 
   // A denser panel wants a physically comparable interface, so the tier follows
   // the density the system reported. The ideal at 300 dpi is 12 * 300 / 160,
-  // which is 22, and the largest UI font built in is 16: the ladder takes the
-  // biggest tier that does not exceed the ideal, and gains a rung the day a 20
-  // or 24 point Ubuntu is generated.
+  // which is 22, and the ladder takes the biggest tier that does not
+  // exceed it, so 300 dpi lands on 20 and a denser panel would reach 24.
   const int dpi = crosspoint::android::displayInfo().densityDpi;
   const int ideal = dpi > 0 ? (REFERENCE_BODY_POINT_SIZE * dpi + 80) / 160 : REFERENCE_BODY_POINT_SIZE;
-  if (ideal >= 16) {
+  if (ideal >= 24) {
+    spec.smallFontId = UI_16_FONT_ID;
+    spec.bodyFontId = UI_24_FONT_ID;
+    spec.bodyPointSize = 24;
+  } else if (ideal >= 20) {
+    spec.smallFontId = UI_14_FONT_ID;
+    spec.bodyFontId = UI_20_FONT_ID;
+    spec.bodyPointSize = 20;
+  } else if (ideal >= 16) {
     spec.smallFontId = UI_12_FONT_ID;
     spec.bodyFontId = UI_16_FONT_ID;
     spec.bodyPointSize = 16;

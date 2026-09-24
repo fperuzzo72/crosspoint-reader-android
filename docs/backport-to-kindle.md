@@ -405,6 +405,30 @@ Things the Kindle solved that need rethinking here, not copying:
 
 ## Build traps that hold for both
 
+- **A tree can carry a fix for months and ship without it**, when the thing
+  that applies it belongs to a build system the port no longer uses.
+  `scripts/jpegdec_patches/` has two patches against JPEGDEC's pinned commit,
+  and `scripts/patch_jpegdec.py` applies them as a **PlatformIO pre-build
+  step**. Neither hosted port goes through PlatformIO, so both shipped the
+  unpatched decoder: a wild pointer in `JPEGDecodeMCU_P`, about 33 MB past
+  `sMCUs`, faulting on the first AC write. It needs a progressive 3-component
+  JPEG decoded to grayscale, which is what this reader does with every
+  progressive image in a book.
+
+  Neither port could have found it by reading its own source, because its own
+  source was right. The Kindle found it by reading the *dependency* after the
+  code above it turned out to be correct.
+
+  The fetch step that applies them is deliberately **separate from the
+  download**, which has an "already present" guard: a tree fetched before the
+  fix would never receive the patches if the two were one step. Idempotence is
+  git's call — reverses clean means already applied, applies clean means apply,
+  neither means abort rather than guess.
+
+  It is testable off-device, which is how this port confirmed it: drive
+  JPEGDEC from a host harness the way the reader does, `EIGHT_BIT_GRAYSCALE`
+  at `JPEG_SCALE_EIGHTH`, on any progressive image. Unpatched exits 139.
+
 - **A quoted `-D` does not survive being written into a generated script.** The
   inner shell eats the quotes and the macro becomes an identifier. Defines go in
   a header via `-include`.

@@ -43,6 +43,37 @@ if [ ! -f "$DST/JPEGDEC.h" ]; then
   cp "$TMP"/JPEGDEC-$JPEGREV/src/*.cpp "$DST"/ 2>/dev/null || true
 fi
 
+# --- patches do JPEGDEC ---------------------------------------------------
+#
+# Um passo separado do download acima, de proposito. Aquele bloco tem guarda de
+# "ja existe", entao uma arvore baixada antes desta correcao nunca receberia os
+# patches se isso estivesse junto.
+#
+# O que eles consertam: em JPEGDecodeMCU_P, MCU_SKIP chega com iMCU negativo e
+# o mascaramento & 0xffffff produz um ponteiro cerca de 33 MB alem de sMCUs. A
+# primeira escrita de coeficiente AC falha o store. Dispara decodificando um
+# JPEG progressivo de 3 componentes em escala de cinza, porque cada MCU de Y
+# arrasta duas chamadas MCU_SKIP atras de si, para Cb e Cr. E exatamente o que
+# este leitor faz com todo JPEG progressivo de um livro.
+#
+# Eram um pre-build do PlatformIO. Qualquer build que nao passe por ele -- este
+# aqui e o do Kindle -- embarcava o ponteiro selvagem.
+for patch in scripts/jpegdec_patches/*.patch; do
+  [ -f "$patch" ] || continue
+  name=$(basename "$patch")
+  # A idempotencia e decidida pelo git: se reverte limpo, ja esta aplicado.
+  if git apply -p2 --directory="$DST" --check --reverse "$patch" 2>/dev/null; then
+    continue
+  fi
+  if git apply -p2 --directory="$DST" --check "$patch" 2>/dev/null; then
+    echo "  aplicando $name"
+    git apply -p2 --directory="$DST" "$patch"
+  else
+    echo "ERRO: $name nao aplica nem reverte em $DST; arvore inesperada" >&2
+    exit 1
+  fi
+done
+
 # --- QRCode 0.0.1, MIT ----------------------------------------------------
 if [ ! -f "$DST/qrcode.h" ]; then
   echo "QRCode 0.0.1"

@@ -24,19 +24,25 @@ Decided: this port exists for **one** device. There is no ambition of
 generality, because the hardware diverges too far between an e-ink phone, a
 Kindle and an ESP32 for an abstraction to be worth what it costs.
 
-That does not mean everything goes behind `#if FREEINK_DEVICE_HIBREAK`. The
-criterion is what would break *inside this tree*, where the Kindle branch
-compiles from the same code:
+**This tree builds one target and no other.** It is not a multi-device build
+with Android among the devices, so code describing hardware this phone does not
+have is cut rather than guarded: the settings that named page buttons, the
+battery gauge, firmware updates and the ESP32 sleep were deleted outright, not
+put behind `#if FREEINK_DEVICE_HIBREAK`. A guard there would be pretending at a
+generality nothing exercises, and the pretence costs a reader's attention on
+every pass through the file.
 
-- **Guarded** when the right value here would be wrong for the Kindle: font
-  sizes, margin bounds, the storage root, the refresh ladder.
-- **Unguarded** when it is a fix that holds anywhere. The status bar aligning
-  with the text column is the case: the user changes a setting called "screen
-  margin" expecting it to apply to the whole page, and the bar ignored it.
-  Guarding that would pretend a correction is a local preference.
+**One exception, and it is the whole reason this document exists.**
+`lib/hal/posix/` and the shim under it stay as they are, conditionals and all.
+That is the code the Kindle shares, and the two ports have been trading fixes
+through it: the 405 patch and the chunked patch each crossed without a line of
+adjustment because those files were identical. Flattening the conditionals
+there would buy tidiness in a file nobody reads and spend the property that has
+been paying for itself weekly.
 
-When in doubt, unguarded and noted here. One guard too many hides a fix; one fix
-too many shows up in the diff and somebody argues about it.
+So: cut freely in `src/` and in the parts of `lib/` this port owns; leave the
+shared POSIX layer alone. When a fix in it holds anywhere, it still goes in
+unguarded and gets an entry below, because the Kindle will want it.
 
 ## The structural item
 

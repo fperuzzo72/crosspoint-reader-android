@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.graphics.Point
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
@@ -86,12 +88,37 @@ class ReaderActivity : Activity(), SurfaceHolder.Callback {
 
     // The panel, measured rather than compiled in. Same rule as the storage
     // root: before nativeStart(), because setup() allocates the frame and lays
-    // out the first screen. Taken from the window rather than the display, so
-    // it is the area this Activity actually owns.
-    val metrics = resources.displayMetrics
-    CrossPointNative.nativeSetDisplay(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi)
+    // out the first screen.
+    //
+    // NOT resources.displayMetrics. That reports the area left after the system
+    // bars, and the Surface this Activity paints on is the whole window: on a
+    // Boox it read 1404x1773 against a 1404x1872 surface, 99 pixels of
+    // navigation bar, and the compositor scaled every frame to make up the
+    // difference. currentWindowMetrics is the window itself, bars included,
+    // which is what the Surface will be.
+    val size = windowSizePx()
+    CrossPointNative.nativeSetDisplay(size.first, size.second, resources.displayMetrics.densityDpi)
 
     CrossPointNative.nativeStart()
+  }
+
+
+  /**
+   * The window's size in pixels, bars included, to match the Surface.
+   *
+   * currentWindowMetrics arrived in API 30; below it getRealSize is the
+   * equivalent, and it is deprecated only on the versions that have the
+   * replacement.
+   */
+  @Suppress("DEPRECATION")
+  private fun windowSizePx(): Pair<Int, Int> {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      val bounds = windowManager.currentWindowMetrics.bounds
+      return Pair(bounds.width(), bounds.height())
+    }
+    val point = Point()
+    windowManager.defaultDisplay.getRealSize(point)
+    return Pair(point.x, point.y)
   }
 
   /**

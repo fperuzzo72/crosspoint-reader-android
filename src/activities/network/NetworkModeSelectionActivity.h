@@ -21,7 +21,11 @@ class NetworkModeSelectionActivity final : public UiListActivity {
  public:
   explicit NetworkModeSelectionActivity(GfxRenderer& renderer, MappedInputManager& mappedInput);
 
-#if FREEINK_CAP_USB_MSC
+#if FREEINK_MCU_HOSTED
+  // Two, not three: "Join a Network" and "Create Hotspot" do the same thing on
+  // a target whose radio belongs to the operating system. See the .cpp.
+  static constexpr int MENU_ITEM_COUNT = 2;
+#elif FREEINK_CAP_USB_MSC
   static constexpr int MENU_ITEM_COUNT = 4;
 #else
   static constexpr int MENU_ITEM_COUNT = 3;

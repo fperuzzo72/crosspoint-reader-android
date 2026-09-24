@@ -405,6 +405,29 @@ Things the Kindle solved that need rethinking here, not copying:
 
 ## Build traps that hold for both
 
+- **The tree carries it and the binary does not receive it.** Three instances
+  landed in one day, which is usually a sign the category is larger than the
+  three. In each one, reading the source proved nothing, because the source was
+  right:
+  - `patch_jpegdec.py` applied two patches nothing ran, so both ports shipped a
+    wild pointer (below).
+  - `ENABLE_SERIAL_LOG` was never defined, so every `LOG_` macro in the tree
+    expanded to nothing, **errors included**. Not "the logging was quiet": the
+    logging did not exist in the binary.
+  - `test/kindle_arduino_string` and `test/kindle_crypto` still pointed at
+    `lib/hal/kindle/` after this port moved those files to `lib/hal/posix/`.
+    CMake fails at *configure*, so the whole host suite was unavailable here,
+    including the thirty tests that were fine.
+
+  The sharpest illustration is a line that was already written. The blur in a
+  progressive JPEG is fully described by `jpegScale 1/8, fineScale 7.94`, which
+  `JpegToFramebufferConverter` has always logged. The explanation sat in the
+  tree the whole time and neither port could read it.
+
+  The counter-check is cheap and worth running when something is inexplicable:
+  ask what the binary actually contains, with `strings`, rather than what the
+  repository contains.
+
 - **A tree can carry a fix for months and ship without it**, when the thing
   that applies it belongs to a build system the port no longer uses.
   `scripts/jpegdec_patches/` has two patches against JPEGDEC's pinned commit,
@@ -424,6 +447,14 @@ Things the Kindle solved that need rethinking here, not copying:
   fix would never receive the patches if the two were one step. Idempotence is
   git's call — reverses clean means already applied, applies clean means apply,
   neither means abort rather than guess.
+
+  Patched, progressive JPEGs stop crashing but still render badly, and that is
+  JPEGDEC by design rather than a second bug: it forces eighth scale and reads
+  DC coefficients only, one average per 8x8 block, which the reader then
+  enlarges back. Measured across a 182-book library: 23 books carry at least
+  one progressive JPEG and 9 carry five or more, so it bites a handful of books
+  and passes unnoticed in the rest. `jpegtran` converts progressive to baseline
+  losslessly, since both hold the same coefficients in a different order.
 
   It is testable off-device, which is how this port confirmed it: drive
   JPEGDEC from a host harness the way the reader does, `EIGHT_BIT_GRAYSCALE`

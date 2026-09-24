@@ -79,9 +79,22 @@ void logLine(const char* fmt, ...) {
   std::fflush(stderr);
 }
 
+// Kept so a rotation mid-run can reopen without the JNI root being passed
+// around. Written once, before the reader thread exists.
+std::string g_logPath;
+std::string g_logPrevPath;
+
+// Past this, the current log becomes the previous one and a fresh file starts.
+// Launch rotation alone was enough while the tree emitted nothing but a dozen
+// hand-written fprintf lines; with LOG_LEVEL=2 a page turn writes a paragraph,
+// and a long reading session has no launch in it to rotate on.
+constexpr long LOG_ROTATE_BYTES = 1024L * 1024L;
+
 void openLogFile(const std::string& root) {
   const std::string path = root + "/crosspoint.log";
   const std::string prev = root + "/crosspoint.log.anterior";
+  g_logPath = path;
+  g_logPrevPath = prev;
 
   // The PREVIOUS run is kept before truncating, and this is not fussiness: the
   // case where the log matters is when the process dies, and the only way to
@@ -101,6 +114,27 @@ void openLogFile(const std::string& root) {
   const std::time_t now = std::time(nullptr);
   logLine("=== CrossPoint hibreak-dev, %s", std::ctime(&now));
   __android_log_print(ANDROID_LOG_INFO, "CrossPoint", "log at %s", path.c_str());
+}
+
+// Rolls the log over when it outgrows the cap. Cheap enough to call often:
+// ftell() on an unbuffered stream is a field read, not a syscall, and the work
+// only happens on the turn that crosses the limit.
+void rotateLogIfLarge() {
+  if (g_logPath.empty()) return;
+  const long size = std::ftell(stderr);
+  if (size < LOG_ROTATE_BYTES) return;
+
+  std::fflush(stderr);
+  std::remove(g_logPrevPath.c_str());
+  std::rename(g_logPath.c_str(), g_logPrevPath.c_str());
+  if (std::freopen(g_logPath.c_str(), "w", stderr) == nullptr) {
+    // Nothing useful left to do: the old file is already renamed, and saying
+    // so through the logger would need the logger.
+    __android_log_print(ANDROID_LOG_WARN, "CrossPoint", "log rotation failed");
+    return;
+  }
+  std::setvbuf(stderr, nullptr, _IONBF, 0);
+  logLine("=== continua de crosspoint.log.anterior (%ld bytes)", size);
 }
 
 // Capture the reason for death before it happens in silence.
@@ -157,6 +191,11 @@ void readerThread() {
     // wedged. After that, silence: the log is for diagnosis, not telemetry.
     if (++iterations <= 3) {
       logLine("[jni] loop() turn %llu", iterations);
+    }
+    // Not every turn: the check is cheap, but a page turn is not, and nothing
+    // here writes a megabyte between one check and the next.
+    if ((iterations & 0xFF) == 0) {
+      rotateLogIfLarge();
     }
   }
   logLine("[jni] reader thread finished");

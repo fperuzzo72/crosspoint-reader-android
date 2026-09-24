@@ -506,7 +506,7 @@ bool Epub::load(const bool buildIfMissing, const bool skipLoadingCss) {
     LOG_ERR("EBP", "Could not end writing content.opf pass");
     return false;
   }
-  LOG_DBG("EBP", "OPF pass completed in %lu ms", millis() - opfStart);
+  LOG_DBG("EBP", "OPF pass completed in %u ms", millis() - opfStart);
 
   // TOC Pass - try EPUB 3 nav first, fall back to NCX
   const uint32_t tocStart = millis();
@@ -538,7 +538,7 @@ bool Epub::load(const bool buildIfMissing, const bool skipLoadingCss) {
     LOG_ERR("EBP", "Could not end writing toc pass");
     return false;
   }
-  LOG_DBG("EBP", "TOC pass completed in %lu ms", millis() - tocStart);
+  LOG_DBG("EBP", "TOC pass completed in %u ms", millis() - tocStart);
 
   // Close the cache files
   if (!bookMetadataCache->endWrite()) {
@@ -552,8 +552,8 @@ bool Epub::load(const bool buildIfMissing, const bool skipLoadingCss) {
     LOG_ERR("EBP", "Could not update mappings and sizes");
     return false;
   }
-  LOG_DBG("EBP", "buildBookBin completed in %lu ms", millis() - buildStart);
-  LOG_DBG("EBP", "Total indexing completed in %lu ms", millis() - indexingStart);
+  LOG_DBG("EBP", "buildBookBin completed in %u ms", millis() - buildStart);
+  LOG_DBG("EBP", "Total indexing completed in %u ms", millis() - indexingStart);
 
   if (!bookMetadataCache->cleanupTmpFiles()) {
     LOG_DBG("EBP", "Could not cleanup tmp files - ignoring");
@@ -962,7 +962,7 @@ int Epub::getSpineIndexForTextReference() const {
     LOG_ERR("EBP", "getSpineIndexForTextReference called but cache not loaded");
     return 0;
   }
-  LOG_DBG("EBP", "Core Metadata: cover(%d)=%s, textReference(%d)=%s",
+  LOG_DBG("EBP", "Core Metadata: cover(%zu)=%s, textReference(%zu)=%s",
           bookMetadataCache->coreMetadata.coverItemHref.size(), bookMetadataCache->coreMetadata.coverItemHref.c_str(),
           bookMetadataCache->coreMetadata.textReferenceHref.size(),
           bookMetadataCache->coreMetadata.textReferenceHref.c_str());
@@ -975,7 +975,7 @@ int Epub::getSpineIndexForTextReference() const {
   // loop through spine items to get the correct index matching the text href
   for (size_t i = 0; i < getSpineItemsCount(); i++) {
     if (getSpineItem(i).href == bookMetadataCache->coreMetadata.textReferenceHref) {
-      LOG_DBG("EBP", "Text reference %s found at index %d", bookMetadataCache->coreMetadata.textReferenceHref.c_str(),
+      LOG_DBG("EBP", "Text reference %s found at index %zu", bookMetadataCache->coreMetadata.textReferenceHref.c_str(),
               i);
       return i;
     }

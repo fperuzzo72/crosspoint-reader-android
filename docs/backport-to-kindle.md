@@ -107,6 +107,9 @@ Each fix carries one of three marks:
 | **Upstream** | `HomeActivity.h` forward-declared `struct RecentBook;` and had a `std::vector<RecentBook>` as a member. Ill-formed: instantiating a vector's members requires a complete type. The ESP32's libstdc++ accepts it, libc++ refuses. |
 | **Upstream** | The size-to-ID `switch` in `CrossPointSettings.cpp` is a hand-maintained mirror of `BUILTIN_READER_POINT_SIZES`. A size present in one list and absent from the other falls to `default` and draws at the wrong size without complaining. |
 | **Upstream** | `FirmwareBoardTag.cpp` has an `#error` for an unknown device, so every new target needs an entry. Correct, and worth recording that it is deliberate. |
+| **Upstream** | `DirectPixelWriter` indexed the framebuffer through a `uint16_t`, reaching 65,535 bytes. That is all of an 800x480 panel (48,000 B) and still covers a 600x800 one (60,000 B), so it was invisible while those were the only targets. Any panel over 524,288 pixels wraps. Only images use this writer, so a page looks right except for its illustration. |
+| **Upstream** | `logPrintf` had no `format(printf, 3, 4)` attribute, so no LOG_ call site in the tree was ever checked. Adding it found 68 wrong specifiers. None of them corrupt anything but the log, which is the instrument everything else is diagnosed with. |
+| **Upstream** | The 68 above are portable fixes (`%u` for `uint32_t`, `%zu` for `size_t`, a cast for `uint64_t`), not 64-bit ones. Worth taking anywhere. Note that clang's own fix-its are *not* portable: on LP64 it suggests `%lu` for `size_t` and `uint64_t`, which is wrong on the 32-bit targets. |
 | **Upstream** | `build-font-ids.sh` had a ruby block copied per size. It became a loop when the list went from four sizes to six and the copy grew larger than the logic. |
 
 ## Done: multipart uploads
@@ -288,6 +291,27 @@ page renders its values, and the fonts page lists what is installed. A font
 family uploads through the browser: five `.cpfont` files picked as a directory,
 all five arriving, and the family selectable and rendering afterwards. Deleting
 one is the remaining untested corner of the web UI on either port.
+
+### Found here because it is the first 64-bit target
+
+Two of the three things the image bug turned up were not about the image, and
+both come from this being the first port built for a 64-bit machine. `%lu`
+against a `uint32_t` is correct where `unsigned long` is 32 bits and silently
+wrong where it is 64: the first five variadic values ride in registers and
+survive, and everything after them is read off the stack at the wrong width.
+The reader's page-timing line was the visible case, printing
+`gray_msb=502511173641ms`.
+
+The `uint16_t` framebuffer index is the same shape of assumption but about
+geometry rather than word size, and it is the one that broke the page.
+
+The Kindle is 32-bit ARM, so it has none of the `%lu` problem and, at 60,000
+bytes of framebuffer, none of the index problem either. Both fixes still belong
+there: the format specifiers are portable spellings rather than 64-bit ones,
+and a 16-bit index is wrong on the merits.
+
+The `freeink-sdk` copy of `SDCardManager.cpp` has nine of the same specifier
+bugs. Left alone: it is a separate repository.
 
 ## Counter-current
 

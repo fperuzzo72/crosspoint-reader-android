@@ -207,7 +207,7 @@ bool Dictionary::buildSidecar(const std::string& sourcePath, const std::string& 
   constexpr size_t CHUNK_BYTES = 4096;
   auto buf = makeUniqueNoThrow<uint8_t[]>(CHUNK_BYTES);
   if (!buf) {
-    LOG_ERR("DICT", "OOM: %u byte index scan buffer", CHUNK_BYTES);
+    LOG_ERR("DICT", "OOM: %zu byte index scan buffer", CHUNK_BYTES);
     return fail(IndexResult::LowMemory);
   }
 

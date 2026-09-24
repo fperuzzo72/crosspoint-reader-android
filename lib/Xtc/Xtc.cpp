@@ -36,7 +36,7 @@ bool Xtc::load() {
   }
 
   loaded = true;
-  LOG_DBG("XTC", "Loaded XTC: %s (%lu pages)", filepath.c_str(), parser->getPageCount());
+  LOG_DBG("XTC", "Loaded XTC: %s (%hu pages)", filepath.c_str(), parser->getPageCount());
   return true;
 }
 

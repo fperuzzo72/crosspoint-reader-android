@@ -154,7 +154,7 @@ void XtcReaderActivity::renderPage() {
 
   uint8_t* pageBuffer = static_cast<uint8_t*>(malloc(pageBufferSize));
   if (!pageBuffer) {
-    LOG_ERR("XTR", "Failed to allocate page buffer (%lu bytes)", pageBufferSize);
+    LOG_ERR("XTR", "Failed to allocate page buffer (%zu bytes)", pageBufferSize);
     renderer.clearScreen();
     renderer.drawCenteredText(UI_12_FONT_ID, 300, tr(STR_MEMORY_ERROR), true, EpdFontFamily::BOLD);
     renderer.displayBuffer();
@@ -163,8 +163,8 @@ void XtcReaderActivity::renderPage() {
 
   size_t bytesRead = xtc->loadPage(currentPage, pageBuffer, pageBufferSize);
   if (bytesRead == 0) {
-    LOG_ERR("XTR", "Failed to load page %lu: bufferSize=%lu bitDepth=%u error=%s", currentPage, pageBufferSize,
-            bitDepth, xtc::errorToString(xtc->getLastError()));
+    LOG_ERR("XTR", "Failed to load page %u: bufferSize=%zu bitDepth=%u error=%s", currentPage, pageBufferSize, bitDepth,
+            xtc::errorToString(xtc->getLastError()));
     free(pageBuffer);
     renderer.clearScreen();
     renderer.drawCenteredText(UI_12_FONT_ID, 300, tr(STR_PAGE_LOAD_ERROR), true, EpdFontFamily::BOLD);
@@ -254,7 +254,7 @@ void XtcReaderActivity::renderPage() {
 
     free(pageBuffer);
 
-    LOG_DBG("XTR", "Rendered page %lu/%lu (2-bit grayscale)", currentPage + 1, xtc->getPageCount());
+    LOG_DBG("XTR", "Rendered page %u/%u (2-bit grayscale)", currentPage + 1, xtc->getPageCount());
     return;
   } else {
     const size_t srcRowBytes = (pageWidth + 7) / 8;
@@ -284,7 +284,7 @@ void XtcReaderActivity::renderPage() {
 
   ReaderUtils::displayWithRefreshCycle(renderer, pagesUntilFullRefresh);
 
-  LOG_DBG("XTR", "Rendered page %lu/%lu (%u-bit)", currentPage + 1, xtc->getPageCount(), bitDepth);
+  LOG_DBG("XTR", "Rendered page %u/%u (%u-bit)", currentPage + 1, xtc->getPageCount(), bitDepth);
 }
 
 bool XtcReaderActivity::pageTurn(bool isForward) {
@@ -333,7 +333,7 @@ void XtcReaderActivity::saveProgress() const {
   data[2] = (currentPage >> 16) & 0xFF;
   data[3] = (currentPage >> 24) & 0xFF;
   if (!ProgressFile::writeAtomic(xtc->getCachePath(), data, sizeof(data))) {
-    LOG_ERR("XTC", "Failed to save progress: page %lu", currentPage);
+    LOG_ERR("XTC", "Failed to save progress: page %u", currentPage);
   }
 }
 
@@ -347,7 +347,7 @@ void XtcReaderActivity::loadProgress() {
       if (currentPage >= xtc->getPageCount() && xtc->getPageCount() > 0) {
         currentPage = xtc->getPageCount() - 1;
       }
-      LOG_DBG("XTC", "Loaded progress: page %lu/%lu", currentPage + 1, xtc->getPageCount());
+      LOG_DBG("XTC", "Loaded progress: page %u/%u", currentPage + 1, xtc->getPageCount());
     }
   }
 }

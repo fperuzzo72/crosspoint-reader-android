@@ -2104,7 +2104,7 @@ void ChapterHtmlSlimParser::abortParse() {
 
 bool ChapterHtmlSlimParser::finishParse() {
   if (xmlParser_) {
-    LOG_DBG("EHP", "Time to parse and build pages: %lu ms", millis() - parseStartTime_);
+    LOG_DBG("EHP", "Time to parse and build pages: %u ms", millis() - parseStartTime_);
     destroyXmlParser(xmlParser_);
     xmlParser_ = nullptr;
   }

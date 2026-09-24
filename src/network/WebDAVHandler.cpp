@@ -105,7 +105,7 @@ void WebDAVHandler::raw(WebServer& server, const String& uri, HTTPRaw& raw) {
       }
       if (!_putOk) Storage.remove(tempPath.c_str());
     }
-    LOG_DBG("DAV", "PUT END: %u bytes, ok=%d", raw.totalSize, _putOk);
+    LOG_DBG("DAV", "PUT END: %zu bytes, ok=%d", raw.totalSize, _putOk);
 
   } else if (raw.status == RAW_ABORTED) {
     if (_putFile) _putFile.close();

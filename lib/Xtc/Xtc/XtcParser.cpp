@@ -215,7 +215,7 @@ XtcError XtcParser::readFirstPageInfo() {
   // This avoids allocating pageCount * 16 bytes (e.g. 65KB for 4000+ pages)
   PageTableEntry entry;
   if (!m_file.seek64(m_header.pageTableOffset)) {
-    LOG_DBG("XTC", "Failed to seek to page table at %llu", m_header.pageTableOffset);
+    LOG_DBG("XTC", "Failed to seek to page table at %llu", static_cast<unsigned long long>(m_header.pageTableOffset));
     return XtcError::READ_ERROR;
   }
   size_t bytesRead = m_file.read(reinterpret_cast<uint8_t*>(&entry), sizeof(PageTableEntry));
@@ -244,14 +244,15 @@ bool XtcParser::readPageTableEntry(uint32_t pageIndex, PageInfo& info) {
   // Seek to the specific page table entry on the SD card
   const uint64_t entryOffset = m_header.pageTableOffset + static_cast<uint64_t>(pageIndex) * sizeof(PageTableEntry);
   if (!m_file.seek64(entryOffset)) {
-    LOG_DBG("XTC", "Failed to seek to page table entry %lu at %llu", pageIndex, entryOffset);
+    LOG_DBG("XTC", "Failed to seek to page table entry %u at %llu", pageIndex,
+            static_cast<unsigned long long>(entryOffset));
     return false;
   }
 
   PageTableEntry entry;
   size_t bytesRead = m_file.read(reinterpret_cast<uint8_t*>(&entry), sizeof(PageTableEntry));
   if (bytesRead != sizeof(PageTableEntry)) {
-    LOG_DBG("XTC", "Failed to read page table entry %lu", pageIndex);
+    LOG_DBG("XTC", "Failed to read page table entry %u", pageIndex);
     return false;
   }
 
@@ -450,7 +451,7 @@ size_t XtcParser::loadPage(uint32_t pageIndex, uint8_t* buffer, size_t bufferSiz
 
   // Check buffer size
   if (bufferSize < bitmapSize) {
-    LOG_DBG("XTC", "Buffer too small: need %u, have %u", bitmapSize, bufferSize);
+    LOG_DBG("XTC", "Buffer too small: need %zu, have %zu", bitmapSize, bufferSize);
     m_lastError = XtcError::MEMORY_ERROR;
     return 0;
   }
@@ -458,7 +459,7 @@ size_t XtcParser::loadPage(uint32_t pageIndex, uint8_t* buffer, size_t bufferSiz
   // Read bitmap data
   size_t bytesRead = m_file.read(buffer, bitmapSize);
   if (bytesRead != bitmapSize) {
-    LOG_DBG("XTC", "Page read error: expected %u, got %u", bitmapSize, bytesRead);
+    LOG_DBG("XTC", "Page read error: expected %zu, got %zu", bitmapSize, bytesRead);
     m_lastError = XtcError::READ_ERROR;
     return 0;
   }

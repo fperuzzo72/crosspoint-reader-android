@@ -423,35 +423,22 @@ inline std::vector<SettingInfo> getSettingsList(const SdCardFontRegistry* regist
   }();
 
   std::vector<SettingInfo> v = baseList;
-  if (!BoardConfig::hasTouch()) {
-    // The toolbar reader menu is touch-first chrome: button boards keep the
-    // classic list menu, so the style choice is hidden along with the touch
-    // controls.
-    v.erase(std::remove_if(v.begin(), v.end(),
-                           [](const SettingInfo& s) {
-                             return s.nameId == StrId::STR_TOUCH_READER_CONTROLS ||
-                                    s.nameId == StrId::STR_READER_MENU_STYLE;
-                           }),
-            v.end());
-  }
-  // The reader-menu gesture choice only makes sense where the menu stays
-  // reachable without the tap and the bottom edge is free (the capacitive
-  // Home key); everywhere else the bottom-edge up-swipe is Home and the
-  // center tap is the primary path, so the setting stays at its Tap default.
-  if (!BoardConfig::hasHomeKey()) {
-    v.erase(std::remove_if(v.begin(), v.end(),
-                           [](const SettingInfo& s) { return s.nameId == StrId::STR_SHOW_READER_MENU; }),
-            v.end());
-  }
-  if (BoardConfig::hasTouch()) {
-    v.erase(std::remove_if(v.begin(), v.end(),
-                           [](const SettingInfo& s) {
-                             return s.nameId == StrId::STR_FRONT_BTN_FOLLOW_ORIENTATION ||
-                                    s.nameId == StrId::STR_SUNLIGHT_FADING_FIX ||
-                                    s.nameId == StrId::STR_BACK_SHORT_TO_FILE_BROWSER;
-                           }),
-            v.end());
-  }
+
+  // This device has a touchscreen and no buttons, stated rather than asked.
+  //
+  // BoardConfig::hasTouch() and hasHomeKey() both answer about
+  // BoardConfig::ACTIVE, and nothing here calls selectDevice(), so ACTIVE is
+  // the compile-time default: the X4 profile, which is NO_TOUCH. Asking it
+  // deleted Touch Reader Controls and Show Reader Menu on the grounds that this
+  // is a button board, which left the whole Controls category empty. The
+  // touchscreen is described by FREEINK_CAP_TOUCH, a compile-time capability,
+  // and at runtime by HalGPIO::hasTouch(), which reports the open device.
+  //
+  // Sunlight fading fix goes: it compensates a grayscale waveform this port
+  // does not drive, since the panel belongs to the system.
+  v.erase(std::remove_if(v.begin(), v.end(),
+                         [](const SettingInfo& s) { return s.nameId == StrId::STR_SUNLIGHT_FADING_FIX; }),
+          v.end());
   if (registry && registry->getFamilyCount() > 0) {
     auto it = std::find_if(v.begin(), v.end(), [](const SettingInfo& s) { return s.nameId == StrId::STR_FONT_FAMILY; });
     if (it != v.end()) {

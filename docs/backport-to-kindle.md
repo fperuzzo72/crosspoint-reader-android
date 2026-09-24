@@ -107,7 +107,7 @@ Each fix carries one of three marks:
 | **Upstream** | `HomeActivity.h` forward-declared `struct RecentBook;` and had a `std::vector<RecentBook>` as a member. Ill-formed: instantiating a vector's members requires a complete type. The ESP32's libstdc++ accepts it, libc++ refuses. |
 | **Upstream** | The size-to-ID `switch` in `CrossPointSettings.cpp` is a hand-maintained mirror of `BUILTIN_READER_POINT_SIZES`. A size present in one list and absent from the other falls to `default` and draws at the wrong size without complaining. |
 | **Upstream** | `FirmwareBoardTag.cpp` has an `#error` for an unknown device, so every new target needs an entry. Correct, and worth recording that it is deliberate. |
-| **Upstream** | `DirectPixelWriter` indexed the framebuffer through a `uint16_t`, reaching 65,535 bytes. That is all of an 800x480 panel (48,000 B) and still covers a 600x800 one (60,000 B), so it was invisible while those were the only targets. Any panel over 524,288 pixels wraps. Only images use this writer, so a page looks right except for its illustration. |
+| **Upstream** | `DirectPixelWriter` indexed the framebuffer through a `uint16_t`, reaching 65,535 bytes. That is all of an 800x480 panel (48,000 B) and still covers a 600x800 one (60,000 B), so it was invisible while those were the only targets. Fixed on the Kindle too, where it is latent rather than visible: 5,535 B of slack, which is luck and not design. Any panel over 524,288 pixels wraps. Only images use this writer, so a page looks right except for its illustration. |
 | **Upstream** | `logPrintf` had no `format(printf, 3, 4)` attribute, so no LOG_ call site in the tree was ever checked. Adding it found 68 wrong specifiers. None of them corrupt anything but the log, which is the instrument everything else is diagnosed with. |
 | **Upstream** | The 68 above are portable fixes (`%u` for `uint32_t`, `%zu` for `size_t`, a cast for `uint64_t`), not 64-bit ones. Worth taking anywhere. Note that clang's own fix-its are *not* portable: on LP64 it suggests `%lu` for `size_t` and `uint64_t`, which is wrong on the 32-bit targets. |
 | **Upstream** | `build-font-ids.sh` had a ruby block copied per size. It became a loop when the list went from four sizes to six and the copy grew larger than the logic. |
@@ -333,8 +333,10 @@ permission to do the only possible thing. `FREEINK_MCU_HOSTED` in
 `CrossPointWebServerActivity::onEnter()` calls `onNetworkModeSelected` straight
 away. The screen still exists and still opens on the ESP32 targets.
 
-The Kindle would want the menu skip for the same reason and does not have to
-take the Calibre removal; they are independent. Note that
+Both landed on the Kindle the same day (`db5c42fb`), and the menu skip is
+guarded `FREEINK_MCU_HOSTED` there too. That tree defines the macro as exactly
+`FREEINK_DEVICE_KINDLE`, so a device guard would have protected an ESP32 branch
+that does not exist in it while spending a line of divergence for nothing. Note that
 `CrossPointWebServerActivity.cpp` has now diverged in a second place, so the
 next patch crossing through it will not apply as cleanly as the last two did.
 
@@ -350,9 +352,24 @@ Things the Kindle solved that need rethinking here, not copying:
   are dead on modern Android and `/proc/net/wireless` is not readable by an
   ordinary app. Here the network state comes from `ConnectivityManager`, which
   additionally distinguishes "has an address" from "has internet".
-- **TLS** is unimplemented in the shim. On the Kindle that rules out OPDS and
-  KOReader sync in practice. Here it crosses into Kotlin, where the system trust
-  store already exists.
+- **TLS** now works on the Kindle, through wolfSSL in the shim. Here it crosses
+  into Kotlin, where the system trust store already exists, so none of that
+  build is reachable from this port. Three findings from it are worth keeping
+  anyway, because all three fail *silently* and two of them read as the wrong
+  problem entirely:
+  - `--with-max-rsa-bits=4096`. Without it `sp_int.h` applies its own 3072-bit
+    default and an RSA-4096 signature fails as `ASN_SIG_CONFIRM_E`, which reads
+    like a bad certificate. 59 of the 121 CAs in a current Mozilla bundle are
+    RSA-4096.
+  - `--enable-altcertchains`. Without it the chain a server *presents* must end
+    at a trusted root, and a cross-signed chain does not: gutenberg.org ends at
+    AAA Certificate Services, no longer in the bundle, while the trusted anchor
+    sits mid-chain. Fails as `ASN_NO_SIGNER_E`, which reads as "the root is
+    missing" while the root is loaded.
+  - `wolfSSL_CTX_load_verify_buffer` walks a multi-cert PEM in order and stops
+    at the first it cannot parse, and `SecureClient` does not check its return.
+    One bad certificate silently discards every one after it. Loading them one
+    at a time is the fix.
 - **`ESP.restart()`** re-execs the process on the Kindle. On Android restarting
   a process is not the same as restarting the Activity, and the right semantics
   are still undecided.
